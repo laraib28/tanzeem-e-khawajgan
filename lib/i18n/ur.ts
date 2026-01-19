@@ -1,0 +1,55 @@
+import type { Translations } from './en'
+
+export const ur: Translations = {
+  common: {
+    loading: 'لوڈ ہو رہا ہے...',
+    error: 'خرابی',
+    submit: 'جمع کرائیں',
+    cancel: 'منسوخ کریں',
+    close: 'بند کریں',
+    next: 'اگلا',
+    previous: 'پچھلا',
+    readMore: 'مزید پڑھیں',
+    donateNow: 'ابھی عطیہ کریں',
+  },
+  navigation: {
+    home: 'ہوم',
+    about: 'ہمارے بارے میں',
+    vision: 'ویژن',
+    mission: 'مشن',
+    boardOfMembers: 'ارکان کی بورڈ',
+    newsEvents: 'خبریں اور تقریبات',
+    services: 'خدمات',
+    it: 'آئی ٹی',
+    medical: 'طبی',
+    education: 'تعلیم',
+    sports: 'کھیل',
+    banquets: 'بینکویٹ',
+    graveyard: 'قبرستان',
+    contact: 'ہم سے رابطہ کریں',
+    askWithMe: 'میرے ساتھ پوچھیں',
+  },
+  home: {
+    hero: {
+      title: 'تنظیم خواجگان میں خوش آمدید',
+      subtitle: 'لگن کے ساتھ کمیونٹی کی خدمت',
+    },
+  },
+  forms: {
+    name: 'نام',
+    email: 'ای میل',
+    phone: 'فون',
+    subject: 'موضوع',
+    message: 'پیغام',
+    course: 'کورس',
+    send: 'بھیجیں',
+    sending: 'بھیج رہے ہیں...',
+    success: 'پیغام کامیابی سے بھیج دیا گیا',
+    error: 'پیغام بھیجنے میں ناکام',
+  },
+  ai: {
+    greeting: 'ہیلو! آج میں آپ کی کیسے مدد کر سکتا ہوں؟',
+    placeholder: 'اپنا پیغام ٹائپ کریں...',
+    thinking: 'سوچ رہا ہے...',
+  },
+}

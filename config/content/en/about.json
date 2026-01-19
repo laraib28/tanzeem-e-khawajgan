@@ -1,0 +1,70 @@
+{
+  "banner": {
+    "title": "About Us",
+    "subtitle": "Discover our story, mission, and commitment to serving the community"
+  },
+  "introduction": {
+    "heading": "Our Story",
+    "content": "Tanzeem-e-Khawjgan has been a pillar of the community, dedicated to uplifting lives through comprehensive services and unwavering commitment. Our organization was founded on the principles of service, compassion, and excellence."
+  },
+  "mission": {
+    "heading": "Our Mission",
+    "content": "To provide accessible, high-quality services that empower individuals and strengthen communities through education, healthcare, sports, and social welfare programs."
+  },
+  "values": {
+    "heading": "Our Core Values",
+    "items": [
+      {
+        "title": "Integrity",
+        "description": "We uphold the highest standards of honesty and ethical conduct in all our activities."
+      },
+      {
+        "title": "Excellence",
+        "description": "We strive for excellence in every service we provide to our community."
+      },
+      {
+        "title": "Compassion",
+        "description": "We approach every individual with empathy, respect, and understanding."
+      },
+      {
+        "title": "Community",
+        "description": "We believe in building strong, supportive communities where everyone can thrive."
+      }
+    ]
+  },
+  "timeline": {
+    "heading": "Our Journey",
+    "events": [
+      {
+        "year": "2010",
+        "title": "Foundation Established",
+        "description": "Tanzeem-e-Khawjgan was founded with a vision to serve the community through comprehensive programs and services."
+      },
+      {
+        "year": "2012",
+        "title": "Education Programs Launched",
+        "description": "Initiated IT training and educational programs to empower youth with modern skills and knowledge."
+      },
+      {
+        "year": "2015",
+        "title": "Healthcare Services Expanded",
+        "description": "Opened medical facilities to provide accessible healthcare services to community members."
+      },
+      {
+        "year": "2018",
+        "title": "Sports Complex Inaugurated",
+        "description": "Established sports facilities to promote physical fitness and healthy lifestyles among all age groups."
+      },
+      {
+        "year": "2020",
+        "title": "Community Services Diversified",
+        "description": "Added banquet halls and expanded community services to support various social and cultural needs."
+      },
+      {
+        "year": "2023",
+        "title": "Digital Transformation",
+        "description": "Embraced digital technologies to enhance service delivery and community engagement."
+      }
+    ]
+  }
+}

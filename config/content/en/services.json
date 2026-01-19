@@ -1,0 +1,100 @@
+{
+  "it": {
+    "banner": {
+      "title": "IT Services",
+      "subtitle": "Empowering the future through technology education and training"
+    },
+    "description": "Our IT department offers comprehensive training programs designed to equip individuals with modern technical skills. From web development to software engineering, we provide quality education that prepares students for successful careers in technology.",
+    "courses": [
+      {
+        "title": "Web Development",
+        "description": "Learn HTML, CSS, JavaScript, and modern frameworks like React and Next.js to build professional websites.",
+        "duration": "6 months",
+        "level": "Beginner to Advanced"
+      },
+      {
+        "title": "Software Engineering",
+        "description": "Comprehensive training in software development, algorithms, and software design patterns.",
+        "duration": "12 months",
+        "level": "Intermediate to Advanced"
+      },
+      {
+        "title": "Mobile App Development",
+        "description": "Create Android and iOS applications using modern development frameworks.",
+        "duration": "8 months",
+        "level": "Intermediate"
+      },
+      {
+        "title": "Database Management",
+        "description": "Master SQL and NoSQL databases, data modeling, and database administration.",
+        "duration": "4 months",
+        "level": "Beginner to Intermediate"
+      }
+    ],
+    "summerCamp": "Special intensive training program for students during summer break with hands-on coding projects, robotics workshops, and digital skills development."
+  },
+  "medical": {
+    "banner": {
+      "title": "Medical Services",
+      "subtitle": "Comprehensive healthcare for the community"
+    },
+    "description": "Our medical center provides accessible, affordable healthcare services with experienced professionals and modern facilities.",
+    "services": [
+      { "title": "General Consultation", "description": "Comprehensive health checkups with qualified physicians" },
+      { "title": "Diagnostic Services", "description": "Laboratory tests and medical imaging facilities" },
+      { "title": "Preventive Care", "description": "Vaccination programs and health screenings" },
+      { "title": "Emergency Care", "description": "24/7 emergency medical services" }
+    ]
+  },
+  "education": {
+    "banner": {
+      "title": "Education Services",
+      "subtitle": "Building foundations for lifelong learning"
+    },
+    "description": "Various educational programs and support services to promote learning and academic excellence.",
+    "programs": [
+      { "title": "Tutoring Services", "description": "One-on-one and group tutoring for various subjects" },
+      { "title": "Scholarship Program", "description": "Financial assistance for deserving students" },
+      { "title": "Adult Education", "description": "Literacy programs and skill development for adults" },
+      { "title": "Library Services", "description": "Books, digital resources, and study spaces" }
+    ]
+  },
+  "sports": {
+    "banner": {
+      "title": "Sports Facilities",
+      "subtitle": "Promoting fitness and healthy lifestyles"
+    },
+    "description": "World-class facilities for various sports and fitness activities promoting physical health and community engagement.",
+    "facilities": [
+      { "title": "Football Field", "description": "Full-size field for matches and training" },
+      { "title": "Cricket Grounds", "description": "Well-maintained grounds for matches and practice" },
+      { "title": "Indoor Sports Hall", "description": "Basketball, volleyball, badminton facilities" },
+      { "title": "Fitness Center", "description": "Modern gym with professional trainers" }
+    ]
+  },
+  "banquets": {
+    "banner": {
+      "title": "Banquet Services",
+      "subtitle": "Perfect venues for your special occasions"
+    },
+    "description": "Elegant spaces for weddings, conferences, and social gatherings with professional event management.",
+    "halls": [
+      { "title": "Grand Hall", "description": "Large venue for up to 500 guests", "capacity": "500" },
+      { "title": "Executive Hall", "description": "Mid-sized venue for 200 guests", "capacity": "200" },
+      { "title": "Meeting Rooms", "description": "Professional spaces for 50 guests", "capacity": "50" }
+    ]
+  },
+  "graveyard": {
+    "banner": {
+      "title": "Graveyard Services",
+      "subtitle": "Dignified and respectful final resting place"
+    },
+    "description": "Peaceful and well-maintained resting place with complete burial services.",
+    "services": [
+      { "title": "Burial Plots", "description": "Available for reservation or immediate use" },
+      { "title": "Funeral Services", "description": "Complete funeral arrangements and support" },
+      { "title": "Maintenance", "description": "Regular upkeep of cemetery grounds" }
+    ],
+    "contact": "For arrangements, contact: +92 XXX XXXXXXX (Mon-Fri, 9AM-5PM)"
+  }
+}

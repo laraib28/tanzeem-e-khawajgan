@@ -1,0 +1,60 @@
+{
+  "banner": {
+    "title": "Our Mission & Vision",
+    "subtitle": "Guiding principles that drive our commitment to community service"
+  },
+  "mission": {
+    "heading": "Mission Statement",
+    "content": "To empower individuals and strengthen communities through accessible, high-quality services in education, healthcare, sports, and social welfare. We are committed to fostering growth, promoting well-being, and creating opportunities for all members of our community."
+  },
+  "vision": {
+    "heading": "Our Vision",
+    "content": "To be a leading organization recognized for excellence in community service, creating a society where every individual has access to quality education, healthcare, and opportunities for personal and professional development."
+  },
+  "objectives": {
+    "heading": "Strategic Objectives",
+    "items": [
+      {
+        "title": "Educational Excellence",
+        "description": "Provide cutting-edge IT training and educational programs that prepare individuals for success in the modern workforce.",
+        "icon": "📚"
+      },
+      {
+        "title": "Healthcare Access",
+        "description": "Deliver comprehensive and affordable healthcare services to improve community health and well-being.",
+        "icon": "🏥"
+      },
+      {
+        "title": "Youth Development",
+        "description": "Foster physical fitness, teamwork, and healthy lifestyles through diverse sports and recreational programs.",
+        "icon": "⚽"
+      },
+      {
+        "title": "Community Engagement",
+        "description": "Create spaces and opportunities for social connection, cultural events, and community celebration.",
+        "icon": "🤝"
+      },
+      {
+        "title": "Social Welfare",
+        "description": "Support families and individuals through various social services and community assistance programs.",
+        "icon": "❤️"
+      },
+      {
+        "title": "Sustainable Growth",
+        "description": "Continuously expand and improve our services while maintaining financial sustainability and accountability.",
+        "icon": "📈"
+      }
+    ]
+  },
+  "principles": {
+    "heading": "Guiding Principles",
+    "items": [
+      "Commitment to quality and excellence in all services",
+      "Respect for diversity and inclusion",
+      "Transparency and accountability in operations",
+      "Continuous innovation and improvement",
+      "Collaboration with community stakeholders",
+      "Environmental and social responsibility"
+    ]
+  }
+}

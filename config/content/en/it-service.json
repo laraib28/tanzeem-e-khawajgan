@@ -1,0 +1,46 @@
+{
+  "itService": {
+    "banner": {
+      "title": "IT Services",
+      "subtitle": "Modern technology solutions for community development"
+    },
+    "description": "Our IT services department provides cutting-edge technology solutions to support education, administration, and community connectivity initiatives. We leverage modern tools and platforms to enhance operational efficiency and enable digital transformation across all our community programs.",
+    "imageSection": {
+      "title": "Technology for Community Empowerment",
+      "description": "We believe that technology should serve as a bridge to connect, educate, and empower our community members. Our IT infrastructure supports various programs including online learning platforms, digital record keeping, and communication systems that keep our community connected.",
+      "imageAlt": "IT services and technology infrastructure"
+    },
+    "courses": [
+      {
+        "title": "Digital Literacy",
+        "description": "Basic computer skills and internet usage for all age groups.",
+        "icon": "Monitor"
+      },
+      {
+        "title": "Web Development",
+        "description": "Learn to build websites and web applications using modern technologies.",
+        "icon": "Code"
+      },
+      {
+        "title": "Cybersecurity Basics",
+        "description": "Essential knowledge to protect personal and organizational data.",
+        "icon": "Shield"
+      },
+      {
+        "title": "Data Management",
+        "description": "Organizing, storing, and retrieving data effectively and securely.",
+        "icon": "Database"
+      },
+      {
+        "title": "Cloud Computing",
+        "description": "Understanding cloud platforms and services for personal and business use.",
+        "icon": "Cloud"
+      },
+      {
+        "title": "Digital Marketing",
+        "description": "Promoting businesses and services through online channels.",
+        "icon": "BarChart3"
+      }
+    ]
+  }
+}

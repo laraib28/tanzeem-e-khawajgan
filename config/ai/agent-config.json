@@ -1,0 +1,46 @@
+{
+  "sessionTTL": 1800000,
+  "maxMessagesPerSession": 50,
+  "rateLimit": {
+    "requestsPerMinute": 10,
+    "messagesPerSession": 50
+  },
+  "agents": {
+    "information": {
+      "enabled": true,
+      "maxRetries": 3,
+      "description": "Answers questions about organization history, mission, values, and programs"
+    },
+    "navigation": {
+      "enabled": true,
+      "maxRetries": 3,
+      "description": "Helps users navigate to specific pages and sections of the website"
+    },
+    "services": {
+      "enabled": true,
+      "maxRetries": 3,
+      "description": "Provides information about IT, Medical, Education, Sports, Banquets, and Graveyard services"
+    },
+    "policy": {
+      "enabled": true,
+      "maxRetries": 3,
+      "description": "Enforces content policy and rejects inappropriate requests"
+    },
+    "action": {
+      "enabled": true,
+      "maxRetries": 3,
+      "description": "Assists with form submission, inquiries, feedback, and donations"
+    }
+  },
+  "language": {
+    "default": "en",
+    "supported": ["en", "ur"],
+    "autoDetect": true
+  },
+  "permissions": {
+    "canProvideLegalAdvice": false,
+    "canProvideMedicalAdvice": false,
+    "canExpressOpinions": false,
+    "canSharePersonalInfo": false
+  }
+}

@@ -1,0 +1,170 @@
+{
+  "organization": {
+    "name": {
+      "en": "Tanzeem-e-Khawjgan",
+      "ur": "تنظیم خواجگان"
+    },
+    "description": {
+      "en": "Tanzeem-e-Khawjgan is a community-focused organization dedicated to serving society through various programs and services.",
+      "ur": "تنظیم خواجگان ایک کمیونٹی پر مبنی تنظیم ہے جو مختلف پروگراموں اور خدمات کے ذریعے معاشرے کی خدمت کے لیے وقف ہے۔"
+    },
+    "mission": {
+      "en": "To improve the community and enhance people's lives through quality services and programs in education, health, sports, and social welfare.",
+      "ur": "تعلیم، صحت، کھیل، اور سماجی بہبود میں معیاری خدمات اور پروگراموں کے ذریعے کمیونٹی کو بہتر بنانا اور لوگوں کی زندگیوں کو بڑھانا۔"
+    },
+    "values": {
+      "en": ["Integrity", "Service", "Community Responsibility", "Excellence", "Compassion"],
+      "ur": ["ایمانداری", "خدمت", "کمیونٹی کی ذمہ داری", "بہترین", "ہمدردی"]
+    }
+  },
+  "services": {
+    "it": {
+      "name": {
+        "en": "IT Services",
+        "ur": "آئی ٹی خدمات"
+      },
+      "description": {
+        "en": "Professional IT training including Web Development, Graphic Design, and Programming courses",
+        "ur": "پیشہ ور آئی ٹی تربیت بشمول ویب ڈویلپمنٹ، گرافک ڈیزائن، اور پروگرامنگ کورسز"
+      },
+      "page": "/services/it"
+    },
+    "medical": {
+      "name": {
+        "en": "Medical Services",
+        "ur": "طبی خدمات"
+      },
+      "description": {
+        "en": "Healthcare services including General Checkups, Laboratory Tests, and Medical Consultations",
+        "ur": "صحت کی دیکھ بھال کی خدمات بشمول عام چیک اپ، لیبارٹری ٹیسٹ، اور طبی مشاورت"
+      },
+      "page": "/services/medical"
+    },
+    "education": {
+      "name": {
+        "en": "Education Services",
+        "ur": "تعلیمی خدمات"
+      },
+      "description": {
+        "en": "Educational programs including Scholarships, Tuition Support, and Learning Resources",
+        "ur": "تعلیمی پروگرام بشمول اسکالرشپ، ٹیوشن سپورٹ، اور سیکھنے کے وسائل"
+      },
+      "page": "/services/education"
+    },
+    "sports": {
+      "name": {
+        "en": "Sports Facilities",
+        "ur": "کھیلوں کی سہولیات"
+      },
+      "description": {
+        "en": "Sports facilities including Fitness Center, Basketball Court, and other recreational areas",
+        "ur": "کھیلوں کی سہولیات بشمول فٹنس سینٹر، باسکٹ بال کورٹ، اور دیگر تفریحی علاقے"
+      },
+      "page": "/services/sports"
+    },
+    "banquets": {
+      "name": {
+        "en": "Banquet Halls",
+        "ur": "بینکویٹ ہال"
+      },
+      "description": {
+        "en": "Event venues and banquet halls available for community events and gatherings",
+        "ur": "کمیونٹی کی تقریبات اور اجتماعات کے لیے دستیاب ایونٹ کے مقامات اور بینکویٹ ہال"
+      },
+      "page": "/services/banquets"
+    },
+    "graveyard": {
+      "name": {
+        "en": "Graveyard Services",
+        "ur": "قبرستان کی خدمات"
+      },
+      "description": {
+        "en": "Burial services and graveyard management for community members",
+        "ur": "کمیونٹی کے اراکین کے لیے تدفین کی خدمات اور قبرستان کا انتظام"
+      },
+      "page": "/services/graveyard"
+    }
+  },
+  "pages": {
+    "home": {
+      "path": "/",
+      "description": {
+        "en": "Homepage with organization overview and quick access to services",
+        "ur": "تنظیم کے جائزے اور خدمات تک فوری رسائی کے ساتھ ہوم پیج"
+      }
+    },
+    "about": {
+      "path": "/about",
+      "description": {
+        "en": "Information about the organization's history, timeline, and values",
+        "ur": "تنظیم کی تاریخ، ٹائم لائن، اور اقدار کے بارے میں معلومات"
+      }
+    },
+    "mission": {
+      "path": "/vision/mission",
+      "description": {
+        "en": "Organization's mission statement and strategic objectives",
+        "ur": "تنظیم کا مشن بیان اور اسٹریٹجک مقاصد"
+      }
+    },
+    "board": {
+      "path": "/vision/board-members",
+      "description": {
+        "en": "Board of members and leadership team information",
+        "ur": "بورڈ آف ممبرز اور لیڈرشپ ٹیم کی معلومات"
+      }
+    },
+    "news": {
+      "path": "/vision/news-events",
+      "description": {
+        "en": "Latest news updates and upcoming events",
+        "ur": "تازہ ترین خبریں اور آنے والے واقعات"
+      }
+    },
+    "contact": {
+      "path": "/contact",
+      "description": {
+        "en": "Contact information, location map, and feedback form",
+        "ur": "رابطے کی معلومات، مقام کا نقشہ، اور رائے کا فارم"
+      }
+    }
+  },
+  "commonQuestions": {
+    "en": [
+      {
+        "question": "What services do you offer?",
+        "answer": "We offer IT training, Medical services, Education programs, Sports facilities, Banquet halls, and Graveyard services."
+      },
+      {
+        "question": "How can I contact you?",
+        "answer": "You can contact us through the Contact page at /contact or by filling out the feedback form."
+      },
+      {
+        "question": "How do I enroll in IT courses?",
+        "answer": "Visit the IT Services page at /services/it and fill out the inquiry form to enroll in courses."
+      },
+      {
+        "question": "Where are you located?",
+        "answer": "You can find our location on the Contact page with an interactive map showing our address."
+      }
+    ],
+    "ur": [
+      {
+        "question": "آپ کون سی خدمات پیش کرتے ہیں؟",
+        "answer": "ہم آئی ٹی تربیت، طبی خدمات، تعلیمی پروگرام، کھیلوں کی سہولیات، بینکویٹ ہال، اور قبرستان کی خدمات پیش کرتے ہیں۔"
+      },
+      {
+        "question": "میں آپ سے کیسے رابطہ کر سکتا ہوں؟",
+        "answer": "آپ /contact پر رابطہ صفحہ کے ذریعے یا رائے کا فارم بھر کر ہم سے رابطہ کر سکتے ہیں۔"
+      },
+      {
+        "question": "میں آئی ٹی کورسز میں کیسے داخلہ لوں؟",
+        "answer": "کورسز میں داخلہ لینے کے لیے /services/it پر آئی ٹی سروسز صفحہ پر جائیں اور استفسار کا فارم بھریں۔"
+      },
+      {
+        "question": "آپ کہاں واقع ہیں؟",
+        "answer": "آپ رابطہ صفحہ پر ہمارا مقام تلاش کر سکتے ہیں جس میں ہمارا پتہ دکھانے والا ایک انٹرایکٹو نقشہ ہے۔"
+      }
+    ]
+  }
+}

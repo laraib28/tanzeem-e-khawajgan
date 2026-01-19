@@ -1,0 +1,55 @@
+export const en = {
+  common: {
+    loading: 'Loading...',
+    error: 'Error',
+    submit: 'Submit',
+    cancel: 'Cancel',
+    close: 'Close',
+    next: 'Next',
+    previous: 'Previous',
+    readMore: 'Read More',
+    donateNow: 'Donate Now',
+  },
+  navigation: {
+    home: 'Home',
+    about: 'About',
+    vision: 'Vision',
+    mission: 'Mission',
+    boardOfMembers: 'Board of Members',
+    newsEvents: 'News & Events',
+    services: 'Services',
+    it: 'IT',
+    medical: 'Medical',
+    education: 'Education',
+    sports: 'Sports',
+    banquets: 'Banquets',
+    graveyard: 'Graveyard',
+    contact: 'Contact Us',
+    askWithMe: 'Ask With Me',
+  },
+  home: {
+    hero: {
+      title: 'Welcome to Tanzeem-e-Khawjgan',
+      subtitle: 'Serving the community with dedication',
+    },
+  },
+  forms: {
+    name: 'Name',
+    email: 'Email',
+    phone: 'Phone',
+    subject: 'Subject',
+    message: 'Message',
+    course: 'Course',
+    send: 'Send',
+    sending: 'Sending...',
+    success: 'Message sent successfully',
+    error: 'Failed to send message',
+  },
+  ai: {
+    greeting: 'Hello! How can I help you today?',
+    placeholder: 'Type your message...',
+    thinking: 'Thinking...',
+  },
+}
+
+export type Translations = typeof en

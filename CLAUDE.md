@@ -208,3 +208,9 @@ Wait for consent; never auto-create ADRs. Group related decisions (stacks, authe
 
 ## Code Standards
 See `.specify/memory/constitution.md` for code quality, testing, performance, security, and architecture principles.
+
+## Active Technologies
+- TypeScript 5.x with Next.js 14+ (App Router) (001-org-website-agentic-ai)
+
+## Recent Changes
+- 001-org-website-agentic-ai: Added TypeScript 5.x with Next.js 14+ (App Router)

@@ -1,0 +1,126 @@
+{
+  "mainMenu": [
+    {
+      "id": "home",
+      "label": {
+        "en": "Home",
+        "ur": "ہوم"
+      },
+      "href": "/"
+    },
+    {
+      "id": "about",
+      "label": {
+        "en": "About",
+        "ur": "ہمارے بارے میں"
+      },
+      "href": "/about"
+    },
+    {
+      "id": "vision",
+      "label": {
+        "en": "Vision",
+        "ur": "ویژن"
+      },
+      "submenu": [
+        {
+          "id": "mission",
+          "label": {
+            "en": "Mission",
+            "ur": "مشن"
+          },
+          "href": "/vision/mission"
+        },
+        {
+          "id": "board-of-members",
+          "label": {
+            "en": "Board of Members",
+            "ur": "ارکان کی بورڈ"
+          },
+          "href": "/vision/board-of-members"
+        },
+        {
+          "id": "news-events",
+          "label": {
+            "en": "News & Events",
+            "ur": "خبریں اور تقریبات"
+          },
+          "href": "/vision/news-events"
+        }
+      ]
+    },
+    {
+      "id": "services",
+      "label": {
+        "en": "Services",
+        "ur": "خدمات"
+      },
+      "submenu": [
+        {
+          "id": "it",
+          "label": {
+            "en": "IT",
+            "ur": "آئی ٹی"
+          },
+          "href": "/services/it"
+        },
+        {
+          "id": "medical",
+          "label": {
+            "en": "Medical",
+            "ur": "طبی"
+          },
+          "href": "/services/medical"
+        },
+        {
+          "id": "education",
+          "label": {
+            "en": "Education",
+            "ur": "تعلیم"
+          },
+          "href": "/services/education"
+        },
+        {
+          "id": "sports",
+          "label": {
+            "en": "Sports",
+            "ur": "کھیل"
+          },
+          "href": "/services/sports"
+        },
+        {
+          "id": "banquets",
+          "label": {
+            "en": "Banquets",
+            "ur": "بینکویٹ"
+          },
+          "href": "/services/banquets"
+        },
+        {
+          "id": "graveyard",
+          "label": {
+            "en": "Graveyard",
+            "ur": "قبرستان"
+          },
+          "href": "/services/graveyard"
+        }
+      ]
+    },
+    {
+      "id": "contact",
+      "label": {
+        "en": "Contact Us",
+        "ur": "ہم سے رابطہ کریں"
+      },
+      "href": "/contact"
+    }
+  ],
+  "aiAction": {
+    "id": "ask-with-me",
+    "label": {
+      "en": "Ask With Me",
+      "ur": "میرے ساتھ پوچھیں"
+    },
+    "action": "openAIChat"
+  }
+}

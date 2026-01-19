@@ -1,0 +1,80 @@
+{
+  "banner": {
+    "title": "News & Events",
+    "subtitle": "Stay updated with our latest news, announcements, and upcoming events"
+  },
+  "news": {
+    "heading": "Latest News",
+    "items": [
+      {
+        "title": "New IT Training Programs Launched for 2024",
+        "summary": "We are excited to announce the launch of advanced IT training programs including web development, data science, and cybersecurity courses designed to meet modern industry demands.",
+        "date": "2024-01-15",
+        "category": "Education",
+        "imageAlt": "IT training programs announcement"
+      },
+      {
+        "title": "Healthcare Facility Expansion Completed",
+        "summary": "Our medical center has been expanded with new diagnostic equipment and additional consultation rooms to better serve the community's healthcare needs.",
+        "date": "2024-01-10",
+        "category": "Healthcare",
+        "imageAlt": "Healthcare facility expansion"
+      },
+      {
+        "title": "Annual Sports Tournament Results",
+        "summary": "Congratulations to all participants in our annual inter-community sports tournament. Over 500 athletes competed across multiple sporting events.",
+        "date": "2024-01-05",
+        "category": "Sports",
+        "imageAlt": "Sports tournament highlights"
+      },
+      {
+        "title": "Community Service Awards Ceremony",
+        "summary": "Honoring outstanding volunteers and community members who have made significant contributions to our organization's mission and goals.",
+        "date": "2023-12-20",
+        "category": "Community",
+        "imageAlt": "Awards ceremony"
+      }
+    ]
+  },
+  "events": {
+    "heading": "Upcoming Events",
+    "items": [
+      {
+        "title": "Annual Fundraising Gala",
+        "description": "Join us for an evening of celebration and community support. Proceeds will benefit our educational and healthcare programs.",
+        "date": "2024-03-15",
+        "time": "6:00 PM - 10:00 PM",
+        "location": "Main Banquet Hall, Tanzeem-e-Khawjgan",
+        "status": "upcoming",
+        "imageAlt": "Fundraising gala event"
+      },
+      {
+        "title": "Free Health Screening Camp",
+        "description": "Comprehensive health screenings including blood pressure, diabetes, and general health checkups available for all community members.",
+        "date": "2024-02-28",
+        "time": "9:00 AM - 5:00 PM",
+        "location": "Medical Center, Tanzeem-e-Khawjgan",
+        "status": "upcoming",
+        "imageAlt": "Health screening camp"
+      },
+      {
+        "title": "Youth Sports Championship",
+        "description": "Annual youth sports championship featuring football, cricket, and athletics competitions for different age groups.",
+        "date": "2024-02-20",
+        "time": "8:00 AM - 6:00 PM",
+        "location": "Sports Complex, Tanzeem-e-Khawjgan",
+        "status": "upcoming",
+        "imageAlt": "Youth sports championship"
+      },
+      {
+        "title": "IT Career Fair",
+        "description": "Connect with leading tech companies and explore career opportunities. Open to all IT training program graduates and students.",
+        "date": "2024-02-10",
+        "time": "10:00 AM - 4:00 PM",
+        "location": "IT Training Center, Tanzeem-e-Khawjgan",
+        "status": "upcoming",
+        "imageAlt": "IT career fair"
+      }
+    ]
+  }
+}

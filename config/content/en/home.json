@@ -1,0 +1,47 @@
+{
+  "hero": {
+    "title": "Welcome to Tanzeem-e-Khawjgan",
+    "subtitle": "Serving our community with dedication and compassion",
+    "description": "A trusted organization committed to providing quality services in education, healthcare, sports, and community development.",
+    "ctaText": "Donate Now",
+    "ctaLink": "#donate",
+    "imageAlt": "Tanzeem-e-Khawjgan community services"
+  },
+  "introduction": {
+    "heading": "Who We Are",
+    "content": "Tanzeem-e-Khawjgan is a community-focused organization dedicated to improving lives through comprehensive services and programs. We believe in creating positive change through education, healthcare, sports, and community engagement.",
+    "highlights": [
+      "Serving the community for years with excellence",
+      "Committed to quality education and skill development",
+      "Providing accessible healthcare services",
+      "Promoting sports and healthy lifestyles"
+    ]
+  },
+  "imageSection": {
+    "title": "Our Impact in the Community",
+    "description": "Through our various programs and services, we continue to make a meaningful difference in people's lives.",
+    "imageAlt": "Community programs and services"
+  },
+  "impactCounters": [
+    {
+      "value": 5000,
+      "label": "Students Trained",
+      "suffix": "+"
+    },
+    {
+      "value": 10000,
+      "label": "People Served",
+      "suffix": "+"
+    },
+    {
+      "value": 15,
+      "label": "Years of Service",
+      "suffix": "+"
+    },
+    {
+      "value": 6,
+      "label": "Key Services",
+      "suffix": ""
+    }
+  ]
+}

@@ -1,0 +1,62 @@
+{
+  "banner": {
+    "title": "Board of Members",
+    "subtitle": "Meet the dedicated leaders guiding our organization"
+  },
+  "president": {
+    "name": "President Name",
+    "position": "President & Chairman",
+    "bio": "Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth.",
+    "email": "president@tanzeem-e-khawjgan.org",
+    "phone": "+92 XXX XXXXXXX",
+    "message": "Welcome to Tanzeem-e-Khawjgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives."
+  },
+  "executiveCommittee": {
+    "heading": "Executive Committee",
+    "members": [
+      {
+        "name": "Vice President Name",
+        "position": "Vice President",
+        "bio": "Supporting organizational leadership and strategic initiatives.",
+        "email": "vp@tanzeem-e-khawjgan.org"
+      },
+      {
+        "name": "General Secretary Name",
+        "position": "General Secretary",
+        "bio": "Managing organizational operations and administrative affairs.",
+        "email": "secretary@tanzeem-e-khawjgan.org"
+      },
+      {
+        "name": "Treasurer Name",
+        "position": "Treasurer",
+        "bio": "Overseeing financial management and accountability.",
+        "email": "treasurer@tanzeem-e-khawjgan.org"
+      }
+    ]
+  },
+  "managementCommittee": {
+    "heading": "Management Committee",
+    "members": [
+      {
+        "name": "Education Coordinator",
+        "position": "Head of Education Programs",
+        "bio": "Leading IT training and educational initiatives."
+      },
+      {
+        "name": "Healthcare Coordinator",
+        "position": "Head of Medical Services",
+        "bio": "Managing healthcare programs and facilities."
+      },
+      {
+        "name": "Sports Coordinator",
+        "position": "Head of Sports Programs",
+        "bio": "Coordinating sports activities and facilities."
+      },
+      {
+        "name": "Community Services Coordinator",
+        "position": "Head of Community Services",
+        "bio": "Overseeing banquet halls and community programs."
+      }
+    ]
+  }
+}
