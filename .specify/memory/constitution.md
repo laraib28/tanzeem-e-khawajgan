@@ -428,3 +428,168 @@ This constitution is the **highest authority** for this project.
 6. Update all dependent artifacts
 
 **Version**: 1.0.0 | **Ratified**: 2025-12-21 | **Last Amended**: 2025-12-21
+
+---
+
+## Amendment 001: Banquet Booking Agent System
+
+**Effective Date**: 2026-01-20
+**Amendment Type**: Feature Addition
+
+### Purpose
+
+This amendment extends the Agentic AI system to support banquet hall availability checking, agent-based booking, and priority escalation workflows with optional WhatsApp notifications.
+
+### New Capabilities
+
+#### 1. Banquet Availability Checking
+
+**Database Integration:**
+- Real-time availability queries against banquet database
+- Support for date range queries
+- Hall capacity and amenity filtering
+- Pricing information retrieval
+
+**Availability Data Model:**
+```
+banquet_halls:
+  - id: unique identifier
+  - name: hall name
+  - capacity: maximum guests
+  - amenities: list of amenities
+  - price_per_hour: decimal
+  - status: active/inactive
+
+bookings:
+  - id: unique identifier
+  - hall_id: reference to hall
+  - booking_date: date
+  - start_time: time
+  - end_time: time
+  - customer_name: string
+  - customer_phone: string
+  - customer_email: string
+  - event_type: string
+  - guest_count: integer
+  - status: pending/confirmed/cancelled
+  - priority: normal/high/urgent
+  - created_at: timestamp
+```
+
+#### 2. Agent-Based Booking and Form Filling
+
+**Booking Agent (New Sub-Agent):**
+- Integrated into the existing Agentic AI architecture
+- Conversational booking flow
+- Automatic form population from conversation context
+- Validation before submission
+
+**Booking Agent Capabilities:**
+- Check hall availability for requested dates
+- Collect booking details through conversation
+- Pre-fill booking form with gathered information
+- Submit booking requests
+- Provide booking confirmation
+
+**Booking Agent Constraints:**
+- Must validate all required fields before submission
+- Must confirm details with user before final submission
+- Cannot modify existing bookings (read-only for status)
+- Must log all booking attempts
+
+#### 3. Priority Escalation System
+
+**Escalation Levels:**
+1. **Normal**: Standard processing queue
+2. **High**: Expedited review within 4 hours
+3. **Urgent**: Immediate attention required
+
+**Escalation Triggers:**
+- User explicitly requests urgent handling
+- Large event (100+ guests)
+- VIP customer flag
+- Same-day or next-day booking
+
+**Escalation Actions:**
+- Priority flag set in database
+- Optional WhatsApp notification to admin
+- Email notification to booking manager
+- Dashboard highlight for urgent items
+
+#### 4. WhatsApp Notification Integration
+
+**Notification Scope:**
+- Priority escalation alerts
+- Booking confirmation (optional)
+- Booking status updates (optional)
+
+**WhatsApp Integration Rules:**
+- User must explicitly opt-in for WhatsApp notifications
+- Phone number validation required
+- Rate limiting: maximum 5 messages per booking
+- Template-based messages only (no free-form)
+- Fallback to SMS/Email if WhatsApp delivery fails
+
+**Notification Templates:**
+1. `booking_received`: New booking acknowledgment
+2. `booking_confirmed`: Booking confirmation
+3. `escalation_alert`: Priority escalation to admin
+4. `status_update`: Booking status change
+
+### Updated AI Architecture
+
+**Extended Sub-Agents:**
+```
+Main Agent (Controller)
+├── Information Agent
+├── Navigation Agent
+├── Services Agent
+├── Policy Agent
+├── Action Agent
+└── Booking Agent (NEW)
+    ├── Availability Checker
+    ├── Form Filler
+    ├── Submission Handler
+    └── Escalation Manager
+```
+
+### API Contracts
+
+**New Endpoints Required:**
+
+```
+GET  /api/banquets/halls
+GET  /api/banquets/halls/{id}
+GET  /api/banquets/availability?date={date}&hall_id={id}
+POST /api/banquets/bookings
+GET  /api/banquets/bookings/{id}
+POST /api/banquets/bookings/{id}/escalate
+POST /api/notifications/whatsapp
+```
+
+### Security Requirements
+
+**Additional Security for This Amendment:**
+- Phone number encryption at rest
+- WhatsApp API credentials in secure vault
+- Rate limiting on booking submissions (5 per IP per hour)
+- Admin authentication for escalation management
+- Audit logging for all booking operations
+
+### Compliance Updates
+
+**This amendment adds to the Success Criteria:**
+- ✅ Banquet availability checking works in real-time
+- ✅ Booking agent completes conversational booking flow
+- ✅ Priority escalation triggers appropriate notifications
+- ✅ WhatsApp notifications delivered (when opted-in)
+- ✅ All booking operations are audit-logged
+
+### Migration Notes
+
+- Existing AI agent system requires Booking Agent integration
+- Database schema extension required for bookings table
+- WhatsApp Business API setup required (external dependency)
+- Admin dashboard enhancement for escalation management
+
+**Amendment Version**: 1.0.0 | **Approved**: 2026-01-20

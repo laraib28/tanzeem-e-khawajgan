@@ -107,6 +107,14 @@
       ]
     },
     {
+      "id": "membership-form",
+      "label": {
+        "en": "Membership Form",
+        "ur": "رکنیت فارم"
+      },
+      "href": "/membership-form"
+    },
+    {
       "id": "contact",
       "label": {
         "en": "Contact Us",
