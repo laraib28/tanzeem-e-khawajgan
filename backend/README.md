@@ -1,4 +1,4 @@
-# Tanzeem-e-Khawjgan Membership Backend
+# Tanzeem-e-Khawajgan Membership Backend
 
 ## Prerequisites
 

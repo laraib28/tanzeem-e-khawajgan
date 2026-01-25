@@ -12,8 +12,8 @@ export function IntroductionSection({
   highlights,
 }: IntroductionSectionProps) {
   return (
-    <section className="w-full py-12 md:py-16 bg-white">
-      <div className="container mx-auto px-4">
+    <section className="w-full py-12 md:py-16 bg-accent/5">
+      <div className="container mx-auto px-6 md:px-12 lg:px-16">
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-6 text-foreground">
             {heading}

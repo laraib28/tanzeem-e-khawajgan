@@ -73,7 +73,7 @@ export class InformationAgent {
     const message =
       language === 'ur'
         ? 'تنظیم خواجگان ایک تنظیم ہے جو معاشرے کی خدمت کے لیے وقف ہے۔ ہم تعلیم، صحت، کھیل، اور دیگر شعبوں میں خدمات فراہم کرتے ہیں۔'
-        : 'Tanzeem-e-Khawjgan is an organization dedicated to serving the community. We provide services in education, health, sports, and other areas.'
+        : 'Tanzeem-e-Khawajgan is an organization dedicated to serving the community. We provide services in education, health, sports, and other areas.'
 
     return {
       success: true,
@@ -101,7 +101,7 @@ export class InformationAgent {
     const message =
       language === 'ur'
         ? 'تنظیم خواجگان کی تاریخ بہت امیر ہے۔ مزید معلومات کے لیے "About" صفحہ دیکھیں۔'
-        : 'Tanzeem-e-Khawjgan has a rich history of community service. Visit the About page for more details.'
+        : 'Tanzeem-e-Khawajgan has a rich history of community service. Visit the About page for more details.'
 
     return {
       success: true,

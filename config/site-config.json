@@ -1,16 +1,16 @@
 {
   "siteName": {
-    "en": "Tanzeem-e-Khawjgan",
+    "en": "Tanzeem-e-Khawajgan",
     "ur": "تنظیم خواجگان"
   },
   "siteDescription": {
-    "en": "Official website of Tanzeem-e-Khawjgan organization",
+    "en": "Official website of Tanzeem-e-Khawajgan organization",
     "ur": "تنظیم خواجگان کی سرکاری ویب سائٹ"
   },
   "defaultLanguage": "en",
   "supportedLanguages": ["en", "ur"],
   "contact": {
-    "email": "info@tanzeem-e-khawjgan.org",
+    "email": "info@tanzeem-e-khawajgan.org",
     "phone": "+92 300 1234567",
     "address": {
       "en": "123 Main Street, Lahore, Punjab, Pakistan",
@@ -28,8 +28,8 @@
   },
   "email": {
     "resendApiKey": "RESEND_API_KEY_HERE",
-    "fromEmail": "noreply@tanzeem-e-khawjgan.org",
-    "adminEmail": "admin@tanzeem-e-khawjgan.org"
+    "fromEmail": "noreply@tanzeem-e-khawajgan.org",
+    "adminEmail": "admin@tanzeem-e-khawajgan.org"
   },
   "ai": {
     "sessionTTL": 1800,

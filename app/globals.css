@@ -4,16 +4,33 @@
 
 :root {
   --background: #F9F5E8;
+  --foreground: #1a1a1a;
   --primary: #E88C30;
   --accent: #00715D;
-}
-
-body {
-  background-color: var(--background);
+  --border: #E88C30;
 }
 
 @layer base {
+  /* Reset browser defaults for links */
+  a {
+    @apply no-underline text-inherit;
+  }
+
+  /* Reset details/summary browser defaults */
+  details summary {
+    list-style: none;
+  }
+  details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  /* Base body styles */
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+  }
+
+  /* Ensure buttons and inputs inherit font */
+  button, input, select, textarea {
+    @apply font-sans;
   }
 }

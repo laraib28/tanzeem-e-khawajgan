@@ -2,6 +2,7 @@
 
 import type { Message } from '@/lib/ai/types'
 import { Bot, User } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 interface ChatMessageProps {
   message: Message
@@ -9,7 +10,6 @@ interface ChatMessageProps {
 
 export function ChatMessage({ message }: ChatMessageProps) {
   const isUser = message.role === 'user'
-  const isUrdu = message.language === 'ur'
 
   // Don't render system messages
   if (message.role === 'system') {
@@ -18,34 +18,39 @@ export function ChatMessage({ message }: ChatMessageProps) {
 
   return (
     <div
-      className={`flex gap-3 ${isUser ? 'flex-row-reverse' : 'flex-row'} ${
-        isUrdu ? 'text-right' : 'text-left'
-      }`}
-      dir={isUrdu ? 'rtl' : 'ltr'}
+      className={cn(
+        'flex gap-3',
+        isUser ? 'flex-row-reverse' : 'flex-row'
+      )}
     >
       {/* Avatar */}
       <div
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? 'bg-primary' : 'bg-accent'
-        }`}
+        className={cn(
+          'flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center',
+          isUser ? 'bg-primary' : 'bg-muted'
+        )}
       >
         {isUser ? (
-          <User className="w-5 h-5 text-white" />
+          <User className="w-4 h-4 text-primary-foreground" />
         ) : (
-          <Bot className="w-5 h-5 text-white" />
+          <Bot className="w-4 h-4 text-foreground" />
         )}
       </div>
 
       {/* Message Content */}
       <div
-        className={`flex-1 max-w-[80%] ${isUser ? 'items-end' : 'items-start'} flex flex-col gap-1`}
+        className={cn(
+          'flex-1 max-w-[80%] flex flex-col gap-1',
+          isUser ? 'items-end' : 'items-start'
+        )}
       >
         <div
-          className={`rounded-lg px-4 py-2 ${
+          className={cn(
+            'rounded-lg px-4 py-2',
             isUser
-              ? 'bg-primary text-white'
-              : 'bg-foreground/10 text-foreground'
-          }`}
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-muted text-foreground'
+          )}
         >
           <p className="text-sm whitespace-pre-wrap break-words">
             {message.content}
@@ -53,14 +58,11 @@ export function ChatMessage({ message }: ChatMessageProps) {
         </div>
 
         {/* Timestamp */}
-        <span className="text-xs text-foreground/50 px-2">
-          {new Date(message.timestamp).toLocaleTimeString(
-            isUrdu ? 'ur-PK' : 'en-US',
-            {
-              hour: '2-digit',
-              minute: '2-digit',
-            }
-          )}
+        <span className="text-xs text-muted-foreground px-2">
+          {new Date(message.timestamp).toLocaleTimeString('en-US', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
         </span>
       </div>
     </div>

@@ -1,82 +1,103 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { ChatMessage } from './ChatMessage'
-import type { Message, Language } from '@/lib/ai/types'
-import { Send, X, Loader2 } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import type { Message } from '@/lib/ai/types'
+import { Send, X, Loader2, MessageCircle } from 'lucide-react'
+import './chat.css'
 
 interface ChatInterfaceProps {
   onClose: () => void
+}
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+
+// Fallback responses when backend is unavailable
+function getFallbackResponse(message: string): string {
+  const msg = message.toLowerCase()
+
+  // Greetings
+  if (msg.includes('hello') || msg.includes('hi') || msg.includes('salam') || msg.includes('assalam')) {
+    return 'Wa Alaikum Assalam! Welcome to Tanzeem-e-Khawajgan. I can help you with information about our services:\n\n• Medical Services\n• IT Courses\n• Education Programs\n• Sports Facilities\n• Banquet Hall Booking\n\nWhat would you like to know about?'
+  }
+
+  // Booking intent
+  if (msg.includes('book') || msg.includes('hall') || msg.includes('banquet') || msg.includes('venue') || msg.includes('wedding')) {
+    return 'We have the following banquet halls available:\n\n🏛️ **Grand Hall** - Capacity: 500 guests (PKR 5,000/hour)\n🏢 **Conference Room A** - Capacity: 50 guests (PKR 1,000/hour)\n🌳 **Garden Lawn** - Capacity: 300 guests (PKR 3,000/hour)\n\nWhich hall interests you? Please provide your preferred date.'
+  }
+
+  // Services
+  if (msg.includes('service') || msg.includes('what do you offer')) {
+    return 'Tanzeem-e-Khawajgan offers these services:\n\n• **Medical**: Healthcare, diagnostics, emergency care\n• **IT**: Computer courses, programming training\n• **Education**: Programs, scholarships, tutoring\n• **Sports**: Fitness facilities, sports programs\n• **Banquets**: Event halls for weddings/gatherings\n\nWhich service would you like to know more about?'
+  }
+
+  // Medical
+  if (msg.includes('medical') || msg.includes('doctor') || msg.includes('health')) {
+    return 'Our Medical Services include:\n\n• Diagnostic center\n• General consultations\n• Emergency care\n• Specialist referrals\n\nFor appointments, please contact our medical center directly.'
+  }
+
+  // IT
+  if (msg.includes('it') || msg.includes('computer') || msg.includes('course') || msg.includes('programming')) {
+    return 'Our IT Department offers:\n\n• Web Development courses\n• Programming training (Python, JavaScript)\n• Computer basics\n• Summer coding camps for kids\n\nEnrollment is open throughout the year.'
+  }
+
+  // Default response
+  return 'Thank you for your message! I can help you with:\n\n• Information about our services\n• Banquet hall booking\n• Medical services\n• IT courses\n• Education programs\n\nPlease ask about any of these topics.'
 }
 
 export function ChatInterface({ onClose }: ChatInterfaceProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [language, setLanguage] = useState<Language>('en')
+  const [sessionId] = useState<string>(() =>
+    `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
+  )
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
-  // Initialize session
-  const initializeSession = async () => {
-    try {
-      const response = await fetch('/api/ai/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'init', language }),
-      })
-
-      const data = await response.json()
-
-      if (data.success) {
-        setSessionId(data.sessionId)
-        if (data.greeting) {
-          const greetingMessage: Message = {
-            id: Date.now().toString(),
-            role: 'assistant',
-            content: data.greeting,
-            language,
-            timestamp: Date.now(),
-          }
-          setMessages([greetingMessage])
-        }
-      }
-    } catch (error) {
-      console.error('Failed to initialize session:', error)
-    }
-  }
-
+  // Add initial greeting message
   useEffect(() => {
-    initializeSession()
-  }, [language])
+    const greetingMessage: Message = {
+      id: 'greeting',
+      role: 'assistant',
+      content: 'Assalam-o-Alaikum! Welcome to Tanzeem-e-Khawajgan. How can I help you today? You can ask me about our services, programs, or any general information.',
+      language: 'en',
+      timestamp: Date.now(),
+    }
+    setMessages([greetingMessage])
+  }, [])
 
   // Auto-scroll to bottom when messages change
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [])
+
   useEffect(() => {
     scrollToBottom()
-  }, [messages])
+  }, [messages, scrollToBottom])
 
   // Focus input on mount
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!inputValue.trim() || isLoading || !sessionId) {
+    const trimmedInput = inputValue.trim()
+    if (!trimmedInput || isLoading) {
       return
     }
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: inputValue.trim(),
-      language,
+      content: trimmedInput,
+      language: 'en',
       timestamp: Date.now(),
     }
 
@@ -85,134 +106,132 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
     setIsLoading(true)
 
     try {
-      const response = await fetch('/api/ai/chat', {
+      const response = await fetch(`${BACKEND_URL}/api/chat/message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          action: 'message',
-          sessionId,
-          message: userMessage.content,
-          language,
+          message: trimmedInput,
+          session_id: sessionId,
         }),
       })
 
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+
       const data = await response.json()
 
-      if (data.success && data.response) {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
+      // Normalize response - handle both expected format and edge cases
+      const responseText = data.response || data.message || data.detail || 'I received your message.'
+
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: responseText,
+        language: 'en',
+        timestamp: Date.now(),
+      }
+      setMessages(prev => [...prev, assistantMessage])
+
+      // Add follow-up suggestion if available
+      if (data.follow_up) {
+        const followUpMessage: Message = {
+          id: (Date.now() + 2).toString(),
           role: 'assistant',
-          content: data.response,
-          language: data.language || language,
+          content: data.follow_up,
+          language: 'en',
           timestamp: Date.now(),
         }
-        setMessages(prev => [...prev, assistantMessage])
-      } else {
-        throw new Error(data.error || 'Failed to get response')
+        setTimeout(() => {
+          setMessages(prev => [...prev, followUpMessage])
+        }, 500)
       }
     } catch (error) {
       console.error('Chat error:', error)
-      const errorMessage: Message = {
+
+      // Fallback response when backend is not available
+      const fallbackResponse = getFallbackResponse(trimmedInput)
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: language === 'ur'
-          ? 'معذرت، ایک خرابی پیش آئی۔ براہ کرم دوبارہ کوشش کریں۔'
-          : 'Sorry, an error occurred. Please try again.',
-        language,
+        content: fallbackResponse,
+        language: 'en',
         timestamp: Date.now(),
       }
-      setMessages(prev => [...prev, errorMessage])
+      setMessages(prev => [...prev, assistantMessage])
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleLanguageToggle = () => {
-    setLanguage(prev => (prev === 'en' ? 'ur' : 'en'))
-  }
-
   return (
-    <div className="fixed bottom-4 right-4 w-full max-w-md h-[600px] bg-background border border-foreground/20 rounded-lg shadow-2xl flex flex-col z-50">
+    <Card className="chat-container fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-96 h-[500px] sm:h-[600px] flex flex-col z-50 border-primary/20">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-foreground/10 bg-primary/5">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-            <span className="text-white text-sm">AI</span>
+      <CardHeader className="chat-header flex flex-row items-center justify-between p-4 rounded-t-lg">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+            <MessageCircle className="w-5 h-5 text-primary-foreground" />
           </div>
           <div>
-            <h3 className="font-semibold text-foreground">AI Assistant</h3>
-            <p className="text-xs text-foreground/60">
-              {language === 'ur' ? 'مدد کے لیے تیار' : 'Ready to help'}
-            </p>
+            <CardTitle className="text-base font-semibold">AI Assistant</CardTitle>
+            <p className="text-xs text-muted-foreground">Ask me anything</p>
           </div>
         </div>
-
-        <div className="flex items-center gap-2">
-          {/* Language Toggle */}
-          <button
-            onClick={handleLanguageToggle}
-            className="px-2 py-1 text-xs rounded bg-foreground/10 hover:bg-foreground/20 transition-colors"
-          >
-            {language === 'en' ? 'اردو' : 'EN'}
-          </button>
-
-          {/* Close Button */}
-          <button
-            onClick={onClose}
-            className="p-1 rounded-full hover:bg-foreground/10 transition-colors"
-            aria-label="Close chat"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onClose}
+          aria-label="Close chat"
+          className="h-8 w-8"
+        >
+          <X className="w-4 h-4" />
+        </Button>
+      </CardHeader>
 
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map(message => (
-          <ChatMessage key={message.id} message={message} />
-        ))}
-        {isLoading && (
-          <div className="flex gap-3">
-            <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-accent">
-              <Loader2 className="w-5 h-5 text-white animate-spin" />
-            </div>
-            <div className="flex-1">
-              <p className="text-sm text-foreground/60">
-                {language === 'ur' ? 'جواب لکھ رہا ہے...' : 'Typing...'}
-              </p>
-            </div>
+      <CardContent className="chat-window flex-1 p-0 overflow-hidden">
+        <ScrollArea className="h-full">
+          <div className="p-4 space-y-4">
+            {messages.map(message => (
+              <ChatMessage key={message.id} message={message} />
+            ))}
+            {isLoading && (
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-primary">
+                  <Loader2 className="w-4 h-4 text-primary-foreground animate-spin" />
+                </div>
+                <div className="flex-1 flex items-center">
+                  <p className="text-sm text-muted-foreground">Typing...</p>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
           </div>
-        )}
-        <div ref={messagesEndRef} />
-      </div>
+        </ScrollArea>
+      </CardContent>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="p-4 border-t border-foreground/10">
+      <form onSubmit={handleSubmit} className="chat-input border-t">
         <div className="flex gap-2">
-          <input
+          <Input
             ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={
-              language === 'ur'
-                ? 'اپنا پیغام لکھیں...'
-                : 'Type your message...'
-            }
-            className="flex-1 px-4 py-2 border border-foreground/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            placeholder="Type your message..."
             disabled={isLoading}
-            dir={language === 'ur' ? 'rtl' : 'ltr'}
+            className="flex-1 bg-transparent"
           />
-          <button
+          <Button
             type="submit"
             disabled={isLoading || !inputValue.trim()}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] flex items-center justify-center"
+            size="icon"
+            aria-label="Send message"
           >
-            <Send className="w-5 h-5" />
-          </button>
+            <Send className="w-4 h-4" />
+          </Button>
         </div>
       </form>
-    </div>
+    </Card>
   )
 }

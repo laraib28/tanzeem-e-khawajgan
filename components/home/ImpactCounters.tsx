@@ -53,7 +53,7 @@ export function ImpactCounters({ counters }: ImpactCountersProps) {
 
   return (
     <section className="w-full py-12 md:py-16 bg-accent/5">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-6 md:px-12 lg:px-16">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {counters.map((counter, index) => (
             <div

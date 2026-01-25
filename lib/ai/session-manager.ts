@@ -199,7 +199,7 @@ class SessionManager {
       return 'میں تنظیم خواجگان کا AI اسسٹنٹ ہوں۔ میں آپ کو تنظیم کے بارے میں معلومات، خدمات، اور نیویگیشن میں مدد کر سکتا ہوں۔'
     }
 
-    return 'I am the AI assistant for Tanzeem-e-Khawjgan. I can help you with information about the organization, services, and navigation assistance.'
+    return 'I am the AI assistant for Tanzeem-e-Khawajgan. I can help you with information about the organization, services, and navigation assistance.'
   }
 
   /**

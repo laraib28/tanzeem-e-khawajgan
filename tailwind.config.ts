@@ -12,16 +12,11 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        background: '#F9F5E8',
-        primary: '#E88C30',
-        accent: '#00715D',
-        border: '#E88C30',
-        foreground: '#000000',
-      },
-      backgroundColor: {
         background: 'var(--background)',
+        foreground: 'var(--foreground)',
         primary: 'var(--primary)',
         accent: 'var(--accent)',
+        border: 'var(--border)',
       },
       screens: {
         'mobile': { 'max': '767px' },

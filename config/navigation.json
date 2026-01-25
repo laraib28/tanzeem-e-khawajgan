@@ -109,16 +109,16 @@
     {
       "id": "membership-form",
       "label": {
-        "en": "Membership Form",
-        "ur": "رکنیت فارم"
+        "en": "Membership",
+        "ur": "رکنیت"
       },
       "href": "/membership-form"
     },
     {
       "id": "contact",
       "label": {
-        "en": "Contact Us",
-        "ur": "ہم سے رابطہ کریں"
+        "en": "Contact",
+        "ur": "رابطہ"
       },
       "href": "/contact"
     }

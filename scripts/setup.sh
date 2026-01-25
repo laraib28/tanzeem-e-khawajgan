@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Tanzeem-e-Khawjgan Website Setup Script
+# Tanzeem-e-Khawajgan Website Setup Script
 # This script helps configure the application for first-time use
 
 set -e
 
 echo "======================================"
-echo "Tanzeem-e-Khawjgan Website Setup"
+echo "Tanzeem-e-Khawajgan Website Setup"
 echo "======================================"
 echo ""
 

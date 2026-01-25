@@ -72,7 +72,10 @@ class Member(Base):
     father_in_law_name = Column(String(255), nullable=True)
     cnic = Column(String(15), nullable=False)
     country = Column(String(100), nullable=False)
-    city = Column(String(100), nullable=False)
+    native_city = Column(String(100), nullable=True)
+    current_city = Column(String(100), nullable=True)
+    city = Column(String(100), nullable=True)  # Legacy field - kept for backward compatibility
+    address = Column(Text, nullable=True)
     date_of_birth = Column(Date, nullable=False)
     cast = Column(String(50), nullable=False)
     source_of_income = Column(String(100), nullable=False)
@@ -173,7 +176,19 @@ class MembershipCreate(BaseModel):
     father_in_law_name: Optional[str] = None
     cnic: str = Field(..., min_length=13, max_length=15)
     country: str = Field(..., min_length=1, max_length=100)
-    city: str = Field(..., min_length=1, max_length=100)
+    native_city: str = Field(..., min_length=1, max_length=100)
+    current_city: str = Field(..., min_length=1, max_length=100)
+    address: str = Field(..., min_length=1, max_length=500)
+    city: Optional[str] = None  # Legacy field
+
+    @field_validator('membership_no')
+    @classmethod
+    def validate_membership_no(cls, v: Optional[str]) -> Optional[str]:
+        if v is None or v == '':
+            return v
+        if len(v) != 5 or not v.isalnum():
+            raise ValueError('Membership number must be exactly 5 alphanumeric characters')
+        return v.upper()
     date_of_birth: date
     cast: str = Field(..., min_length=1, max_length=50)
     source_of_income: str = Field(..., min_length=1, max_length=100)

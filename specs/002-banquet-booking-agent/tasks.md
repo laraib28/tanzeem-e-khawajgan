@@ -1,261 +1,398 @@
 # Banquet Booking Agent - Implementation Tasks
 
 **Feature ID**: 002-banquet-booking-agent
-**Version**: 1.0.0
+**Version**: 2.0.0
 **Created**: 2026-01-20
+**Updated**: 2026-01-22
+**Phase**: 4 (Information-Only with OpenAI Agents SDK + MCP + ChatKit)
 
 ---
 
-## Phase 1: Database & Models
+## Completed Phases (Do Not Repeat)
 
-### Task 1.1: Create Database Tables
-- [ ] Create `banquet_halls` table with columns: id, name, capacity, amenities (JSON), price_per_hour, status, created_at
-- [ ] Create `bookings` table with all required columns and foreign key to halls
-- [ ] Create `booking_audit_log` table
-- [ ] Create `notification_log` table
-- [ ] Add indexes: idx_hall_date, idx_booking_date, idx_status, idx_priority
-
-**Test**: Run SQL migration, verify tables exist with `SHOW TABLES`
-
-### Task 1.2: Create SQLAlchemy Models
-- [ ] Create `BanquetHall` model in `backend/models.py`
-- [ ] Create `Booking` model with relationships
-- [ ] Create `BookingAuditLog` model
-- [ ] Create `NotificationLog` model
-
-**Test**: Import models, verify no errors
-
-### Task 1.3: Create Pydantic Schemas
-- [ ] Create `backend/schemas/banquet.py`: HallResponse, HallList
-- [ ] Create `backend/schemas/booking.py`: BookingCreate, BookingResponse, BookingEscalate
-- [ ] Create `backend/schemas/notification.py`: WhatsAppRequest, WhatsAppResponse
-
-**Test**: Instantiate schemas with sample data
-
-### Task 1.4: Seed Initial Hall Data
-- [ ] Insert Grand Hall (capacity 500)
-- [ ] Insert Conference Room A (capacity 50)
-- [ ] Insert Garden Lawn (capacity 300)
-
-**Test**: Query halls, verify 3 records returned
+| Phase | Status | Deliverables |
+|-------|--------|--------------|
+| Phase 1 | COMPLETE | Database schema, SQLAlchemy models |
+| Phase 2 | COMPLETE | Core API endpoints (halls, availability) |
+| Phase 3 | COMPLETE | RAG indexing, Information Agent |
 
 ---
 
-## Phase 2: Core API Endpoints
+## Phase 4: OpenAI Agents SDK + MCP + ChatKit
 
-### Task 2.1: Create Halls Endpoint
-- [ ] Create `backend/routers/banquets.py`
-- [ ] Implement `GET /api/banquets/halls` - list all active halls
-- [ ] Implement `GET /api/banquets/halls/{id}` - get hall by ID
-- [ ] Register router in `main.py`
+### 4.1 Backend Dependencies
 
-**Test**:
+**Task 4.1.1**: Update requirements.txt
+
 ```bash
-curl http://localhost:8000/api/banquets/halls
+cd backend
 ```
 
-### Task 2.2: Create Availability Endpoint
-- [ ] Create `backend/services/availability.py`
-- [ ] Implement availability check logic (query bookings for date)
-- [ ] Implement `GET /api/banquets/availability?date=YYYY-MM-DD&hall_id=X`
-- [ ] Return available_slots and booked_slots
+Add to `requirements.txt`:
+```
+openai-agents>=0.6.0
+openai-chatkit>=0.0.2
+mcp>=1.0.0
+httpx>=0.27.0
+```
 
-**Test**: Check availability for future date, verify slots returned
+**Verify**:
+```bash
+pip install -r requirements.txt
+pip list | grep -E "openai|mcp|httpx"
+```
 
-### Task 2.3: Create Booking Endpoint
-- [ ] Create `backend/routers/bookings.py`
-- [ ] Create `backend/services/booking.py`
-- [ ] Implement booking reference generator: `BK-YYYYMMDD-XXXX`
-- [ ] Implement `POST /api/banquets/bookings`
-- [ ] Validate: hall exists, slot available, date is future
-- [ ] Auto-calculate priority based on guest_count and date
-
-**Test**: Create booking, verify reference returned
-
-### Task 2.4: Create Get Booking Endpoint
-- [ ] Implement `GET /api/banquets/bookings/{id}`
-- [ ] Implement `GET /api/banquets/bookings/ref/{reference}`
-
-**Test**: Retrieve created booking by ID and reference
+**Acceptance**: All packages install without errors.
 
 ---
 
-## Phase 3: Escalation & Audit
+### 4.2 MCP Server Implementation
 
-### Task 3.1: Implement Priority Calculation
-- [ ] Create `backend/services/escalation.py`
-- [ ] Normal: default
-- [ ] High: guests >= 100 OR date <= 7 days
-- [ ] Urgent: guests >= 200 OR date <= 48 hours
+**Task 4.2.1**: Create MCP module structure
 
-**Test**: Create bookings with different guest counts, verify priority
+```bash
+mkdir -p backend/mcp
+touch backend/mcp/__init__.py
+touch backend/mcp/server.py
+```
 
-### Task 3.2: Implement Escalation Endpoint
-- [ ] Implement `POST /api/banquets/bookings/{id}/escalate`
-- [ ] Accept: priority, reason
-- [ ] Update booking priority
-- [ ] Trigger notifications
+**Task 4.2.2**: Implement MCP Server
 
-**Test**: Escalate booking, verify priority changed
+**File**: `backend/mcp/server.py`
 
-### Task 3.3: Implement Audit Logging
-- [ ] Create `backend/services/audit.py`
-- [ ] Log: booking_created, booking_escalated, booking_confirmed, booking_cancelled
-- [ ] Include actor, timestamp, details (JSON)
+**Required Tools**:
 
-**Test**: Create booking, verify audit log entry exists
+| Tool | Signature | Description |
+|------|-----------|-------------|
+| `search_content` | `(query: str, service?: str) -> MCPToolResult` | Query RAG index |
+| `get_service_info` | `(service: str) -> MCPToolResult` | Get service details |
+| `get_available_services` | `() -> MCPToolResult` | List all services |
+| `get_organization_info` | `() -> MCPToolResult` | Get org info |
+| `health_status` | `() -> MCPToolResult` | System health |
 
----
+**Constraints**:
+- Read-only RAG access
+- Source attribution in all results
+- No external API calls
 
-## Phase 4: WhatsApp Integration
+**Verify**:
+```python
+from mcp.server import create_mcp_server
+server = create_mcp_server()
+result = server.call_tool("get_available_services", {})
+assert result.success == True
+assert len(result.data) == 6  # medical, it, education, sports, banquets, graveyard
+```
 
-### Task 4.1: Create WhatsApp Service
-- [ ] Create `backend/services/whatsapp.py`
-- [ ] Implement WhatsApp Business API client
-- [ ] Configure templates: booking_received, booking_confirmed, escalation_alert, status_update
-
-**Test**: Mock API call, verify request format
-
-### Task 4.2: Create Notification Endpoint
-- [ ] Create `backend/routers/notifications.py`
-- [ ] Implement `POST /api/notifications/whatsapp`
-- [ ] Validate phone number format
-- [ ] Log notification attempt
-
-**Test**: Send test notification, verify log entry
-
-### Task 4.3: Implement Notification on Booking
-- [ ] Trigger WhatsApp on booking creation (if opted-in)
-- [ ] Trigger WhatsApp on escalation (to admin)
-- [ ] Implement email fallback on WhatsApp failure
-
-**Test**: Create booking with whatsapp_optin=true, verify notification sent
+**Acceptance**: All 5 tools return valid results with sources.
 
 ---
 
-## Phase 5: RAG Content System
+### 4.3 OpenAI Agent Controller
 
-### Task 5.1: Index Service Content
-- [ ] Create `app/lib/rag/content-loader.ts`
-- [ ] Load and parse: medical.json, it.json, education.json, sports.json, banquets.json
-- [ ] Create content index structure
+**Task 4.3.1**: Create OpenAI Agent module
 
-**Test**: Load all content files, verify no errors
+**File**: `backend/agents/openai_agent.py`
 
-### Task 5.2: Implement RAG Query
-- [ ] Create semantic search function
-- [ ] Match user query to relevant content
-- [ ] Return sourced responses with attribution
+**Implementation Requirements**:
 
-**Test**: Query "medical services", verify relevant content returned
+1. Initialize `Agent` with system instructions
+2. Register MCP tools as `@function_tool` decorators
+3. Implement `chat()` method (sync) and `chat_async()` (async)
+4. Handle session context (non-persistent)
+5. Detect intent and service from query
 
-### Task 5.3: Integrate RAG with Information Agent
-- [ ] Update Information Agent to use RAG
-- [ ] Route queries by service type
-- [ ] Ensure no hallucinated responses
+**System Instructions Template**:
+```
+You are the AI Assistant for Tanzeem-e-Khawajgan.
 
-**Test**: Ask about IT courses, verify response matches config content
+CRITICAL RULES:
+1. ONLY use MCP tools for information. Never hallucinate.
+2. If no information found, say "I don't have information about that."
+3. Always cite sources.
+4. Reject booking/action requests politely.
+5. Support English and Urdu.
 
----
+PHASE 4 LIMITATIONS:
+- Information ONLY
+- No bookings, reservations, or form submissions
+- For actions, direct to: +92 300 1234567
+```
 
-## Phase 6: Booking Agent Integration
+**Verify**:
+```python
+from agents.openai_agent import get_agent_controller
+controller = get_agent_controller()
+response = controller.chat("What IT courses do you offer?")
+assert "sources" in response
+assert response["can_help"] == True
+```
 
-### Task 6.1: Create Booking Agent
-- [ ] Create `app/components/ai/agents/BookingAgent.ts`
-- [ ] Implement conversation state machine
-- [ ] Define booking flow stages: date → guests → time → event → contact → confirm
-
-**Test**: Simulate conversation, verify state transitions
-
-### Task 6.2: Implement Form Filler
-- [ ] Extract structured data from conversation
-- [ ] Map intents to form fields
-- [ ] Validate extracted data
-
-**Test**: Parse "150 guests on Jan 25", verify guest_count=150, date=2026-01-25
-
-### Task 6.3: Implement Availability Checker
-- [ ] Connect to GET /api/banquets/availability
-- [ ] Format availability response for chat
-- [ ] Handle no availability scenario
-
-**Test**: Query availability via agent, verify formatted response
-
-### Task 6.4: Implement Submission Handler
-- [ ] Connect to POST /api/banquets/bookings
-- [ ] Format confirmation message
-- [ ] Display booking reference
-
-**Test**: Complete booking flow, verify reference displayed
-
-### Task 6.5: Integrate with Main Agent Controller
-- [ ] Register Booking Agent as sub-agent
-- [ ] Implement intent routing: "book banquet" → Booking Agent
-- [ ] Handle handoff back to main agent
-
-**Test**: Say "I want to book a hall", verify Booking Agent activates
+**Acceptance**: Agent responds with sourced information only.
 
 ---
 
-## Phase 7: Frontend Integration
+### 4.4 ChatKit Backend Endpoint
 
-### Task 7.1: Extend Chat Interface
-- [ ] Update `ChatInterface.tsx` to support Booking Agent
-- [ ] Add booking form preview component
-- [ ] Add confirmation dialog
+**Task 4.4.1**: Create ChatKit router
 
-**Test**: UI renders booking summary correctly
+**File**: `backend/routers/chatkit.py`
 
-### Task 7.2: Create Booking Form Component
-- [ ] Create `BanquetBookingForm.tsx`
-- [ ] Pre-populate from agent conversation
-- [ ] Allow manual edits
+**Endpoint**: `POST /chatkit`
 
-**Test**: Form displays pre-filled data from agent
+**Response Format**: Server-Sent Events (SSE)
 
-### Task 7.3: Add WhatsApp Opt-in UI
-- [ ] Add checkbox for WhatsApp notifications
-- [ ] Validate phone number format
-- [ ] Show consent message
+```
+event: start
+data: {"timestamp": "..."}
 
-**Test**: Toggle opt-in, verify state persists
+event: text
+data: {"content": "chunk of response"}
 
----
+event: metadata
+data: {"intent": "...", "service": "...", "sources": [...]}
 
-## Phase 8: Testing & Documentation
+event: end
+data: {"timestamp": "..."}
+```
 
-### Task 8.1: Unit Tests
-- [ ] Test availability service
-- [ ] Test priority calculation
-- [ ] Test booking reference generation
-- [ ] Test phone validation
+**Task 4.4.2**: Add health endpoint
 
-### Task 8.2: Integration Tests
-- [ ] Test full booking API flow
-- [ ] Test escalation flow
-- [ ] Test notification dispatch
+**Endpoint**: `GET /chatkit/health`
 
-### Task 8.3: E2E Tests
-- [ ] Test conversational booking flow
-- [ ] Test form auto-fill
-- [ ] Test RAG responses for all services
+**Response**:
+```json
+{
+  "status": "healthy",
+  "openai_configured": true,
+  "rag_indexed": true,
+  "mcp_tools": 5
+}
+```
 
----
+**Task 4.4.3**: Register router in main.py
 
-## Summary
+```python
+from routers.chatkit import router as chatkit_router
+app.include_router(chatkit_router)
+```
 
-| Phase | Tasks | Status |
-|-------|-------|--------|
-| 1. Database & Models | 4 | Pending |
-| 2. Core API | 4 | Pending |
-| 3. Escalation & Audit | 3 | Pending |
-| 4. WhatsApp | 3 | Pending |
-| 5. RAG Content | 3 | Pending |
-| 6. Booking Agent | 5 | Pending |
-| 7. Frontend | 3 | Pending |
-| 8. Testing | 3 | Pending |
-| **Total** | **28** | |
+**Verify**:
+```bash
+curl -X POST http://localhost:8000/chatkit \
+  -H "Content-Type: application/json" \
+  -d '{"messages":[{"role":"user","content":"Hello"}]}'
+```
+
+**Acceptance**: SSE stream returns with events.
 
 ---
 
-**Tasks Version**: 1.0.0
+### 4.5 Update Chatbot Router
+
+**Task 4.5.1**: Add conditional agent import
+
+**File**: `backend/routers/chatbot.py`
+
+**Logic**:
+```python
+import os
+if os.getenv("OPENAI_API_KEY"):
+    from agents.openai_agent import get_agent_controller as get_chatbot_service
+else:
+    from agents.chatbot import get_chatbot_service
+```
+
+**Acceptance**: Router uses OpenAI agent when API key present, fallback otherwise.
+
+---
+
+### 4.6 Frontend Dependencies
+
+**Task 4.6.1**: Install ChatKit packages
+
+```bash
+npm install @openai/chatkit @openai/chatkit-react
+```
+
+**Verify**:
+```bash
+npm list | grep chatkit
+```
+
+**Acceptance**: Both packages installed.
+
+---
+
+### 4.7 ChatKit UI Component
+
+**Task 4.7.1**: Create ChatKitInterface component
+
+**File**: `components/ai/ChatKitInterface.tsx`
+
+**Requirements**:
+- Use `useChatKit` hook from `@openai/chatkit-react`
+- Configure API URL from `NEXT_PUBLIC_BACKEND_URL`
+- Handle close button and escape key
+- Mobile responsive
+
+**Task 4.7.2**: Update ChatWidget with toggle
+
+**File**: `components/ai/ChatWidget.tsx`
+
+**Logic**:
+```typescript
+const USE_CHATKIT = process.env.NEXT_PUBLIC_USE_CHATKIT === 'true'
+
+// Render ChatKitInterface if USE_CHATKIT, else ChatInterface
+```
+
+**Verify**:
+```bash
+npm run build
+```
+
+**Acceptance**: Build passes, no type errors.
+
+---
+
+### 4.8 Environment Configuration
+
+**Task 4.8.1**: Update backend .env.example
+
+Add:
+```env
+OPENAI_API_KEY=your_openai_api_key_here
+```
+
+**Task 4.8.2**: Update frontend .env.example
+
+Add:
+```env
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+NEXT_PUBLIC_USE_CHATKIT=true
+```
+
+**Acceptance**: Environment variables documented.
+
+---
+
+### 4.9 Integration Testing
+
+**Task 4.9.1**: Test MCP tool responses
+
+| Query | Expected Tool | Expected Result |
+|-------|---------------|-----------------|
+| "What IT courses do you offer?" | `search_content` | IT course list |
+| "Tell me about medical services" | `get_service_info` | Medical service details |
+| "What services do you have?" | `get_available_services` | 6 services listed |
+| "How can I contact you?" | `get_organization_info` | Contact info |
+
+**Task 4.9.2**: Test action rejection
+
+| Query | Expected Response |
+|-------|-------------------|
+| "I want to book a hall" | Polite redirect to contact info |
+| "Can you reserve a room?" | Polite redirect to contact info |
+| "Submit my application" | Polite redirect to contact info |
+
+**Task 4.9.3**: Test hallucination prevention
+
+| Query | Expected Behavior |
+|-------|-------------------|
+| "What are your opening hours?" (not in RAG) | "I don't have information about that" |
+| "Tell me about services you don't offer" | No fabricated response |
+
+**Verify**:
+```bash
+# Start backend
+cd backend && uvicorn main:app --reload
+
+# Start frontend
+npm run dev
+
+# Test via ChatKit UI
+```
+
+**Acceptance**: All test cases pass.
+
+---
+
+### 4.10 Final Verification
+
+**Task 4.10.1**: Health check
+
+```bash
+curl http://localhost:8000/chatkit/health
+```
+
+Expected:
+```json
+{
+  "status": "healthy",
+  "openai_configured": true,
+  "rag_indexed": true,
+  "mcp_tools": 5
+}
+```
+
+**Task 4.10.2**: Build verification
+
+```bash
+npm run build
+```
+
+**Acceptance**: Build completes with 0 errors.
+
+**Task 4.10.3**: Governance compliance check
+
+| Rule | Verified |
+|------|----------|
+| No hallucinations | [ ] |
+| No persistent storage | [ ] |
+| Source attribution | [ ] |
+| Information-only | [ ] |
+| Constitution compliance | [ ] |
+
+---
+
+## Task Summary
+
+| Task | Description | Status |
+|------|-------------|--------|
+| 4.1.1 | Update backend dependencies | [ ] |
+| 4.2.1 | Create MCP module structure | [ ] |
+| 4.2.2 | Implement MCP Server | [ ] |
+| 4.3.1 | Create OpenAI Agent Controller | [ ] |
+| 4.4.1 | Create ChatKit router | [ ] |
+| 4.4.2 | Add health endpoint | [ ] |
+| 4.4.3 | Register router in main.py | [ ] |
+| 4.5.1 | Update chatbot router | [ ] |
+| 4.6.1 | Install ChatKit packages | [ ] |
+| 4.7.1 | Create ChatKitInterface | [ ] |
+| 4.7.2 | Update ChatWidget | [ ] |
+| 4.8.1 | Update backend .env.example | [ ] |
+| 4.8.2 | Update frontend .env.example | [ ] |
+| 4.9.1 | Test MCP tool responses | [ ] |
+| 4.9.2 | Test action rejection | [ ] |
+| 4.9.3 | Test hallucination prevention | [ ] |
+| 4.10.1 | Health check | [ ] |
+| 4.10.2 | Build verification | [ ] |
+| 4.10.3 | Governance compliance | [ ] |
+
+**Total Tasks**: 19
+**Phase**: 4 (Information-Only)
+
+---
+
+## Future Phases (Not Implemented)
+
+| Phase | Scope | Trigger |
+|-------|-------|---------|
+| Phase 5 | Booking Agent (MCP tools for create_booking, check_availability) | Product decision |
+| Phase 6 | WhatsApp Integration | Phase 5 complete |
+| Phase 7 | Priority Escalation | Phase 6 complete |
+
+---
+
+**Tasks Version**: 2.0.0 | **Author**: AI Architect | **Status**: Ready for Implementation

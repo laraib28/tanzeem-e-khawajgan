@@ -1,226 +1,349 @@
 # Banquet Booking Agent - Implementation Plan
 
 **Feature ID**: 002-banquet-booking-agent
-**Version**: 1.0.0
+**Version**: 2.0.0
 **Created**: 2026-01-20
+**Updated**: 2026-01-22
+**Phase**: 4 (Information-Only with OpenAI Agents SDK + MCP + ChatKit)
 
 ---
 
-## 1. Architecture
+## 1. Architecture Overview
 
 ```
-┌──────────────────────────────────────────────────────────┐
-│                    Frontend (Next.js)                    │
-│  ┌─────────────────────────────────────────────────────┐ │
-│  │           Unified AI Chat Interface                 │ │
-│  │  (Medical | IT | Education | Sports | Banquet)      │ │
-│  └─────────────────────────────────────────────────────┘ │
-└──────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-┌──────────────────────────────────────────────────────────┐
-│                    Backend (FastAPI)                     │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌─────────┐  │
-│  │ /banquets│  │ /bookings│  │ /notify  │  │ /rag    │  │
-│  └──────────┘  └──────────┘  └──────────┘  └─────────┘  │
-└──────────────────────────────────────────────────────────┘
-                           │
-              ┌────────────┼────────────┐
-              ▼            ▼            ▼
-┌───────────────┐  ┌─────────────┐  ┌────────────────┐
-│    MySQL      │  │  RAG Store  │  │ WhatsApp API   │
-│  (bookings)   │  │  (content)  │  │ (notifications)│
-└───────────────┘  └─────────────┘  └────────────────┘
-```
-
----
-
-## 2. Unified Agent Architecture
-
-```
-Main Agent (Controller)
-│
-├── Information Agent (RAG-powered)
-│   ├── Medical Info → /config/content/en/medical.json
-│   ├── IT Info → /config/content/en/it.json
-│   ├── Education Info → /config/content/en/education.json
-│   ├── Sports Info → /config/content/en/sports.json
-│   └── Banquet Info → /config/content/en/banquets.json
-│
-├── Navigation Agent
-├── Services Agent (Router)
-├── Policy Agent
-│
-├── Action Agent
-│   ├── Inquiry Form Handler → POST /api/forms/inquiry
-│   └── Feedback Form Handler → POST /api/forms/feedback
-│
-└── Booking Agent (Banquet)
-    ├── Availability Checker → GET /api/banquets/availability
-    ├── Form Filler → Extract from conversation
-    ├── Submission Handler → POST /api/banquets/bookings
-    └── Escalation Manager → POST /api/banquets/bookings/{id}/escalate
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Frontend (Next.js App Router)                   │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                    OpenAI ChatKit UI Component                    │  │
+│  │              (SSE streaming, thread management)                   │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+                                     │
+                                     │ POST /chatkit (SSE)
+                                     │ POST /api/chat/message (JSON fallback)
+                                     ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Backend (FastAPI - Self-Hosted)                 │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                    OpenAI Agents SDK Controller                   │  │
+│  │         (Agent orchestration, function tool routing)              │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                                     │                                   │
+│                                     │ Tool calls                        │
+│                                     ▼                                   │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                         MCP Server Layer                          │  │
+│  │     ┌─────────────┐  ┌─────────────┐  ┌─────────────────────┐    │  │
+│  │     │ search_     │  │ get_service │  │ get_available_      │    │  │
+│  │     │ content     │  │ _info       │  │ services            │    │  │
+│  │     └─────────────┘  └─────────────┘  └─────────────────────┘    │  │
+│  │     ┌─────────────┐  ┌─────────────┐                             │  │
+│  │     │ get_org_    │  │ health_     │                             │  │
+│  │     │ info        │  │ status      │                             │  │
+│  │     └─────────────┘  └─────────────┘                             │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                                     │                                   │
+│                                     │ Query                             │
+│                                     ▼                                   │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                     RAG Service (TF-IDF Indexed)                  │  │
+│  │               config/content/en/*.json (READONLY)                 │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 3. Database Schema
+## 2. Component Specifications
 
-```sql
--- Banquet Halls
-CREATE TABLE banquet_halls (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    capacity INT NOT NULL,
-    amenities JSON,
-    price_per_hour DECIMAL(10,2),
-    status ENUM('active','inactive') DEFAULT 'active',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+### 2.1 OpenAI Agents SDK Controller
 
--- Bookings
-CREATE TABLE bookings (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    hall_id INT NOT NULL,
-    booking_date DATE NOT NULL,
-    start_time TIME NOT NULL,
-    end_time TIME NOT NULL,
-    customer_name VARCHAR(255) NOT NULL,
-    customer_phone VARCHAR(20) NOT NULL,
-    customer_email VARCHAR(255),
-    event_type VARCHAR(100),
-    guest_count INT NOT NULL,
-    special_requirements TEXT,
-    status ENUM('pending','confirmed','cancelled') DEFAULT 'pending',
-    priority ENUM('normal','high','urgent') DEFAULT 'normal',
-    whatsapp_optin BOOLEAN DEFAULT FALSE,
-    booking_reference VARCHAR(20) UNIQUE,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (hall_id) REFERENCES banquet_halls(id),
-    INDEX idx_hall_date (hall_id, booking_date)
-);
+**Location**: `backend/agents/openai_agent.py`
 
--- Audit Log
-CREATE TABLE booking_audit_log (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    booking_id INT,
-    action VARCHAR(50),
-    actor VARCHAR(100),
-    details JSON,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+**Responsibilities**:
+- Initialize Agent with system instructions
+- Register MCP tools as function tools
+- Handle conversation context (non-persistent)
+- Route tool calls to MCP server
+- Enforce information-only responses (Phase 4)
 
--- Notification Log
-CREATE TABLE notification_log (
-    id INT PRIMARY KEY AUTO_INCREMENT,
-    booking_id INT,
-    channel ENUM('whatsapp','email','sms'),
-    template_id VARCHAR(50),
-    recipient VARCHAR(255),
-    status ENUM('pending','sent','delivered','failed') DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+**Model**: `gpt-4o-mini` (cost-effective for information queries)
+
+**System Instructions** (governance-enforced):
+- ONLY use MCP tools for information retrieval
+- NEVER hallucinate or make assumptions
+- Cite sources when providing information
+- Reject booking/action requests with polite redirect
+- Support English and Urdu responses
+
+### 2.2 MCP Server
+
+**Location**: `backend/mcp/server.py`
+
+**Exposed Tools**:
+
+| Tool | Purpose | Input | Output |
+|------|---------|-------|--------|
+| `search_content` | Query RAG for information | `query: str`, `service?: str` | Ranked results with sources |
+| `get_service_info` | Get complete service details | `service: str` | Structured service data |
+| `get_available_services` | List all services | None | Service list with descriptions |
+| `get_organization_info` | Get org details | None | Contact, address, social |
+| `health_status` | System health check | None | Component status |
+
+**Constraints**:
+- Read-only access to RAG index
+- No database writes
+- No external API calls
+- All responses include source attribution
+
+### 2.3 ChatKit Integration
+
+**Frontend Package**: `@openai/chatkit-react`
+
+**Backend Endpoint**: `POST /chatkit` (SSE streaming)
+
+**ChatKit Configuration**:
+```typescript
+{
+  api: {
+    url: `${BACKEND_URL}/chatkit`,
+    domainKey: 'tanzeem-chatbot'
+  }
+}
+```
+
+**Fallback**: Custom chat UI via `/api/chat/message` (JSON)
+
+### 2.4 RAG Service (Existing)
+
+**Location**: `backend/rag/query_service.py`
+
+**Status**: Complete and indexed
+
+**Content Sources**:
+- `config/content/en/medical.json`
+- `config/content/en/it.json`
+- `config/content/en/education.json`
+- `config/content/en/sports.json`
+- `config/content/en/banquets.json`
+- `config/content/en/graveyard.json`
+- `config/site-config.json`
+
+---
+
+## 3. API Contracts
+
+### 3.1 ChatKit Endpoint (Primary)
+
+```
+POST /chatkit
+Content-Type: application/json
+Accept: text/event-stream
+
+Request:
+{
+  "messages": [
+    {"role": "user", "content": "Tell me about IT courses"}
+  ],
+  "session_id": "optional-session-id"
+}
+
+Response (SSE):
+event: start
+data: {"timestamp": "2026-01-22T10:00:00Z"}
+
+event: text
+data: {"content": "Tanzeem-e-Khawajgan offers..."}
+
+event: metadata
+data: {"intent": "information", "service": "it", "sources": ["config/content/en/it.json"]}
+
+event: end
+data: {"timestamp": "2026-01-22T10:00:01Z"}
+```
+
+### 3.2 Chat Message Endpoint (Fallback)
+
+```
+POST /api/chat/message
+Content-Type: application/json
+
+Request:
+{
+  "message": "What medical services do you offer?",
+  "session_id": "optional-session-id"
+}
+
+Response:
+{
+  "response": "We offer diagnostic services, consultations...",
+  "intent": "information",
+  "service": "medical",
+  "confidence": 0.92,
+  "sources": ["config/content/en/medical.json"],
+  "can_help": true,
+  "follow_up": null,
+  "timestamp": "2026-01-22T10:00:00Z"
+}
+```
+
+### 3.3 Health Endpoint
+
+```
+GET /chatkit/health
+
+Response:
+{
+  "status": "healthy",
+  "openai_configured": true,
+  "rag_indexed": true,
+  "mcp_tools": 5,
+  "timestamp": "2026-01-22T10:00:00Z"
+}
 ```
 
 ---
 
-## 4. File Structure
+## 4. Environment Configuration
+
+### 4.1 Backend (`backend/.env`)
+
+```env
+# Required
+OPENAI_API_KEY=sk-...
+
+# Database (existing)
+MYSQL_USER=root
+MYSQL_PASSWORD=...
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
+MYSQL_DATABASE=tanzeem_membership
+```
+
+### 4.2 Frontend (`.env.local`)
+
+```env
+# Backend API URL
+NEXT_PUBLIC_BACKEND_URL=http://localhost:8000
+
+# ChatKit toggle (true = ChatKit, false = custom UI)
+NEXT_PUBLIC_USE_CHATKIT=true
+```
+
+---
+
+## 5. File Structure
 
 ```
 backend/
+├── agents/
+│   ├── __init__.py
+│   ├── chatbot.py              # Legacy fallback
+│   ├── information_agent.py    # Existing RAG agent
+│   └── openai_agent.py         # NEW: OpenAI Agents SDK controller
+├── mcp/
+│   ├── __init__.py             # NEW
+│   └── server.py               # NEW: MCP server with tools
+├── rag/
+│   ├── content_loader.py       # Existing
+│   ├── indexer.py              # Existing
+│   └── query_service.py        # Existing
 ├── routers/
-│   ├── banquets.py      # Hall & availability endpoints
-│   ├── bookings.py      # Booking CRUD & escalation
-│   └── notifications.py # WhatsApp dispatch
-├── schemas/
-│   ├── banquet.py
-│   ├── booking.py
-│   └── notification.py
-├── services/
-│   ├── availability.py
-│   ├── booking.py
-│   ├── escalation.py
-│   ├── audit.py
-│   └── whatsapp.py
-├── models.py
-└── main.py
+│   ├── chatbot.py              # Updated: conditional agent import
+│   └── chatkit.py              # NEW: ChatKit SSE endpoint
+├── main.py                     # Updated: include chatkit router
+└── requirements.txt            # Updated: new dependencies
 
-app/
-├── components/
-│   └── ai/
-│       ├── ChatInterface.tsx (extend)
-│       └── agents/
-│           └── BookingAgent.ts
-└── lib/
-    └── rag/
-        └── content-loader.ts
+components/
+└── ai/
+    ├── ChatInterface.tsx       # Existing: fallback UI
+    ├── ChatKitInterface.tsx    # NEW: ChatKit wrapper
+    ├── ChatMessage.tsx         # Existing
+    └── ChatWidget.tsx          # Updated: ChatKit toggle
 ```
 
 ---
 
-## 5. Implementation Phases
+## 6. Dependency Matrix
 
-| Phase | Deliverables |
-|-------|--------------|
-| **1** | Database tables, SQLAlchemy models, Pydantic schemas |
-| **2** | GET /halls, GET /availability, POST /bookings |
-| **3** | Escalation logic, audit logging |
-| **4** | WhatsApp notification integration |
-| **5** | RAG content indexing for all services |
-| **6** | Booking Agent integration with AI controller |
-| **7** | Frontend chat enhancements |
+### 6.1 Backend Dependencies
 
----
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `openai-agents` | >=0.6.0 | Agent orchestration |
+| `openai-chatkit` | >=0.0.2 | ChatKit backend SDK |
+| `mcp` | >=1.0.0 | MCP protocol support |
+| `httpx` | >=0.27.0 | Async HTTP client |
 
-## 6. API Endpoints
+### 6.2 Frontend Dependencies
 
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | /api/banquets/halls | List active halls |
-| GET | /api/banquets/halls/{id} | Hall details |
-| GET | /api/banquets/availability | Check date availability |
-| POST | /api/banquets/bookings | Create booking |
-| GET | /api/banquets/bookings/{id} | Get booking |
-| POST | /api/banquets/bookings/{id}/escalate | Escalate priority |
-| POST | /api/notifications/whatsapp | Send notification |
+| Package | Version | Purpose |
+|---------|---------|---------|
+| `@openai/chatkit` | latest | ChatKit core |
+| `@openai/chatkit-react` | latest | React integration |
 
 ---
 
-## 7. Priority Escalation
+## 7. Phase Boundaries
 
-| Condition | Priority |
-|-----------|----------|
-| Default | normal |
-| guests >= 100 OR date <= 7 days | high |
-| guests >= 200 OR date <= 48 hours | urgent |
+### Phase 4 (Current) - Information Only
 
----
+**Included**:
+- OpenAI Agents SDK integration
+- MCP server with RAG tools
+- ChatKit frontend
+- All service information queries
+- Source attribution
 
-## 8. RAG Content Sources
+**Excluded (Future Phases)**:
+- Booking actions
+- Form submissions via agent
+- Database writes
+- WhatsApp notifications
+- Priority escalation
 
-| Service | Source Path |
-|---------|-------------|
-| Medical | config/content/en/medical.json |
-| IT | config/content/en/it.json |
-| Education | config/content/en/education.json |
-| Sports | config/content/en/sports.json |
-| Banquets | config/content/en/banquets.json |
-| General | config/site-config.json |
+### Future Phase Hooks
 
----
-
-## 9. Environment Variables
-
-```env
-# WhatsApp
-WHATSAPP_API_URL=https://graph.facebook.com/v17.0
-WHATSAPP_PHONE_NUMBER_ID=xxx
-WHATSAPP_ACCESS_TOKEN=xxx
-
-# Encryption
-PHONE_ENCRYPTION_KEY=xxx
-```
+The architecture supports future action capabilities via:
+1. Additional MCP tools (e.g., `create_booking`, `check_availability`)
+2. Action Agent sub-component in OpenAI Agent
+3. Database write permissions (gated by phase flag)
 
 ---
 
-**Plan Version**: 1.0.0
+## 8. Governance Compliance
+
+| Requirement | Implementation |
+|-------------|----------------|
+| No hallucinations | MCP tools are ONLY knowledge source |
+| No persistent storage | Session context cleared per request |
+| Source attribution | All responses include `sources` array |
+| Information-only (Phase 4) | System instructions reject actions |
+| Constitution compliance | Agent instructions reference governance |
+
+---
+
+## 9. Error Handling
+
+| Scenario | Response |
+|----------|----------|
+| OpenAI API unavailable | Fallback to legacy chatbot |
+| MCP tool failure | Return error with retry suggestion |
+| No RAG results | "I don't have information about that" |
+| Action request (Phase 4) | Polite redirect to contact info |
+
+---
+
+## 10. Success Criteria
+
+- [ ] ChatKit UI renders and connects to `/chatkit`
+- [ ] Agent responds using MCP tools only
+- [ ] All service queries return sourced information
+- [ ] No hallucinated responses
+- [ ] Booking requests rejected with contact info
+- [ ] Health endpoint returns all green
+- [ ] Build passes with no type errors
+
+---
+
+**Plan Version**: 2.0.0 | **Author**: AI Architect | **Status**: Approved

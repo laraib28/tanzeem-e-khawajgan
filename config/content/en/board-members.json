@@ -7,9 +7,9 @@
     "name": "President Name",
     "position": "President & Chairman",
     "bio": "Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth.",
-    "email": "president@tanzeem-e-khawjgan.org",
+    "email": "president@tanzeem-e-khawajgan.org",
     "phone": "+92 XXX XXXXXXX",
-    "message": "Welcome to Tanzeem-e-Khawjgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives."
+    "message": "Welcome to Tanzeem-e-Khawajgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives."
   },
   "executiveCommittee": {
     "heading": "Executive Committee",
@@ -18,19 +18,19 @@
         "name": "Vice President Name",
         "position": "Vice President",
         "bio": "Supporting organizational leadership and strategic initiatives.",
-        "email": "vp@tanzeem-e-khawjgan.org"
+        "email": "vp@tanzeem-e-khawajgan.org"
       },
       {
         "name": "General Secretary Name",
         "position": "General Secretary",
         "bio": "Managing organizational operations and administrative affairs.",
-        "email": "secretary@tanzeem-e-khawjgan.org"
+        "email": "secretary@tanzeem-e-khawajgan.org"
       },
       {
         "name": "Treasurer Name",
         "position": "Treasurer",
         "bio": "Overseeing financial management and accountability.",
-        "email": "treasurer@tanzeem-e-khawjgan.org"
+        "email": "treasurer@tanzeem-e-khawajgan.org"
       }
     ]
   },

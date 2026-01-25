@@ -29,7 +29,7 @@ export const en = {
   },
   home: {
     hero: {
-      title: 'Welcome to Tanzeem-e-Khawjgan',
+      title: 'Welcome to Tanzeem-e-Khawajgan',
       subtitle: 'Serving the community with dedication',
     },
   },

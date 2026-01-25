@@ -43,7 +43,7 @@ Use:
 - Controlled form with useState
 
 FORM STRUCTURE:
-- Organization heading: Tanzeem-e-Khawjgan
+- Organization heading: Tanzeem-e-Khawajgan
 - Organization address
 - Logo placeholder
 - Title: Membership Form

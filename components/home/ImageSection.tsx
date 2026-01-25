@@ -7,7 +7,7 @@ interface ImageSectionProps {
 export function ImageSection({ title, description }: ImageSectionProps) {
   return (
     <section className="w-full py-12 md:py-16">
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-6 md:px-12 lg:px-16">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <h2 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">

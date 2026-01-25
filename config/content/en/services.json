@@ -7,43 +7,110 @@
     "description": "Our IT department offers comprehensive training programs designed to equip individuals with modern technical skills. From web development to software engineering, we provide quality education that prepares students for successful careers in technology.",
     "courses": [
       {
-        "title": "Web Development",
-        "description": "Learn HTML, CSS, JavaScript, and modern frameworks like React and Next.js to build professional websites.",
-        "duration": "6 months",
-        "level": "Beginner to Advanced"
-      },
-      {
-        "title": "Software Engineering",
-        "description": "Comprehensive training in software development, algorithms, and software design patterns.",
-        "duration": "12 months",
-        "level": "Intermediate to Advanced"
-      },
-      {
-        "title": "Mobile App Development",
-        "description": "Create Android and iOS applications using modern development frameworks.",
-        "duration": "8 months",
-        "level": "Intermediate"
-      },
-      {
-        "title": "Database Management",
-        "description": "Master SQL and NoSQL databases, data modeling, and database administration.",
+        "title": "Amazon Private Label (FBA)",
+        "description": "Master Amazon FBA business from product research, sourcing, listing optimization to launching your own private label brand.",
         "duration": "4 months",
         "level": "Beginner to Intermediate"
+      },
+      {
+        "title": "Shopify E-commerce",
+        "description": "Build and manage professional online stores with Shopify. Learn store setup, themes, apps, and marketing strategies.",
+        "duration": "3 months",
+        "level": "Beginner"
+      },
+      {
+        "title": "Python AI Chatbot Development",
+        "description": "Learn to build intelligent AI chatbots using Python. Master NLP, machine learning, and integrate with platforms like WhatsApp, Telegram, and web applications.",
+        "duration": "4 months",
+        "level": "Intermediate"
       }
     ],
     "summerCamp": "Special intensive training program for students during summer break with hands-on coding projects, robotics workshops, and digital skills development."
   },
   "medical": {
     "banner": {
-      "title": "Medical Services",
-      "subtitle": "Comprehensive healthcare for the community"
+      "title": "Medical Center",
+      "subtitle": "Quality healthcare services for the community"
     },
-    "description": "Our medical center provides accessible, affordable healthcare services with experienced professionals and modern facilities.",
-    "services": [
-      { "title": "General Consultation", "description": "Comprehensive health checkups with qualified physicians" },
-      { "title": "Diagnostic Services", "description": "Laboratory tests and medical imaging facilities" },
-      { "title": "Preventive Care", "description": "Vaccination programs and health screenings" },
-      { "title": "Emergency Care", "description": "24/7 emergency medical services" }
+    "description": "Our medical center provides accessible, affordable healthcare services with experienced doctors and modern facilities. We offer a wide range of medical services including general OPD, specialist consultations, dental care, eye care, and laboratory services.",
+    "doctors": [
+      {
+        "name": "Dr. Qurat Ul Ain",
+        "specialty": "General OPD & Ultrasound",
+        "timing": "Mon to Fri",
+        "icon": "general"
+      },
+      {
+        "name": "Dr. Farzana",
+        "specialty": "Child Specialist (Pediatrics)",
+        "timing": "Mon, Wed, Fri (11 AM - 1 PM)",
+        "icon": "child"
+      },
+      {
+        "name": "Dr. Naila Barni",
+        "specialty": "Gynaecologist",
+        "timing": "Tue, Thu, Sat (10 AM - 12:30 PM)",
+        "icon": "gynae"
+      },
+      {
+        "name": "Dr. Ahmed",
+        "specialty": "Diabetes & General Physician",
+        "timing": "Mon, Wed, Fri (6 PM - 8 PM & 11 AM - 1 PM)",
+        "icon": "diabetes"
+      },
+      {
+        "name": "Dr. Sohail",
+        "specialty": "Dentist",
+        "timing": "Mon to Thu, Sat (5 PM - 8 PM)",
+        "icon": "dental"
+      },
+      {
+        "name": "Dr. Rida",
+        "specialty": "Dentist",
+        "timing": "Mon, Wed, Fri (12:30 PM - 2 PM)",
+        "icon": "dental"
+      },
+      {
+        "name": "Dr. Faiza",
+        "specialty": "Eye Specialist (Ophthalmology)",
+        "timing": "Sat (11 AM - 12:30 PM)",
+        "icon": "eye"
+      },
+      {
+        "name": "Dr. Akif",
+        "specialty": "Homeopathic",
+        "timing": "Mon to Thu (12 PM - 2 PM)",
+        "icon": "homeo"
+      },
+      {
+        "name": "Dr. Rashid Mehmood",
+        "specialty": "Homeopathic & Hajama",
+        "timing": "Mon to Fri (10 AM - 1 PM)",
+        "icon": "homeo"
+      },
+      {
+        "name": "Mrs. Saima Rashid",
+        "specialty": "Hajama Therapy",
+        "timing": "Fri (6:30 PM - 8:30 PM)",
+        "icon": "therapy"
+      }
+    ],
+    "laboratory": {
+      "name": "Sindh Lab",
+      "services": "Complete Laboratory Services",
+      "timing": "Mon to Sat (10:30 AM - 8 PM)"
+    },
+    "partnerHospitals": [
+      {
+        "name": "Shed Hospital",
+        "benefit": "Free OPD",
+        "description": "Free OPD consultation for all Khawajgan members"
+      },
+      {
+        "name": "Abdul Samad Hospital",
+        "benefit": "Free Operations & Delivery",
+        "description": "Free surgical operations and delivery cases for Khawajgan members"
+      }
     ]
   },
   "education": {
@@ -61,27 +128,69 @@
   },
   "sports": {
     "banner": {
-      "title": "Sports Facilities",
-      "subtitle": "Promoting fitness and healthy lifestyles"
+      "title": "Sports Complex",
+      "subtitle": "Premium sports facilities for everyone"
     },
-    "description": "World-class facilities for various sports and fitness activities promoting physical health and community engagement.",
+    "description": "Experience top-notch sports facilities at affordable rates. Our modern sports complex offers Badminton, Cricket, Snooker, and Pool with professional-grade equipment and well-maintained playing areas.",
+    "timings": "10:00 AM - 4:00 AM",
     "facilities": [
-      { "title": "Football Field", "description": "Full-size field for matches and training" },
-      { "title": "Cricket Grounds", "description": "Well-maintained grounds for matches and practice" },
-      { "title": "Indoor Sports Hall", "description": "Basketball, volleyball, badminton facilities" },
-      { "title": "Fitness Center", "description": "Modern gym with professional trainers" }
+      {
+        "title": "Badminton Court",
+        "description": "Professional indoor badminton courts with quality flooring, proper lighting, and all equipment available.",
+        "price": "Rs. 1,500/hour",
+        "icon": "badminton"
+      },
+      {
+        "title": "Cricket Net",
+        "description": "Practice your batting and bowling in our well-maintained cricket nets with professional setup.",
+        "price": "Rs. 2,000 - 2,500/hour",
+        "icon": "cricket"
+      },
+      {
+        "title": "Snooker Table",
+        "description": "Premium snooker tables with professional cues and accessories. Perfect for casual games or serious practice.",
+        "price": "Rs. 7/minute",
+        "icon": "snooker"
+      },
+      {
+        "title": "Pool Table",
+        "description": "Enjoy a game of pool on our well-maintained tables. Great for friends and family entertainment.",
+        "price": "Rs. 100/game",
+        "icon": "pool"
+      }
     ]
   },
   "banquets": {
     "banner": {
-      "title": "Banquet Services",
-      "subtitle": "Perfect venues for your special occasions"
+      "title": "Banquet Halls",
+      "subtitle": "Elegant venues for your memorable occasions"
     },
-    "description": "Elegant spaces for weddings, conferences, and social gatherings with professional event management.",
+    "description": "Host your weddings, receptions, corporate events, and family gatherings in our beautifully designed banquet halls. We offer premium venues with excellent catering services to make your events truly special.",
     "halls": [
-      { "title": "Grand Hall", "description": "Large venue for up to 500 guests", "capacity": "500" },
-      { "title": "Executive Hall", "description": "Mid-sized venue for 200 guests", "capacity": "200" },
-      { "title": "Meeting Rooms", "description": "Professional spaces for 50 guests", "capacity": "50" }
+      {
+        "name": "Tehseena Banquet",
+        "description": "Our premium banquet hall perfect for grand weddings and large celebrations. Features elegant décor, spacious dance floor, and state-of-the-art sound system.",
+        "price": "Rs. 30,000 - 40,000",
+        "priceType": "per event",
+        "capacity": "300+",
+        "features": ["Grand Décor", "AC Hall", "Parking", "Catering Available", "Stage & Lighting"]
+      },
+      {
+        "name": "Iqbal Arena",
+        "description": "Versatile venue ideal for weddings, corporate events, and social gatherings. Complete catering packages available with delicious menu options.",
+        "price": "Rs. 250 - 300",
+        "priceType": "per head",
+        "capacity": "200+",
+        "features": ["Full Catering", "AC Hall", "Sound System", "Parking", "Customizable Setup"]
+      },
+      {
+        "name": "Abdul Lateef Hall",
+        "description": "Comfortable and affordable venue for medium-sized events. Perfect for family functions, engagement ceremonies, and community events.",
+        "price": "Rs. 250 - 300",
+        "priceType": "per head",
+        "capacity": "150+",
+        "features": ["Catering Included", "AC Hall", "Flexible Timing", "Parking", "Event Support"]
+      }
     ]
   },
   "graveyard": {

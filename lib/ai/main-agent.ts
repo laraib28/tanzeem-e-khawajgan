@@ -136,7 +136,7 @@ export class MainAgent {
       return 'السلام علیکم! میں تنظیم خواجگان کا AI اسسٹنٹ ہوں۔ میں آپ کی کیسے مدد کر سکتا ہوں؟'
     }
 
-    return 'Hello! I am the AI assistant for Tanzeem-e-Khawjgan. How can I help you today?'
+    return 'Hello! I am the AI assistant for Tanzeem-e-Khawajgan. How can I help you today?'
   }
 }
 

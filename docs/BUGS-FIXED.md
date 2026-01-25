@@ -1,6 +1,6 @@
 # Bug Fixes Log
 
-**Project**: Tanzeem-e-Khawjgan Website
+**Project**: Tanzeem-e-Khawajgan Website
 **Last Updated**: 2025-12-21
 **Status**: Bugs Fixed - Ready for Configuration
 

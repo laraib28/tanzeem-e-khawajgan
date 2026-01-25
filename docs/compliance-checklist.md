@@ -1,6 +1,6 @@
 # Phase 8 Compliance Checklist
 
-**Project**: Tanzeem-e-Khawjgan Website
+**Project**: Tanzeem-e-Khawajgan Website
 **Date**: 2025-12-21
 **Phase**: 8 - Polish & Cross-Cutting Concerns
 
@@ -140,7 +140,7 @@
 - **Status**: PASSED
 - **Implementation**:
   - Comprehensive metadata in `app/layout.tsx:22-66`
-  - Title template: `%s | Tanzeem-e-Khawjgan`
+  - Title template: `%s | Tanzeem-e-Khawajgan`
   - Description, keywords, authors
   - Open Graph tags
   - Twitter card

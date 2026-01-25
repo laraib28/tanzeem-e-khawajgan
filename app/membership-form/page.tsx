@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { Banner } from '@/components/ui/Banner'
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+
 // All countries list
 const COUNTRIES = [
   "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria",
@@ -27,7 +29,7 @@ const COUNTRIES = [
   "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"
 ]
 
-const CITIES = ["Bhera", "Miani", "Pind Dadan Khan"]
+const CITIES = ["Bhera", "Miani", "Pind Dadan Khan", "Sargodha", "Lahore", "Karachi", "Islamabad", "Rawalpindi", "Faisalabad", "Multan", "Other"]
 
 const CASTS = ["Roar", "Wohra", "Sethi", "Mehta", "Sehgal", "Dogal", "Kapoor", "Other"]
 
@@ -78,7 +80,9 @@ interface FormData {
   fatherInLawName: string
   cnic: string
   country: string
-  city: string
+  nativeCity: string
+  currentCity: string
+  address: string
   dateOfBirth: string
   cast: string
   sourceOfIncome: string
@@ -97,6 +101,11 @@ interface FormData {
   officeStamp: string
 }
 
+interface ValidationErrors {
+  membershipNumber?: string
+  [key: string]: string | undefined
+}
+
 export default function MembershipFormPage() {
   const [formData, setFormData] = useState<FormData>({
     membershipNumber: '',
@@ -107,7 +116,9 @@ export default function MembershipFormPage() {
     fatherInLawName: '',
     cnic: '',
     country: 'Pakistan',
-    city: '',
+    nativeCity: '',
+    currentCity: '',
+    address: '',
     dateOfBirth: '',
     cast: '',
     sourceOfIncome: '',
@@ -125,18 +136,157 @@ export default function MembershipFormPage() {
     officeStamp: ''
   })
 
+  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [lookupQuery, setLookupQuery] = useState('')
+  const [lookupType, setLookupType] = useState<'membership_no' | 'full_name'>('membership_no')
+  const [lookupMessage, setLookupMessage] = useState('')
+  const [lookupLoading, setLookupLoading] = useState(false)
+  const [submitMessage, setSubmitMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Validate membership number format
+  const validateMembershipNumber = (value: string): string | undefined => {
+    if (!value) return undefined // Optional field
+    if (value.length !== 5) {
+      return 'Membership number must be exactly 5 characters'
+    }
+    if (!/^[A-Za-z0-9]+$/.test(value)) {
+      return 'Membership number must be alphanumeric only'
+    }
+    return undefined
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+
+    // Validate membership number on change
+    if (name === 'membershipNumber') {
+      const error = validateMembershipNumber(value)
+      setErrors(prev => ({ ...prev, membershipNumber: error }))
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Member lookup function
+  const handleLookup = async () => {
+    if (!lookupQuery.trim()) {
+      setLookupMessage('Please enter a membership number or name')
+      return
+    }
+
+    setLookupLoading(true)
+    setLookupMessage('')
+
+    try {
+      const params = new URLSearchParams()
+      if (lookupType === 'membership_no') {
+        params.append('membership_no', lookupQuery.trim())
+      } else {
+        params.append('full_name', lookupQuery.trim())
+      }
+
+      const response = await fetch(`${BACKEND_URL}/lookup-member?${params.toString()}`)
+      const data = await response.json()
+
+      if (data.success && data.data && !data.multiple) {
+        // Single member found - fill the form
+        const member = data.data
+        setFormData(prev => ({
+          ...prev,
+          membershipNumber: member.membership_no || '',
+          gender: member.gender || '',
+          fullName: member.full_name || '',
+          relationshipType: member.relationship_type || 'son_of',
+          relationName: member.relation_name || '',
+          fatherInLawName: member.father_in_law_name || '',
+          cnic: member.cnic || '',
+          country: member.country || 'Pakistan',
+          nativeCity: member.native_city || member.city || '',
+          currentCity: member.current_city || '',
+          address: member.address || '',
+          dateOfBirth: member.date_of_birth || '',
+          cast: member.cast || '',
+          sourceOfIncome: member.source_of_income || '',
+          education: member.education || '',
+          occupation: member.occupation || '',
+          profession: member.profession || '',
+          numberOfDependents: member.dependents_count?.toString() || '',
+          relationshipWithDependents: member.dependents_relation || ''
+        }))
+        setLookupMessage('Member record found and loaded!')
+      } else if (data.multiple) {
+        setLookupMessage(`Multiple members found. Please be more specific or use membership number.`)
+      } else {
+        setLookupMessage('Record nahi mila')
+      }
+    } catch (error) {
+      console.error('Lookup error:', error)
+      setLookupMessage('Error looking up member. Please try again.')
+    } finally {
+      setLookupLoading(false)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    console.log('Form submitted:', formData)
+
+    // Validate membership number before submit
+    const membershipError = validateMembershipNumber(formData.membershipNumber)
+    if (membershipError) {
+      setErrors(prev => ({ ...prev, membershipNumber: membershipError }))
+      return
+    }
+
+    setIsSubmitting(true)
+    setSubmitMessage('')
+
+    try {
+      const response = await fetch(`${BACKEND_URL}/submit-membership`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          membership_no: formData.membershipNumber || null,
+          gender: formData.gender,
+          full_name: formData.fullName,
+          relationship_type: formData.relationshipType,
+          relation_name: formData.relationName,
+          father_in_law_name: formData.fatherInLawName || null,
+          cnic: formData.cnic,
+          country: formData.country,
+          native_city: formData.nativeCity,
+          current_city: formData.currentCity,
+          address: formData.address,
+          city: formData.nativeCity, // Legacy field
+          date_of_birth: formData.dateOfBirth,
+          cast: formData.cast,
+          source_of_income: formData.sourceOfIncome,
+          education: formData.education,
+          occupation: formData.occupation,
+          profession: formData.profession || null,
+          dependents_count: parseInt(formData.numberOfDependents) || 0,
+          dependents_relation: formData.relationshipWithDependents || null
+        })
+      })
+
+      const data = await response.json()
+
+      if (data.success) {
+        setSubmitMessage('Membership application submitted successfully!')
+        // Optionally reset form
+      } else {
+        setSubmitMessage(data.detail || 'Error submitting application')
+      }
+    } catch (error) {
+      console.error('Submit error:', error)
+      setSubmitMessage('Error submitting application. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   const inputClass = "w-full px-4 py-3 border border-foreground/20 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
   const labelClass = "block text-sm font-medium text-foreground mb-2"
+  const errorClass = "text-red-500 text-xs mt-1"
 
   return (
     <div className="min-h-screen">
@@ -144,6 +294,45 @@ export default function MembershipFormPage() {
 
       <section className="py-16 px-4">
         <div className="container mx-auto max-w-4xl">
+
+          {/* Member Lookup Section */}
+          <div className="bg-accent/10 border border-accent/30 rounded-lg p-6 mb-8">
+            <h3 className="text-lg font-semibold text-foreground mb-4">Member Lookup</h3>
+            <p className="text-sm text-foreground/70 mb-4">
+              Already a member? Search by membership number or name to load your information.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <select
+                value={lookupType}
+                onChange={(e) => setLookupType(e.target.value as 'membership_no' | 'full_name')}
+                className={`${inputClass} sm:w-48`}
+              >
+                <option value="membership_no">Membership No.</option>
+                <option value="full_name">Full Name</option>
+              </select>
+              <input
+                type="text"
+                value={lookupQuery}
+                onChange={(e) => setLookupQuery(e.target.value)}
+                placeholder={lookupType === 'membership_no' ? 'Enter membership number (e.g., AB123)' : 'Enter full name'}
+                className={`${inputClass} flex-1`}
+              />
+              <button
+                type="button"
+                onClick={handleLookup}
+                disabled={lookupLoading}
+                className="px-6 py-3 bg-accent text-white font-medium rounded-md hover:bg-accent/90 transition-colors disabled:opacity-50"
+              >
+                {lookupLoading ? 'Searching...' : 'Search'}
+              </button>
+            </div>
+            {lookupMessage && (
+              <p className={`mt-3 text-sm ${lookupMessage.includes('found') ? 'text-green-600' : 'text-red-500'}`}>
+                {lookupMessage}
+              </p>
+            )}
+          </div>
+
           <form onSubmit={handleSubmit} className="bg-background border border-foreground/10 rounded-lg shadow-sm">
             {/* ===== HEADER SECTION ===== */}
             <div className="border-b border-foreground/10 p-8">
@@ -155,7 +344,7 @@ export default function MembershipFormPage() {
 
                 {/* Organization Info */}
                 <div className="text-center flex-1">
-                  <h1 className="text-2xl font-bold text-primary">Tanzeem-e-Khawjgan</h1>
+                  <h1 className="text-2xl font-bold text-primary">Tanzeem-e-Khawajgan</h1>
                   <p className="text-foreground/70 mt-1">Organization Address</p>
                 </div>
 
@@ -186,9 +375,13 @@ export default function MembershipFormPage() {
                     name="membershipNumber"
                     value={formData.membershipNumber}
                     onChange={handleChange}
-                    className={inputClass}
-                    placeholder="Enter membership number"
+                    className={`${inputClass} ${errors.membershipNumber ? 'border-red-500' : ''}`}
+                    placeholder="e.g., AB123 (5 alphanumeric characters)"
+                    maxLength={5}
                   />
+                  {errors.membershipNumber && (
+                    <p className={errorClass}>{errors.membershipNumber}</p>
+                  )}
                 </div>
 
                 {/* Gender */}
@@ -325,24 +518,61 @@ export default function MembershipFormPage() {
                   </select>
                 </div>
 
-                {/* City */}
+                {/* Native City */}
                 <div>
-                  <label htmlFor="city" className={labelClass}>
-                    City <span className="text-red-500">*</span>
+                  <label htmlFor="nativeCity" className={labelClass}>
+                    Native City <span className="text-red-500">*</span>
                   </label>
                   <select
-                    id="city"
-                    name="city"
-                    value={formData.city}
+                    id="nativeCity"
+                    name="nativeCity"
+                    value={formData.nativeCity}
                     onChange={handleChange}
                     className={inputClass}
                     required
                   >
-                    <option value="">Select City</option>
+                    <option value="">Select Native City</option>
                     {CITIES.map(city => (
                       <option key={city} value={city}>{city}</option>
                     ))}
                   </select>
+                </div>
+
+                {/* Current City */}
+                <div>
+                  <label htmlFor="currentCity" className={labelClass}>
+                    Current City <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="currentCity"
+                    name="currentCity"
+                    value={formData.currentCity}
+                    onChange={handleChange}
+                    className={inputClass}
+                    required
+                  >
+                    <option value="">Select Current City</option>
+                    {CITIES.map(city => (
+                      <option key={city} value={city}>{city}</option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Address */}
+                <div className="md:col-span-2">
+                  <label htmlFor="address" className={labelClass}>
+                    Address <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    id="address"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    className={`${inputClass} resize-none`}
+                    rows={3}
+                    placeholder="Enter your complete address"
+                    required
+                  />
                 </div>
 
                 {/* Date of Birth */}
@@ -604,11 +834,17 @@ export default function MembershipFormPage() {
 
             {/* ===== SUBMIT BUTTON ===== */}
             <div className="p-8 border-t border-foreground/10">
+              {submitMessage && (
+                <p className={`mb-4 text-center ${submitMessage.includes('success') ? 'text-green-600' : 'text-red-500'}`}>
+                  {submitMessage}
+                </p>
+              )}
               <button
                 type="submit"
-                className="w-full px-6 py-3 min-h-[44px] bg-primary text-white font-medium rounded-md hover:bg-primary/90 transition-colors"
+                disabled={isSubmitting}
+                className="w-full px-6 py-3 min-h-[44px] bg-primary text-white font-medium rounded-md hover:bg-primary/90 transition-colors disabled:opacity-50"
               >
-                Submit Application
+                {isSubmitting ? 'Submitting...' : 'Submit Application'}
               </button>
             </div>
           </form>

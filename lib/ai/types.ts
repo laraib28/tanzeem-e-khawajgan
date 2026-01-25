@@ -37,6 +37,23 @@ export interface MCPConnection {
   retryCount: number
 }
 
+// Backend chatbot API types
+export interface ChatMessageRequest {
+  message: string
+  session_id?: string
+}
+
+export interface ChatMessageResponse {
+  response: string
+  intent: string
+  service: string | null
+  confidence: number
+  sources: string[]
+  can_help: boolean
+  follow_up: string | null
+  timestamp: string
+}
+
 export interface AIConfig {
   sessionTTL: number
   maxMessagesPerSession: number
