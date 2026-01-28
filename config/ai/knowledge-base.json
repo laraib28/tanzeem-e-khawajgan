@@ -1,170 +1,103 @@
 {
   "organization": {
-    "name": {
-      "en": "Tanzeem-e-Khawajgan",
-      "ur": "تنظیم خواجگان"
-    },
-    "description": {
-      "en": "Tanzeem-e-Khawajgan is a community-focused organization dedicated to serving society through various programs and services.",
-      "ur": "تنظیم خواجگان ایک کمیونٹی پر مبنی تنظیم ہے جو مختلف پروگراموں اور خدمات کے ذریعے معاشرے کی خدمت کے لیے وقف ہے۔"
-    },
-    "mission": {
-      "en": "To improve the community and enhance people's lives through quality services and programs in education, health, sports, and social welfare.",
-      "ur": "تعلیم، صحت، کھیل، اور سماجی بہبود میں معیاری خدمات اور پروگراموں کے ذریعے کمیونٹی کو بہتر بنانا اور لوگوں کی زندگیوں کو بڑھانا۔"
-    },
-    "values": {
-      "en": ["Integrity", "Service", "Community Responsibility", "Excellence", "Compassion"],
-      "ur": ["ایمانداری", "خدمت", "کمیونٹی کی ذمہ داری", "بہترین", "ہمدردی"]
-    }
+    "name": "Tanzeem-e-Khawajgan",
+    "description": "Tanzeem-e-Khawajgan is a community-focused organization dedicated to serving society through various programs and services including medical, IT, education, sports, and banquet facilities.",
+    "mission": "To improve the community and enhance people's lives through quality services and programs in education, health, sports, and social welfare.",
+    "values": ["Integrity", "Service", "Community Responsibility", "Excellence", "Compassion"]
   },
   "services": {
-    "it": {
-      "name": {
-        "en": "IT Services",
-        "ur": "آئی ٹی خدمات"
-      },
-      "description": {
-        "en": "Professional IT training including Web Development, Graphic Design, and Programming courses",
-        "ur": "پیشہ ور آئی ٹی تربیت بشمول ویب ڈویلپمنٹ، گرافک ڈیزائن، اور پروگرامنگ کورسز"
-      },
-      "page": "/services/it"
-    },
     "medical": {
-      "name": {
-        "en": "Medical Services",
-        "ur": "طبی خدمات"
-      },
-      "description": {
-        "en": "Healthcare services including General Checkups, Laboratory Tests, and Medical Consultations",
-        "ur": "صحت کی دیکھ بھال کی خدمات بشمول عام چیک اپ، لیبارٹری ٹیسٹ، اور طبی مشاورت"
-      },
+      "name": "Medical Center",
+      "description": "Quality healthcare services with experienced doctors and modern facilities.",
+      "doctors": [
+        {"name": "Dr. Qurat Ul Ain", "specialty": "General OPD & Ultrasound", "timing": "Mon to Fri"},
+        {"name": "Dr. Farzana", "specialty": "Child Specialist (Pediatrics)", "timing": "Mon, Wed, Fri (11 AM - 1 PM)"},
+        {"name": "Dr. Naila Barni", "specialty": "Gynaecologist", "timing": "Tue, Thu, Sat (10 AM - 12:30 PM)"},
+        {"name": "Dr. Ahmed", "specialty": "Diabetes & General Physician", "timing": "Mon, Wed, Fri (6 PM - 8 PM & 11 AM - 1 PM)"},
+        {"name": "Dr. Sohail", "specialty": "Dentist", "timing": "Mon to Thu, Sat (5 PM - 8 PM)"},
+        {"name": "Dr. Rida", "specialty": "Dentist", "timing": "Mon, Wed, Fri (12:30 PM - 2 PM)"},
+        {"name": "Dr. Faiza", "specialty": "Eye Specialist", "timing": "Sat (11 AM - 12:30 PM)"},
+        {"name": "Dr. Akif", "specialty": "Homeopathic", "timing": "Mon to Thu (12 PM - 2 PM)"},
+        {"name": "Dr. Rashid Mehmood", "specialty": "Homeopathic & Hajama", "timing": "Mon to Fri (10 AM - 1 PM)"},
+        {"name": "Mrs. Saima Rashid", "specialty": "Hajama Therapy", "timing": "Fri (6:30 PM - 8:30 PM)"}
+      ],
+      "laboratory": {"name": "Sindh Lab", "timing": "Mon to Sat (10:30 AM - 8 PM)"},
+      "partnerHospitals": [
+        {"name": "Shed Hospital", "benefit": "Free OPD for Khawajgan members"},
+        {"name": "Abdul Samad Hospital", "benefit": "Free Operations & Delivery for Khawajgan members"}
+      ],
       "page": "/services/medical"
     },
-    "education": {
-      "name": {
-        "en": "Education Services",
-        "ur": "تعلیمی خدمات"
-      },
-      "description": {
-        "en": "Educational programs including Scholarships, Tuition Support, and Learning Resources",
-        "ur": "تعلیمی پروگرام بشمول اسکالرشپ، ٹیوشن سپورٹ، اور سیکھنے کے وسائل"
-      },
-      "page": "/services/education"
+    "it": {
+      "name": "IT Services",
+      "description": "Professional IT training for modern technical skills.",
+      "courses": [
+        {"title": "Amazon Private Label (FBA)", "duration": "4 months", "level": "Beginner to Intermediate", "description": "Master Amazon FBA business from product research to launching your private label brand."},
+        {"title": "Shopify E-commerce", "duration": "3 months", "level": "Beginner", "description": "Build and manage professional online stores with Shopify."},
+        {"title": "Python AI Chatbot Development", "duration": "4 months", "level": "Intermediate", "description": "Learn to build intelligent AI chatbots using Python, NLP and machine learning."}
+      ],
+      "summerCamp": "Special intensive training program for students during summer break with hands-on coding projects.",
+      "page": "/services/it",
+      "enrollmentForm": "/services/it#enrollment"
     },
     "sports": {
-      "name": {
-        "en": "Sports Facilities",
-        "ur": "کھیلوں کی سہولیات"
-      },
-      "description": {
-        "en": "Sports facilities including Fitness Center, Basketball Court, and other recreational areas",
-        "ur": "کھیلوں کی سہولیات بشمول فٹنس سینٹر، باسکٹ بال کورٹ، اور دیگر تفریحی علاقے"
-      },
+      "name": "Sports Complex",
+      "description": "Premium sports facilities for everyone.",
+      "timings": "10:00 AM - 4:00 AM",
+      "facilities": [
+        {"title": "Badminton Court", "price": "Rs. 1,500/hour", "description": "Professional indoor badminton courts"},
+        {"title": "Cricket Net", "price": "Rs. 2,000 - 2,500/hour", "description": "Well-maintained cricket nets"},
+        {"title": "Snooker Table", "price": "Rs. 7/minute", "description": "Premium snooker tables"},
+        {"title": "Pool Table", "price": "Rs. 100/game", "description": "Well-maintained pool tables"}
+      ],
       "page": "/services/sports"
     },
     "banquets": {
-      "name": {
-        "en": "Banquet Halls",
-        "ur": "بینکویٹ ہال"
-      },
-      "description": {
-        "en": "Event venues and banquet halls available for community events and gatherings",
-        "ur": "کمیونٹی کی تقریبات اور اجتماعات کے لیے دستیاب ایونٹ کے مقامات اور بینکویٹ ہال"
-      },
+      "name": "Banquet Halls",
+      "description": "Elegant venues for weddings, receptions, and events.",
+      "halls": [
+        {"name": "Tehseena Banquet", "price": "Rs. 30,000 - 40,000 per event", "capacity": "300+", "features": ["Grand Décor", "AC Hall", "Parking", "Catering Available", "Stage & Lighting"]},
+        {"name": "Iqbal Arena", "price": "Rs. 250 - 300 per head", "capacity": "200+", "features": ["Full Catering", "AC Hall", "Sound System", "Parking"]},
+        {"name": "Abdul Lateef Hall", "price": "Rs. 250 - 300 per head", "capacity": "150+", "features": ["Catering Included", "AC Hall", "Parking"]}
+      ],
+      "bookingContact": "Contact for availability and booking",
       "page": "/services/banquets"
     },
+    "education": {
+      "name": "Education Services",
+      "description": "Educational programs and support services.",
+      "programs": ["Tutoring Services", "Scholarship Program", "Adult Education", "Library Services"],
+      "page": "/services/education"
+    },
     "graveyard": {
-      "name": {
-        "en": "Graveyard Services",
-        "ur": "قبرستان کی خدمات"
-      },
-      "description": {
-        "en": "Burial services and graveyard management for community members",
-        "ur": "کمیونٹی کے اراکین کے لیے تدفین کی خدمات اور قبرستان کا انتظام"
-      },
+      "name": "Graveyard Services",
+      "description": "Peaceful and well-maintained resting place with burial services.",
+      "services": ["Burial Plots", "Funeral Services", "Maintenance"],
       "page": "/services/graveyard"
     }
   },
-  "pages": {
-    "home": {
-      "path": "/",
-      "description": {
-        "en": "Homepage with organization overview and quick access to services",
-        "ur": "تنظیم کے جائزے اور خدمات تک فوری رسائی کے ساتھ ہوم پیج"
-      }
+  "forms": {
+    "membership": {
+      "page": "/membership-form",
+      "fields": ["Full Name", "Father's Name", "CNIC", "Phone", "Email", "Address"],
+      "description": "Become a member of Tanzeem-e-Khawajgan to access benefits like free hospital services, discounts, and community support."
     },
-    "about": {
-      "path": "/about",
-      "description": {
-        "en": "Information about the organization's history, timeline, and values",
-        "ur": "تنظیم کی تاریخ، ٹائم لائن، اور اقدار کے بارے میں معلومات"
-      }
-    },
-    "mission": {
-      "path": "/vision/mission",
-      "description": {
-        "en": "Organization's mission statement and strategic objectives",
-        "ur": "تنظیم کا مشن بیان اور اسٹریٹجک مقاصد"
-      }
-    },
-    "board": {
-      "path": "/vision/board-members",
-      "description": {
-        "en": "Board of members and leadership team information",
-        "ur": "بورڈ آف ممبرز اور لیڈرشپ ٹیم کی معلومات"
-      }
-    },
-    "news": {
-      "path": "/vision/news-events",
-      "description": {
-        "en": "Latest news updates and upcoming events",
-        "ur": "تازہ ترین خبریں اور آنے والے واقعات"
-      }
-    },
-    "contact": {
-      "path": "/contact",
-      "description": {
-        "en": "Contact information, location map, and feedback form",
-        "ur": "رابطے کی معلومات، مقام کا نقشہ، اور رائے کا فارم"
-      }
+    "itEnrollment": {
+      "page": "/services/it",
+      "fields": ["Name", "Phone", "Email", "Course Selection"],
+      "description": "Enroll in IT courses including Amazon FBA, Shopify, and Python AI Chatbot development."
     }
   },
-  "commonQuestions": {
-    "en": [
-      {
-        "question": "What services do you offer?",
-        "answer": "We offer IT training, Medical services, Education programs, Sports facilities, Banquet halls, and Graveyard services."
-      },
-      {
-        "question": "How can I contact you?",
-        "answer": "You can contact us through the Contact page at /contact or by filling out the feedback form."
-      },
-      {
-        "question": "How do I enroll in IT courses?",
-        "answer": "Visit the IT Services page at /services/it and fill out the inquiry form to enroll in courses."
-      },
-      {
-        "question": "Where are you located?",
-        "answer": "You can find our location on the Contact page with an interactive map showing our address."
-      }
-    ],
-    "ur": [
-      {
-        "question": "آپ کون سی خدمات پیش کرتے ہیں؟",
-        "answer": "ہم آئی ٹی تربیت، طبی خدمات، تعلیمی پروگرام، کھیلوں کی سہولیات، بینکویٹ ہال، اور قبرستان کی خدمات پیش کرتے ہیں۔"
-      },
-      {
-        "question": "میں آپ سے کیسے رابطہ کر سکتا ہوں؟",
-        "answer": "آپ /contact پر رابطہ صفحہ کے ذریعے یا رائے کا فارم بھر کر ہم سے رابطہ کر سکتے ہیں۔"
-      },
-      {
-        "question": "میں آئی ٹی کورسز میں کیسے داخلہ لوں؟",
-        "answer": "کورسز میں داخلہ لینے کے لیے /services/it پر آئی ٹی سروسز صفحہ پر جائیں اور استفسار کا فارم بھریں۔"
-      },
-      {
-        "question": "آپ کہاں واقع ہیں؟",
-        "answer": "آپ رابطہ صفحہ پر ہمارا مقام تلاش کر سکتے ہیں جس میں ہمارا پتہ دکھانے والا ایک انٹرایکٹو نقشہ ہے۔"
-      }
-    ]
+  "romanUrduPhrases": {
+    "greetings": ["salam", "assalam", "assalamualaikum", "hello", "hi", "aoa"],
+    "thanks": ["shukriya", "thanks", "thank you", "meherbani"],
+    "yes": ["haan", "ji", "yes", "han"],
+    "no": ["nahi", "nhi", "no"],
+    "help": ["madad", "help", "mujhe help chahiye"],
+    "booking": ["booking", "book", "reserve", "hall chahiye"],
+    "doctor": ["doctor", "dr", "daaktar", "tabib"],
+    "course": ["course", "kors", "class", "training"],
+    "sports": ["khel", "sports", "game", "khelna"],
+    "price": ["price", "rate", "kitne", "kitna", "kya rate", "kiraya"]
   }
 }

@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 
 interface HeroSectionProps {
   title: string
@@ -46,15 +47,13 @@ export function HeroSection({
 
           {/* Image - Right */}
           <div className="relative w-full h-[400px] lg:h-[500px] rounded-lg overflow-hidden shadow-2xl">
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20">
-              {/* Placeholder - Replace with actual image */}
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
-                <div className="text-center p-8">
-                  <div className="text-6xl mb-4">🏛️</div>
-                  <p className="text-foreground/60">{imageAlt}</p>
-                </div>
-              </div>
-            </div>
+            <Image
+              src="/main.jpeg"
+              alt={imageAlt}
+              fill
+              className="object-cover"
+              priority
+            />
           </div>
         </div>
       </div>

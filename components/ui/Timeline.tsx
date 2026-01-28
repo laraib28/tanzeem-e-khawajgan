@@ -1,9 +1,11 @@
 import { Calendar } from 'lucide-react'
+import Image from 'next/image'
 
 interface TimelineEvent {
   year: string
   title: string
   description: string
+  image?: string
 }
 
 interface TimelineProps {
@@ -27,15 +29,31 @@ export function Timeline({ events }: TimelineProps) {
           >
             {/* Event Content */}
             <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right md:pr-8' : 'md:text-left md:pl-8'} pl-12 md:pl-0`}>
-              <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                <div className="flex items-center gap-2 mb-2 text-accent font-semibold">
-                  <Calendar className="w-4 h-4" />
-                  <span>{event.year}</span>
+              <div className="relative rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
+                {/* Background Image */}
+                {event.image && (
+                  <div className="absolute inset-0">
+                    <Image
+                      src={event.image}
+                      alt={event.title}
+                      fill
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
+                  </div>
+                )}
+
+                {/* Content */}
+                <div className={`relative p-6 ${event.image ? 'text-white' : 'bg-white'}`}>
+                  <div className={`flex items-center gap-2 mb-2 font-semibold ${event.image ? 'text-primary' : 'text-accent'}`}>
+                    <Calendar className="w-4 h-4" />
+                    <span>{event.year}</span>
+                  </div>
+                  <h3 className={`text-xl font-bold mb-2 ${event.image ? 'text-white' : 'text-foreground'}`}>
+                    {event.title}
+                  </h3>
+                  <p className={event.image ? 'text-white/90' : 'text-foreground/70'}>{event.description}</p>
                 </div>
-                <h3 className="text-xl font-bold text-foreground mb-2">
-                  {event.title}
-                </h3>
-                <p className="text-foreground/70">{event.description}</p>
               </div>
             </div>
 

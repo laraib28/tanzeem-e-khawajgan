@@ -32,7 +32,7 @@ export function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-border/30 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 w-full bg-accent shadow-lg">
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo - Center on mobile, left on desktop */}
@@ -58,7 +58,7 @@ export function Navbar() {
                     <button
                       type="button"
                       className={`inline-flex items-center gap-x-1 px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
-                        isActive(item.submenu[0].href) ? 'text-primary' : 'text-foreground'
+                        isActive(item.submenu[0].href) ? 'text-primary' : 'text-white'
                       }`}
                     >
                       {item.label.en}
@@ -86,7 +86,7 @@ export function Navbar() {
                   <Link
                     href={item.href!}
                     className={`inline-flex items-center px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
-                      isActive(item.href!) ? 'text-primary' : 'text-foreground'
+                      isActive(item.href!) ? 'text-primary' : 'text-white'
                     }`}
                   >
                     {item.label.en}
@@ -111,7 +111,7 @@ export function Navbar() {
           <button
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md text-foreground hover:text-primary hover:bg-primary/10 transition-colors"
+            className="md:hidden inline-flex items-center justify-center min-h-[44px] min-w-[44px] rounded-md text-white hover:text-primary hover:bg-white/10 transition-colors"
             aria-label="Toggle menu"
             aria-expanded={mobileMenuOpen}
           >
@@ -121,7 +121,7 @@ export function Navbar() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border/30 bg-background">
+          <div className="md:hidden border-t border-white/20 bg-accent">
             <ul className="py-4">
               {navigationConfig.mainMenu.map((item) => (
                 <li key={item.id}>
@@ -130,7 +130,7 @@ export function Navbar() {
                       <button
                         type="button"
                         onClick={() => toggleMobileDropdown(item.id)}
-                        className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-foreground hover:bg-primary/10 hover:text-primary transition-colors min-h-[44px]"
+                        className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium text-white hover:bg-white/10 hover:text-primary transition-colors min-h-[44px]"
                         aria-expanded={openDropdown === item.id}
                       >
                         <span>{item.label.en}</span>
@@ -140,7 +140,7 @@ export function Navbar() {
                         />
                       </button>
                       {openDropdown === item.id && (
-                        <ul className="bg-background/50 border-l-2 border-primary/20 ml-4">
+                        <ul className="bg-white/10 border-l-2 border-primary/40 ml-4">
                           {item.submenu.map((subItem) => (
                             <li key={subItem.id}>
                               <Link
@@ -149,8 +149,8 @@ export function Navbar() {
                                   setMobileMenuOpen(false)
                                   setOpenDropdown(null)
                                 }}
-                                className={`flex items-center px-4 py-3 text-sm transition-colors hover:bg-primary/10 hover:text-primary min-h-[44px] ${
-                                  isActive(subItem.href) ? 'text-primary font-medium' : 'text-foreground'
+                                className={`flex items-center px-4 py-3 text-sm transition-colors hover:bg-white/10 hover:text-primary min-h-[44px] ${
+                                  isActive(subItem.href) ? 'text-primary font-medium' : 'text-white'
                                 }`}
                               >
                                 {subItem.label.en}
@@ -167,8 +167,8 @@ export function Navbar() {
                         setMobileMenuOpen(false)
                         setOpenDropdown(null)
                       }}
-                      className={`flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-primary/10 hover:text-primary min-h-[44px] ${
-                        isActive(item.href!) ? 'text-primary' : 'text-foreground'
+                      className={`flex items-center px-4 py-3 text-sm font-medium transition-colors hover:bg-white/10 hover:text-primary min-h-[44px] ${
+                        isActive(item.href!) ? 'text-primary' : 'text-white'
                       }`}
                     >
                       {item.label.en}

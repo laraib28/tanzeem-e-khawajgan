@@ -5,7 +5,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="w-full border-t bg-background">
+    <footer className="w-full bg-accent text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* About Section */}
@@ -13,27 +13,27 @@ export function Footer() {
             <h3 className="text-lg font-semibold mb-4 text-primary">
               {siteConfig.siteName.en}
             </h3>
-            <p className="text-sm text-foreground/70">
+            <p className="text-sm text-white/80">
               {siteConfig.siteDescription.en}
             </p>
           </div>
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Quick Links</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">Quick Links</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/about" className="text-sm text-foreground/70 hover:text-primary transition-colors">
+                <Link href="/about" className="text-sm text-white/80 hover:text-primary transition-colors">
                   About Us
                 </Link>
               </li>
               <li>
-                <Link href="/services/it" className="text-sm text-foreground/70 hover:text-primary transition-colors">
+                <Link href="/services/it" className="text-sm text-white/80 hover:text-primary transition-colors">
                   Services
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-sm text-foreground/70 hover:text-primary transition-colors">
+                <Link href="/contact" className="text-sm text-white/80 hover:text-primary transition-colors">
                   Contact Us
                 </Link>
               </li>
@@ -42,8 +42,8 @@ export function Footer() {
 
           {/* Contact Information */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Contact</h3>
-            <ul className="space-y-2 text-sm text-foreground/70">
+            <h3 className="text-lg font-semibold mb-4 text-white">Contact</h3>
+            <ul className="space-y-2 text-sm text-white/80">
               <li>
                 <a href={`mailto:${siteConfig.contact.email}`} className="hover:text-primary transition-colors">
                   {siteConfig.contact.email}
@@ -61,15 +61,15 @@ export function Footer() {
 
         {/* Social Media Links - Only show if configured */}
         {(siteConfig.social.facebook || siteConfig.social.twitter || siteConfig.social.instagram) && (
-          <div className="mt-8 pt-8 border-t">
-            <h3 className="text-lg font-semibold mb-4 text-center">Follow Us</h3>
+          <div className="mt-8 pt-8 border-t border-white/20">
+            <h3 className="text-lg font-semibold mb-4 text-center text-white">Follow Us</h3>
             <div className="flex justify-center gap-6">
               {siteConfig.social.facebook && (
                 <a
                   href={siteConfig.social.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="text-white/80 hover:text-primary transition-colors"
                   aria-label="Facebook"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -82,7 +82,7 @@ export function Footer() {
                   href={siteConfig.social.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="text-white/80 hover:text-primary transition-colors"
                   aria-label="Twitter"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -95,7 +95,7 @@ export function Footer() {
                   href={siteConfig.social.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-foreground/70 hover:text-primary transition-colors"
+                  className="text-white/80 hover:text-primary transition-colors"
                   aria-label="Instagram"
                 >
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
@@ -108,7 +108,7 @@ export function Footer() {
         )}
 
         {/* Copyright */}
-        <div className="mt-8 pt-8 border-t text-center text-sm text-foreground/60">
+        <div className="mt-8 pt-8 border-t border-white/20 text-center text-sm text-white/70">
           <p>
             &copy; {currentYear} {siteConfig.siteName.en}. All rights reserved.
           </p>

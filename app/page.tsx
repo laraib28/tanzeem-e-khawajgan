@@ -1,6 +1,6 @@
 import { HeroSection } from '@/components/home/HeroSection'
 import { IntroductionSection } from '@/components/home/IntroductionSection'
-import { ImageSection } from '@/components/home/ImageSection'
+import { ProgramsSection } from '@/components/home/ProgramsSection'
 import { ImpactCounters } from '@/components/home/ImpactCounters'
 import homeContent from '@/config/content/en/home.json'
 
@@ -20,11 +20,7 @@ export default function Home() {
         content={homeContent.introduction.content}
         highlights={homeContent.introduction.highlights}
       />
-      <ImageSection
-        title={homeContent.imageSection.title}
-        description={homeContent.imageSection.description}
-        imageAlt={homeContent.imageSection.imageAlt}
-      />
+      <ProgramsSection />
       <ImpactCounters counters={homeContent.impactCounters} />
     </main>
   )

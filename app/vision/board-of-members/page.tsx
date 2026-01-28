@@ -2,100 +2,122 @@
 
 import { useState } from 'react'
 import { Banner } from '@/components/ui/Banner'
-import { User } from 'lucide-react'
+import { User, Mail, Phone } from 'lucide-react'
 import Image from 'next/image'
 
-// President - Featured
 const president = {
   name: 'Khawaja Javed Iqbal',
-  designation: 'President',
+  designation: 'President & Chairman',
   image: '/ijaz.jpeg',
-  message: 'Welcome to Tanzeem-e-Khawajgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives.'
+  description: 'Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth.',
+  message: 'Welcome to Tanzeem-e-Khawjgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives.',
+  email: 'president@tanzeem-e-khawjgan.org',
+  phone: '+92 XXX XXXXXXX'
 }
 
-// Board of Members - Other leadership with designations
 const boardMembers = [
   {
     name: 'Khawaja Haji Muhammad Ahmed',
     designation: 'Sr. Vice President',
     image: '/ahmed.jpeg',
+    description: 'Supporting organizational leadership and strategic initiatives.',
+    email: 'srvp@tanzeem-e-khawjgan.org'
   },
   {
     name: 'Khawaja Muhammad Ahmed',
     designation: 'Vice President',
     image: '/board-members/khawaja-muhammad-ahmed.jpg',
+    description: 'Guiding organizational growth and community relations.',
+    email: 'vp@tanzeem-e-khawjgan.org'
   },
   {
     name: 'Khawaja Babar Hafeez',
     designation: 'General Secretary',
     image: '/baber.jpeg',
+    description: 'Managing organizational operations and administrative affairs.',
+    email: 'secretary@tanzeem-e-khawjgan.org'
   },
   {
     name: 'Zafar Jawed Khawaja',
     designation: 'Finance Secretary',
     image: '/board-members/zafar-jawed-khawaja.jpg',
+    description: 'Overseeing financial management and accountability.',
+    email: 'finance@tanzeem-e-khawjgan.org'
   },
   {
     name: 'Khawaja Mutayyab Shareef',
     designation: 'Joint Secretary',
     image: '/mutayab.jpeg',
+    description: 'Coordinating organizational activities and member engagement.',
+    email: 'joint@tanzeem-e-khawjgan.org'
   },
   {
     name: 'Khawaja Haseeb Mazher',
     designation: 'Social Secretary',
     image: '/haseeb.jpeg',
+    description: 'Leading social programs and community events.',
+    email: 'social@tanzeem-e-khawjgan.org'
   },
 ]
 
-
-// Committee Members - No specific designation
 const committeeMembers = [
-  { name: 'Khawaja Mustafa Fazal', image: '/mustafa.jpeg' },
-  { name: 'Khawaja Masood Ahmed', image: '/masood.jpeg' },
-  { name: 'Khawaja Irfan Munir', image: '/irfan.jpeg' },
-  { name: 'Khawaja Junaid Ahmed', image: '/junaid.jpeg' },
-  { name: 'Khawaja Rehan Saeed', image: '/rehan.jpeg' },
-  { name: 'Khawaja Abdul Mannan', image: '/adul-manan.jpeg' },
-  { name: 'Khawaja Aijaz Ahmed', image: '/ijaz.jpeg' },
-  { name: 'Khawaja Bilal Ahmed', image: '/bilal.jpeg' },
-  { name: 'Khawaja Adeel Tahir', image: '/adeel.jpeg' },
-  { name: 'Khawaja Rizwan Waqar', image: '/rizwan.jpeg' },
+  { name: 'Khawaja Mustafa Fazal', image: '/mustafa.jpeg', description: 'Active contributor to community initiatives.' },
+  { name: 'Khawaja Masood Ahmed', image: '/masood.jpeg', description: 'Dedicated member serving the organization.' },
+  { name: 'Khawaja Irfan Munir', image: '/irfan.jpeg', description: 'Supporting organizational activities.' },
+  { name: 'Khawaja Junaid Ahmed', image: '/junaid.jpeg', description: 'Committed to community development.' },
+  { name: 'Khawaja Rehan Saeed', image: '/rehan.jpeg', description: 'Contributing to welfare programs.' },
+  { name: 'Khawaja Abdul Mannan', image: '/adul-manan.jpeg', description: 'Active participant in community service.' },
+  { name: 'Khawaja Aijaz Ahmed', image: '/ijaz.jpeg', description: 'Supporting organizational growth.' },
+  { name: 'Khawaja Bilal Ahmed', image: '/bilal.jpeg', description: 'Dedicated to community welfare.' },
+  { name: 'Khawaja Adeel Tahir', image: '/adeel.jpeg', description: 'Contributing to organizational success.' },
+  { name: 'Khawaja Rizwan Waqar', image: '/rizwan.jpeg', description: 'Active member in community programs.' },
 ]
 
-// President Featured Card
-function PresidentCard({ name, designation, image, message }: { name: string; designation: string; image: string; message: string }) {
+function PresidentCard() {
   const [imageError, setImageError] = useState(false)
 
   return (
-    <div className="bg-primary/5 rounded-xl p-8 md:p-10 shadow-sm border border-foreground/5">
-      <div className="flex flex-col items-center gap-6">
-        {/* Image - Top */}
-        <div className="w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-72 lg:h-72 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden flex-shrink-0">
+    <div className="bg-[#FDF6E9] rounded-xl p-6 md:p-10 shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+      <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
+        <div className="w-full lg:w-[45%] aspect-[4/3] rounded-lg overflow-hidden bg-gradient-to-br from-[#D4C4A8] via-[#B8C4B8] to-[#A8C4C4] flex items-center justify-center">
           {imageError ? (
-            <User className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 text-primary" />
+            <User className="w-24 h-24 text-primary/60" />
           ) : (
             <Image
-              src={image}
-              alt={name}
-              width={288}
-              height={288}
+              src={president.image}
+              alt={president.name}
+              width={500}
+              height={375}
               className="w-full h-full object-cover"
               onError={() => setImageError(true)}
             />
           )}
         </div>
-
-        {/* Content - Bottom */}
-        <div className="flex-1 text-center">
-          <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
-            {name}
+        <div className="flex-1 text-left">
+          <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+            {president.name}
           </h3>
-          <p className="text-lg sm:text-xl font-medium text-primary mb-5">
-            {designation}
+          <p className="text-lg md:text-xl font-semibold text-primary mb-4">
+            {president.designation}
           </p>
-          <p className="text-base sm:text-lg text-foreground/80 leading-relaxed max-w-md mx-auto">
-            {message}
+          <p className="text-base text-foreground/80 mb-6 leading-relaxed">
+            {president.description}
           </p>
+          <div className="border-l-4 border-accent pl-4 mb-6">
+            <p className="text-base italic text-foreground/70 leading-relaxed">
+              &ldquo;{president.message}&rdquo;
+            </p>
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center gap-3 text-foreground/70">
+              <Mail className="w-5 h-5 text-accent" />
+              <span className="text-sm">{president.email}</span>
+            </div>
+            <div className="flex items-center gap-3 text-foreground/70">
+              <Phone className="w-5 h-5 text-accent" />
+              <span className="text-sm">{president.phone}</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -104,54 +126,54 @@ function PresidentCard({ name, designation, image, message }: { name: string; de
 
 interface MemberCardProps {
   name: string
-  designation?: string
+  designation: string
   image?: string
+  description?: string
+  email?: string
   variant?: 'primary' | 'accent'
 }
 
-function MemberCard({ name, designation, image, variant = 'primary' }: MemberCardProps) {
+function MemberCard({ name, designation, image, description, email, variant = 'primary' }: MemberCardProps) {
   const [imageError, setImageError] = useState(false)
-
-  const bgClass = variant === 'primary' ? 'bg-primary/5' : 'bg-accent/5'
-  const iconBgClass = variant === 'primary' ? 'bg-primary/10' : 'bg-accent/10'
-  const iconColorClass = variant === 'primary' ? 'text-primary' : 'text-accent'
-  const designationColorClass = variant === 'primary' ? 'text-primary' : 'text-accent'
 
   const showFallback = !image || imageError
 
   return (
-    <div
-      className={`${bgClass} rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow border border-foreground/5`}
-    >
-      <div className="flex flex-col items-center text-center space-y-4">
-        {/* Avatar - Image or Icon Fallback */}
-        <div
-          className={`w-20 h-20 rounded-full ${iconBgClass} flex items-center justify-center overflow-hidden`}
-        >
-          {showFallback ? (
-            <User className={`w-10 h-10 ${iconColorClass}`} />
-          ) : (
-            <Image
-              src={image}
-              alt={name}
-              width={80}
-              height={80}
-              className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
-            />
-          )}
-        </div>
-
-        {/* Name */}
-        <h3 className="text-lg font-bold text-foreground leading-tight">
+    <div className="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
+      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#D4C4A8] via-[#B8C4B8] to-[#A8C4C4] flex items-center justify-center">
+        {showFallback ? (
+          <User className="w-16 h-16 text-primary/60" />
+        ) : (
+          <Image
+            src={image}
+            alt={name}
+            fill
+            className="object-cover"
+            onError={() => setImageError(true)}
+          />
+        )}
+      </div>
+      <div className="p-5 flex flex-col flex-1 bg-white">
+        <h3 className="text-lg font-bold text-foreground text-left">
           {name}
         </h3>
-
-        {/* Designation */}
-        {designation && (
-          <p className={`text-sm font-medium ${designationColorClass}`}>
-            {designation}
+        <p className="text-sm font-semibold text-primary text-left mt-1">
+          {designation}
+        </p>
+        {description && (
+          <p className="text-sm text-foreground/70 text-left mt-3 leading-relaxed">
+            {description}
           </p>
+        )}
+        {email && (
+          <>
+            <div className="border-t border-foreground/10 mt-4 pt-4">
+              <div className="flex items-center gap-2 text-foreground/70">
+                <Mail className="w-4 h-4 text-accent" />
+                <span className="text-xs">{email}</span>
+              </div>
+            </div>
+          </>
         )}
       </div>
     </div>
@@ -160,40 +182,35 @@ function MemberCard({ name, designation, image, variant = 'primary' }: MemberCar
 
 export default function BoardOfMembersPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-primary/5">
       <Banner
         title="Board of Members"
         subtitle="Meet the dedicated leaders guiding our organization"
       />
 
-      {/* President Section - Featured */}
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-6 md:px-12 lg:px-16">
-          <div className="max-w-md sm:max-w-lg mx-auto">
-            <PresidentCard
-              name={president.name}
-              designation={president.designation}
-              image={president.image}
-              message={president.message}
-            />
+          <div className="max-w-5xl mx-auto">
+            <PresidentCard />
           </div>
         </div>
       </section>
 
-      {/* Board of Members Section */}
-      <section className="py-12 md:py-16 bg-primary/5">
+      <section className="py-12 md:py-16 bg-background">
         <div className="container mx-auto px-6 md:px-12 lg:px-16">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-foreground">
+            <h2 className="text-2xl md:text-3xl font-bold text-left mb-8 text-foreground">
               Board of Members
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {boardMembers.map((member, index) => (
                 <MemberCard
                   key={index}
                   name={member.name}
                   designation={member.designation}
                   image={member.image}
+                  description={member.description}
+                  email={member.email}
                   variant="primary"
                 />
               ))}
@@ -202,20 +219,20 @@ export default function BoardOfMembersPage() {
         </div>
       </section>
 
-      {/* Committee Members Section */}
       <section className="py-12 md:py-16 bg-accent/5">
         <div className="container mx-auto px-6 md:px-12 lg:px-16">
           <div className="max-w-6xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-10 text-foreground">
+            <h2 className="text-2xl md:text-3xl font-bold text-left mb-8 text-foreground">
               Committee Members
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {committeeMembers.map((member, index) => (
                 <MemberCard
                   key={index}
                   name={member.name}
                   designation="Committee Member"
                   image={member.image}
+                  description={member.description}
                   variant="accent"
                 />
               ))}

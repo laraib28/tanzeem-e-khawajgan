@@ -38,32 +38,38 @@
       {
         "year": "2010",
         "title": "Foundation Established",
-        "description": "Tanzeem-e-Khawajgan was founded with a vision to serve the community through comprehensive programs and services."
+        "description": "Tanzeem-e-Khawajgan was founded with a vision to serve the community through comprehensive programs and services.",
+        "image": "/about-f-e.jpeg"
       },
       {
         "year": "2012",
         "title": "Education Programs Launched",
-        "description": "Initiated IT training and educational programs to empower youth with modern skills and knowledge."
+        "description": "Initiated IT training and educational programs to empower youth with modern skills and knowledge.",
+        "image": "/it1.jpeg"
       },
       {
         "year": "2015",
         "title": "Healthcare Services Expanded",
-        "description": "Opened medical facilities to provide accessible healthcare services to community members."
+        "description": "Opened medical facilities to provide accessible healthcare services to community members.",
+        "image": "/medical.jpeg"
       },
       {
         "year": "2018",
         "title": "Sports Complex Inaugurated",
-        "description": "Established sports facilities to promote physical fitness and healthy lifestyles among all age groups."
+        "description": "Established sports facilities to promote physical fitness and healthy lifestyles among all age groups.",
+        "image": "/sp-act.jpeg"
       },
       {
         "year": "2020",
         "title": "Community Services Diversified",
-        "description": "Added banquet halls and expanded community services to support various social and cultural needs."
+        "description": "Added banquet halls and expanded community services to support various social and cultural needs.",
+        "image": "/about-com-ser.jpeg"
       },
       {
         "year": "2023",
         "title": "Digital Transformation",
-        "description": "Embraced digital technologies to enhance service delivery and community engagement."
+        "description": "Embraced digital technologies to enhance service delivery and community engagement.",
+        "image": "/it2.jpeg"
       }
     ]
   }
