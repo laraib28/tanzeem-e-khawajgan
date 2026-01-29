@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, Suspense, lazy } from 'react'
-import { ChatInterface } from './ChatInterface'
+import { VoiceChatWidget } from './VoiceChatWidget'
 import { Button } from '@/components/ui/button'
 import { MessageCircle, X, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -64,7 +64,7 @@ export function ChatWidget() {
             <ChatKitInterface onClose={() => setIsOpen(false)} />
           </Suspense>
         ) : (
-          <ChatInterface onClose={() => setIsOpen(false)} />
+          <VoiceChatWidget onClose={() => setIsOpen(false)} />
         )
       )}
 

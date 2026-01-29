@@ -478,9 +478,7 @@ Use these tools for information:
                 timestamp=assistant_msg.timestamp
             )
 
-        except Exception as e:
-            print(f"Agent error: {e}")
-
+        except Exception:
             # Different error messages based on intent
             if intent == "booking":
                 error_msg = "I encountered a temporary issue. Let me try again - which hall would you like to book? I can show you our available halls."

@@ -176,9 +176,7 @@ class SessionManager {
       this.deleteSession(sessionId)
     }
 
-    if (expiredSessions.length > 0) {
-      console.log(`Cleaned up ${expiredSessions.length} expired session(s)`)
-    }
+    // Sessions cleaned up silently
   }
 
   /**

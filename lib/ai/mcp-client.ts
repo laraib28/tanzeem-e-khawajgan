@@ -39,8 +39,7 @@ class MCPClient {
       this.pingIntervals.set(serverId, pingInterval)
 
       return true
-    } catch (error) {
-      console.error(`Failed to connect to MCP server ${serverId}:`, error)
+    } catch {
       return false
     }
   }
@@ -56,8 +55,7 @@ class MCPClient {
       // Update last ping timestamp
       connection.lastPing = Date.now()
       this.connections.set(serverId, connection)
-    } catch (error) {
-      console.error(`Ping failed for server ${serverId}:`, error)
+    } catch {
       connection.connected = false
       this.connections.set(serverId, connection)
     }
@@ -91,12 +89,9 @@ class MCPClient {
       }
 
       return response
-    } catch (error) {
-      console.error(`Request failed for server ${serverId}:`, error)
-
+    } catch {
       // Retry logic
       if (retryCount < MAX_RETRIES) {
-        console.log(`Retrying request (attempt ${retryCount + 1}/${MAX_RETRIES})`)
         await this.delay(RETRY_DELAY * (retryCount + 1)) // Exponential backoff
         return this.sendRequest<T>(serverId, request, retryCount + 1)
       }

@@ -332,3 +332,28 @@ class WhatsAppResponse(BaseModel):
     success: bool
     message: str
     data: dict
+
+
+# ===== CHAT HISTORY MODEL =====
+
+class ChatHistory(Base):
+    __tablename__ = "chat_history"
+
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    session_id = Column(String(100), nullable=False, index=True)
+    user_message = Column(Text, nullable=False)
+    assistant_message = Column(Text, nullable=False)
+    timestamp = Column(DateTime, server_default=func.now(), nullable=False)
+    created_at = Column(DateTime, server_default=func.now(), nullable=False)
+
+
+class ChatHistoryCreate(BaseModel):
+    session_id: str
+    user_message: str
+    assistant_message: str
+    timestamp: Optional[str] = None
+
+
+class ChatHistoryResponse(BaseModel):
+    success: bool
+    message: str

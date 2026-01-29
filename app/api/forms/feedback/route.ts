@@ -120,8 +120,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Message sent successfully',
       })
-    } catch (emailError) {
-      console.error('Email sending failed:', emailError)
+    } catch {
       return NextResponse.json(
         {
           success: false,
@@ -130,8 +129,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-  } catch (error) {
-    console.error('Feedback submission error:', error)
+  } catch {
     return NextResponse.json(
       {
         success: false,

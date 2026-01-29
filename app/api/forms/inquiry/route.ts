@@ -65,8 +65,7 @@ export async function POST(request: NextRequest) {
         success: true,
         message: 'Inquiry submitted successfully',
       })
-    } catch (emailError) {
-      console.error('Email sending failed:', emailError)
+    } catch {
       return NextResponse.json(
         {
           success: false,
@@ -75,8 +74,7 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-  } catch (error) {
-    console.error('Inquiry submission error:', error)
+  } catch {
     return NextResponse.json(
       {
         success: false,

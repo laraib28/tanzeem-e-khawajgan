@@ -123,8 +123,6 @@ export async function POST(request: NextRequest) {
           metadata: agentResponse.metadata,
         })
       } catch (error) {
-        console.error('AI processing error:', error)
-
         // Check if it's a message limit error
         if (error instanceof Error && error.message.includes('Maximum messages')) {
           return NextResponse.json(
@@ -154,8 +152,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 400 }
     )
-  } catch (error) {
-    console.error('AI chat error:', error)
+  } catch {
     return NextResponse.json(
       {
         success: false,

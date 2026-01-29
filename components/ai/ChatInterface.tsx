@@ -178,13 +178,13 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isListening, setIsListening] = useState(false)
-  const [micError, setMicError] = useState<string | null>(null)
+  const [speechSupported] = useState(false) // Speech disabled in legacy component
   const [sessionId] = useState<string>(() =>
     `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`
   )
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const recognitionRef = useRef<unknown>(null)
 
   // Add initial greeting message
   useEffect(() => {
@@ -216,11 +216,12 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
   const toggleVoiceInput = () => {
     if (!recognitionRef.current) return
 
+    const recognition = recognitionRef.current as { start: () => void; stop: () => void }
     if (isListening) {
-      recognitionRef.current.stop()
+      recognition.stop()
       setIsListening(false)
     } else {
-      recognitionRef.current.start()
+      recognition.start()
       setIsListening(true)
     }
   }
@@ -400,12 +401,4 @@ export function ChatInterface({ onClose }: ChatInterfaceProps) {
       </form>
     </Card>
   )
-}
-
-// Add type declarations for Web Speech API
-declare global {
-  interface Window {
-    SpeechRecognition: typeof SpeechRecognition
-    webkitSpeechRecognition: typeof SpeechRecognition
-  }
 }

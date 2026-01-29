@@ -130,10 +130,9 @@ interface MemberCardProps {
   image?: string
   description?: string
   email?: string
-  variant?: 'primary' | 'accent'
 }
 
-function MemberCard({ name, designation, image, description, email, variant = 'primary' }: MemberCardProps) {
+function MemberCard({ name, designation, image, description, email }: MemberCardProps) {
   const [imageError, setImageError] = useState(false)
 
   const showFallback = !image || imageError
@@ -211,8 +210,7 @@ export default function BoardOfMembersPage() {
                   image={member.image}
                   description={member.description}
                   email={member.email}
-                  variant="primary"
-                />
+                                  />
               ))}
             </div>
           </div>
@@ -233,8 +231,7 @@ export default function BoardOfMembersPage() {
                   designation="Committee Member"
                   image={member.image}
                   description={member.description}
-                  variant="accent"
-                />
+                                  />
               ))}
             </div>
           </div>

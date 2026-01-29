@@ -138,7 +138,7 @@ export default function MembershipFormPage() {
 
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [lookupQuery, setLookupQuery] = useState('')
-  const [lookupType, setLookupType] = useState<'membership_no' | 'full_name'>('membership_no')
+  const [lookupType, setLookupType] = useState<'membership_no' | 'full_name' | 'cnic'>('cnic')
   const [lookupMessage, setLookupMessage] = useState('')
   const [lookupLoading, setLookupLoading] = useState(false)
   const [submitMessage, setSubmitMessage] = useState('')
@@ -170,7 +170,7 @@ export default function MembershipFormPage() {
   // Member lookup function
   const handleLookup = async () => {
     if (!lookupQuery.trim()) {
-      setLookupMessage('Please enter a membership number or name')
+      setLookupMessage('Please enter CNIC, membership number, or name')
       return
     }
 
@@ -181,6 +181,8 @@ export default function MembershipFormPage() {
       const params = new URLSearchParams()
       if (lookupType === 'membership_no') {
         params.append('membership_no', lookupQuery.trim())
+      } else if (lookupType === 'cnic') {
+        params.append('cnic', lookupQuery.trim())
       } else {
         params.append('full_name', lookupQuery.trim())
       }
@@ -219,8 +221,7 @@ export default function MembershipFormPage() {
       } else {
         setLookupMessage('Record nahi mila')
       }
-    } catch (error) {
-      console.error('Lookup error:', error)
+    } catch {
       setLookupMessage('Error looking up member. Please try again.')
     } finally {
       setLookupLoading(false)
@@ -276,8 +277,7 @@ export default function MembershipFormPage() {
       } else {
         setSubmitMessage(data.detail || 'Error submitting application')
       }
-    } catch (error) {
-      console.error('Submit error:', error)
+    } catch {
       setSubmitMessage('Error submitting application. Please try again.')
     } finally {
       setIsSubmitting(false)
@@ -297,16 +297,17 @@ export default function MembershipFormPage() {
 
           {/* Member Lookup Section */}
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-6 mb-8">
-            <h3 className="text-lg font-semibold text-foreground mb-4">Member Lookup</h3>
+            <h3 className="text-lg font-semibold text-foreground mb-4">Member Lookup / Record Search</h3>
             <p className="text-sm text-foreground/70 mb-4">
-              Already a member? Search by membership number or name to load your information.
+              Already a member? CNIC, Membership Number ya Name se apna record search karein.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <select
                 value={lookupType}
-                onChange={(e) => setLookupType(e.target.value as 'membership_no' | 'full_name')}
+                onChange={(e) => setLookupType(e.target.value as 'membership_no' | 'full_name' | 'cnic')}
                 className={`${inputClass} sm:w-48`}
               >
+                <option value="cnic">CNIC</option>
                 <option value="membership_no">Membership No.</option>
                 <option value="full_name">Full Name</option>
               </select>
@@ -314,7 +315,19 @@ export default function MembershipFormPage() {
                 type="text"
                 value={lookupQuery}
                 onChange={(e) => setLookupQuery(e.target.value)}
-                placeholder={lookupType === 'membership_no' ? 'Enter membership number (e.g., AB123)' : 'Enter full name'}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault()
+                    handleLookup()
+                  }
+                }}
+                placeholder={
+                  lookupType === 'cnic'
+                    ? 'CNIC likhen (e.g., 35202-1234567-1)'
+                    : lookupType === 'membership_no'
+                      ? 'Membership number likhen (e.g., AB123)'
+                      : 'Naam likhen'
+                }
                 className={`${inputClass} flex-1`}
               />
               <button

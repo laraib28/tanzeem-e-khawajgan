@@ -7,6 +7,7 @@ from models import Member, MembershipCreate, MembershipResponse, SuccessResponse
 from routers.rag import router as rag_router
 from routers.chatbot import router as chatbot_router
 from routers.chatkit import router as chatkit_router
+from routers.voice import router as voice_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -36,6 +37,7 @@ app.add_middleware(
 app.include_router(rag_router)
 app.include_router(chatbot_router)
 app.include_router(chatkit_router)
+app.include_router(voice_router)
 
 
 @app.get("/")
@@ -107,48 +109,80 @@ def health_check():
 def lookup_member(
     membership_no: str = None,
     full_name: str = None,
+    cnic: str = None,
     db: Session = Depends(get_db)
 ):
     """
-    Look up a member by membership number or full name.
+    Look up a member by CNIC, membership number, or full name.
     Returns member data if found, or error message if not found.
     """
-    if not membership_no and not full_name:
-        raise HTTPException(status_code=400, detail="Please provide membership_no or full_name")
+    if not membership_no and not full_name and not cnic:
+        raise HTTPException(status_code=400, detail="Please provide cnic, membership_no, or full_name")
 
     query = db.query(Member)
 
+    # Helper function to format member data
+    def format_member_data(member):
+        return {
+            "id": member.id,
+            "membership_no": member.membership_no,
+            "gender": member.gender,
+            "full_name": member.full_name,
+            "relationship_type": member.relationship_type,
+            "relation_name": member.relation_name,
+            "father_in_law_name": member.father_in_law_name,
+            "cnic": member.cnic,
+            "country": member.country,
+            "native_city": member.native_city,
+            "current_city": member.current_city,
+            "city": member.city,
+            "address": member.address,
+            "date_of_birth": str(member.date_of_birth) if member.date_of_birth else None,
+            "cast": member.cast,
+            "source_of_income": member.source_of_income,
+            "education": member.education,
+            "occupation": member.occupation,
+            "profession": member.profession,
+            "dependents_count": member.dependents_count,
+            "dependents_relation": member.dependents_relation,
+            "approval_status": member.approval_status
+        }
+
+    # Search by CNIC (most reliable)
+    if cnic:
+        # Clean input - remove dashes and spaces
+        clean_input = cnic.replace("-", "").replace(" ", "").strip()
+
+        # Get all members and compare CNICs without dashes
+        all_members = query.all()
+        for member in all_members:
+            if member.cnic:
+                # Clean the stored CNIC
+                stored_cnic = member.cnic.replace("-", "").replace(" ", "")
+                if stored_cnic == clean_input or clean_input in stored_cnic or stored_cnic in clean_input:
+                    return {
+                        "success": True,
+                        "message": "Member found by CNIC",
+                        "data": format_member_data(member)
+                    }
+
+        # If not found with exact match, try partial match
+        member = query.filter(Member.cnic.ilike(f"%{cnic}%")).first()
+        if member:
+            return {
+                "success": True,
+                "message": "Member found by CNIC",
+                "data": format_member_data(member)
+            }
+
+    # Search by membership number (case-insensitive)
     if membership_no:
-        # Search by membership number (case-insensitive)
         member = query.filter(Member.membership_no.ilike(membership_no)).first()
         if member:
             return {
                 "success": True,
-                "message": "Member found",
-                "data": {
-                    "id": member.id,
-                    "membership_no": member.membership_no,
-                    "gender": member.gender,
-                    "full_name": member.full_name,
-                    "relationship_type": member.relationship_type,
-                    "relation_name": member.relation_name,
-                    "father_in_law_name": member.father_in_law_name,
-                    "cnic": member.cnic,
-                    "country": member.country,
-                    "native_city": member.native_city,
-                    "current_city": member.current_city,
-                    "city": member.city,
-                    "address": member.address,
-                    "date_of_birth": str(member.date_of_birth) if member.date_of_birth else None,
-                    "cast": member.cast,
-                    "source_of_income": member.source_of_income,
-                    "education": member.education,
-                    "occupation": member.occupation,
-                    "profession": member.profession,
-                    "dependents_count": member.dependents_count,
-                    "dependents_relation": member.dependents_relation,
-                    "approval_status": member.approval_status
-                }
+                "message": "Member found by membership number",
+                "data": format_member_data(member)
             }
 
     if full_name:
@@ -159,31 +193,8 @@ def lookup_member(
                 member = members[0]
                 return {
                     "success": True,
-                    "message": "Member found",
-                    "data": {
-                        "id": member.id,
-                        "membership_no": member.membership_no,
-                        "gender": member.gender,
-                        "full_name": member.full_name,
-                        "relationship_type": member.relationship_type,
-                        "relation_name": member.relation_name,
-                        "father_in_law_name": member.father_in_law_name,
-                        "cnic": member.cnic,
-                        "country": member.country,
-                        "native_city": member.native_city,
-                        "current_city": member.current_city,
-                        "city": member.city,
-                        "address": member.address,
-                        "date_of_birth": str(member.date_of_birth) if member.date_of_birth else None,
-                        "cast": member.cast,
-                        "source_of_income": member.source_of_income,
-                        "education": member.education,
-                        "occupation": member.occupation,
-                        "profession": member.profession,
-                        "dependents_count": member.dependents_count,
-                        "dependents_relation": member.dependents_relation,
-                        "approval_status": member.approval_status
-                    }
+                    "message": "Member found by name",
+                    "data": format_member_data(member)
                 }
             else:
                 # Multiple matches - return list of names for user to select
@@ -195,7 +206,8 @@ def lookup_member(
                         {
                             "id": m.id,
                             "membership_no": m.membership_no,
-                            "full_name": m.full_name
+                            "full_name": m.full_name,
+                            "cnic": m.cnic
                         }
                         for m in members[:10]  # Limit to 10 results
                     ]
@@ -203,5 +215,5 @@ def lookup_member(
 
     return {
         "success": False,
-        "message": "Record nahi mila"
+        "message": "Record nahi mila. CNIC, Membership Number ya Name check karein."
     }

@@ -8,10 +8,15 @@ Phase 6: Booking Agent (ACTIVE)
 - Booking capabilities ENABLED via MCP tools
 """
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, List
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+from datetime import datetime
 import os
+
+from database import get_db
+from models import ChatHistory, ChatHistoryCreate, ChatHistoryResponse
 
 # Use OpenAI Agent if OPENAI_API_KEY is set, otherwise fallback to basic chatbot
 if os.getenv("OPENAI_API_KEY"):
@@ -165,3 +170,30 @@ async def chatbot_health():
             "status": "unhealthy",
             "error": str(e)
         }
+
+
+@router.post("/save", response_model=ChatHistoryResponse)
+async def save_chat(request: ChatHistoryCreate, db: Session = Depends(get_db)):
+    """Save chat conversation to database."""
+    try:
+        timestamp = datetime.utcnow()
+        if request.timestamp:
+            try:
+                timestamp = datetime.fromisoformat(request.timestamp.replace('Z', '+00:00'))
+            except ValueError:
+                pass
+
+        chat_record = ChatHistory(
+            session_id=request.session_id,
+            user_message=request.user_message,
+            assistant_message=request.assistant_message,
+            timestamp=timestamp
+        )
+
+        db.add(chat_record)
+        db.commit()
+
+        return ChatHistoryResponse(success=True, message="Chat saved successfully")
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
