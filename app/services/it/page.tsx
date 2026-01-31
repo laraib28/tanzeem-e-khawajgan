@@ -4,7 +4,7 @@ import { Banner } from '@/components/ui/Banner'
 import { InquiryForm } from '@/components/forms/InquiryForm'
 import servicesContent from '@/config/content/en/services.json'
 import Image from 'next/image'
-import { Monitor, Users, Award, Clock, CheckCircle, Laptop, TrendingUp, ShoppingCart, Bot } from 'lucide-react'
+import { Monitor, Users, Award, Clock, CheckCircle, Laptop, TrendingUp } from 'lucide-react'
 
 export default function ITServicePage() {
   const { banner, description, courses, summerCamp } = servicesContent.it
@@ -13,7 +13,7 @@ export default function ITServicePage() {
     { icon: Users, value: '500+', label: 'Students Trained' },
     { icon: Award, value: '95%', label: 'Success Rate' },
     { icon: Monitor, value: '3', label: 'Professional Courses' },
-    { icon: Clock, value: '24/7', label: 'Lab Access' },
+    { icon: Clock, value: '12:pm-8:pm', label: 'Lab Access' },
   ]
 
   const labFeatures = [
@@ -69,7 +69,7 @@ export default function ITServicePage() {
                 <div className="relative">
                   <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/homepage-com-eng.jpeg"
+                      src="/it3.jpeg"
                       alt="KTEK IT Lab"
                       fill
                       className="object-cover"
@@ -125,46 +125,56 @@ export default function ITServicePage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {courses.map((course, index) => (
-                  <div
-                    key={index}
-                    className="bg-gradient-to-br from-background to-primary/5 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-primary/10 group"
-                  >
-                    {/* Course Icon */}
-                    <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mb-6 group-hover:bg-primary/20 transition-colors">
-                      {course.title.includes('Amazon') ? (
-                        <ShoppingCart className="w-8 h-8 text-primary" />
-                      ) : course.title.includes('Python') || course.title.includes('AI') ? (
-                        <Bot className="w-8 h-8 text-primary" />
-                      ) : (
-                        <Laptop className="w-8 h-8 text-primary" />
-                      )}
-                    </div>
+                {courses.map((course, index) => {
+                  // Get logo based on course title
+                  const getLogo = () => {
+                    if (course.title.toLowerCase().includes('amazon')) return '/amazon-logo.png'
+                    if (course.title.toLowerCase().includes('python') || course.title.toLowerCase().includes('ai')) return '/python-logo.png'
+                    if (course.title.toLowerCase().includes('shopify')) return '/shopify-logo.png'
+                    return '/ktek-logo.png'
+                  }
 
-                    <h3 className="text-2xl font-bold text-foreground mb-3">{course.title}</h3>
-                    <p className="text-foreground/70 mb-6 leading-relaxed">{course.description}</p>
-
-                    {/* Course Meta */}
-                    <div className="flex flex-wrap gap-4 mb-6">
-                      <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
-                        <Clock className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-medium">{course.duration}</span>
-                      </div>
-                      <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
-                        <Award className="w-4 h-4 text-primary" />
-                        <span className="text-sm font-medium">{course.level}</span>
-                      </div>
-                    </div>
-
-                    <a
-                      href="#enroll"
-                      className="inline-flex items-center text-primary font-semibold hover:gap-3 gap-2 transition-all"
+                  return (
+                    <div
+                      key={index}
+                      className="bg-gradient-to-br from-background to-primary/5 p-8 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 border border-primary/10 group"
                     >
-                      Enroll Now
-                      <span>→</span>
-                    </a>
-                  </div>
-                ))}
+                      {/* Course Logo */}
+                      <div className="w-20 h-20 bg-white rounded-xl flex items-center justify-center mb-6 shadow-sm p-2">
+                        <Image
+                          src={getLogo()}
+                          alt={course.title}
+                          width={60}
+                          height={60}
+                          className="object-contain"
+                        />
+                      </div>
+
+                      <h3 className="text-2xl font-bold text-foreground mb-3">{course.title}</h3>
+                      <p className="text-foreground/70 mb-6 leading-relaxed">{course.description}</p>
+
+                      {/* Course Meta */}
+                      <div className="flex flex-wrap gap-4 mb-6">
+                        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                          <Clock className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">{course.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm">
+                          <Award className="w-4 h-4 text-primary" />
+                          <span className="text-sm font-medium">{course.level}</span>
+                        </div>
+                      </div>
+
+                      <a
+                        href="#enroll"
+                        className="inline-flex items-center text-primary font-semibold hover:gap-3 gap-2 transition-all"
+                      >
+                        Enroll Now
+                        <span>→</span>
+                      </a>
+                    </div>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -180,7 +190,7 @@ export default function ITServicePage() {
                   <div className="space-y-4">
                     <div className="relative h-48 rounded-xl overflow-hidden shadow-lg">
                       <Image
-                        src="/homepage-education.jpeg"
+                        src="/it1.jpeg"
                         alt="IT Lab Environment"
                         fill
                         className="object-cover"
@@ -188,7 +198,7 @@ export default function ITServicePage() {
                     </div>
                     <div className="relative h-32 rounded-xl overflow-hidden shadow-lg">
                       <Image
-                        src="/homepage-com-eng.jpeg"
+                        src="/it2.jpeg"
                         alt="Computer Lab"
                         fill
                         className="object-cover"
@@ -198,7 +208,7 @@ export default function ITServicePage() {
                   <div className="space-y-4 pt-8">
                     <div className="relative h-32 rounded-xl overflow-hidden shadow-lg">
                       <Image
-                        src="/homepage-main.jpeg"
+                        src="/it3.jpeg"
                         alt="Training Session"
                         fill
                         className="object-cover"
@@ -206,7 +216,7 @@ export default function ITServicePage() {
                     </div>
                     <div className="relative h-48 rounded-xl overflow-hidden shadow-lg">
                       <Image
-                        src="/homepage-education.jpeg"
+                        src="/it4.jpeg"
                         alt="Students Learning"
                         fill
                         className="object-cover"

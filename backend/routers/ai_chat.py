@@ -356,25 +356,26 @@ def get_fallback_response(message: str, lang: str) -> str:
         return "[Banquet] Kitne guests? 50-150: Abdul Lateef, 200-250: Iqbal Arena, 300+: Tehseena."
 
     # ============ IT - SPECIFIC COURSES FIRST ============
-    asking_contact = any(w in msg for w in ['contact', 'number', 'no', 'phone', 'call', 'rabta'])
+    asking_contact = any(w in msg for w in ['contact', 'number', 'no', 'phone', 'call', 'rabta', 'نمبر', 'رابطہ'])
 
-    if 'shopify' in msg:
+    if 'shopify' in msg or 'شاپیفائی' in msg:
         if asking_contact:
             return "[IT] Shopify: Kh Mustafa Fazal 0334-3699906"
         return "[IT] Shopify: 3 months. Contact: 0334-3699906"
 
-    if 'amazon' in msg or 'fba' in msg:
+    if 'amazon' in msg or 'fba' in msg or 'ایمیزون' in msg:
         if asking_contact:
             return "[IT] Amazon FBA: Kh Mustafa Fazal 0334-3699906"
         return "[IT] Amazon FBA: 4 months. Contact: 0334-3699906"
 
-    if 'python' in msg:
+    if 'python' in msg or 'پائتھون' in msg:
         if asking_contact:
             return "[IT] Python: Kh Mustafa Fazal 0334-3699906"
         return "[IT] Python: 4 months. Contact: 0334-3699906"
 
-    # General IT query (AFTER all specific courses)
-    if any(w in msg for w in ['course', 'it', 'coding', 'training', 'computer', 'programming']):
+    # General IT query (AFTER all specific courses) - includes Hindi/Urdu
+    if any(w in msg for w in ['course', 'courses', 'it', 'coding', 'training', 'computer', 'programming',
+                               'कोर्स', 'आईटी', 'कंप्यूटर', 'ट्रेनिंग', 'پورس', 'کورس', 'آئی ٹی', 'کمپیوٹر']):
         if asking_contact:
             return "[IT] Kh Mustafa Fazal 0334-3699906"
         return "[IT] Shopify (3m), Amazon FBA (4m), Python (4m). Contact: 0334-3699906"

@@ -40,9 +40,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     const greeting: Message = {
       id: 'greeting',
       role: 'assistant',
-      content: `Assalam-o-Alaikum! Kya madad kar sakta hoon?
-
-Medical, IT courses, sports, hall booking ya membership ke baare mein poochein.`,
+      content: `Assalam o Alaikum, how may I help you?`,
       timestamp: Date.now()
     }
     setMessages([greeting])
@@ -163,10 +161,13 @@ Medical, IT courses, sports, hall booking ya membership ke baare mein poochein.`
         }
       } catch (err) {
         const error = err as Error
+        console.error('Voice transcription error:', error)
         if (error.message.includes('503')) {
-          alert('Voice service available nahi. Type karein.')
+          alert('Voice service available nahi. OPENAI_API_KEY check karein.')
+        } else if (error.message.includes('500')) {
+          alert('Server error. Backend logs check karein.')
         } else {
-          alert('Voice error. Type karein.')
+          alert(`Voice error: ${error.message}`)
         }
       } finally {
         setIsLoading(false)
@@ -318,7 +319,7 @@ Medical, IT courses, sports, hall booking ya membership ke baare mein poochein.`
     setMessages([{
       id: 'greeting',
       role: 'assistant',
-      content: 'Chat clear. Kya madad chahiye?',
+      content: 'Assalam o Alaikum, how may I help you?',
       timestamp: Date.now()
     }])
   }
@@ -347,7 +348,7 @@ Medical, IT courses, sports, hall booking ya membership ke baare mein poochein.`
           </div>
           <div>
             <CardTitle className="text-sm font-semibold text-white">Khawajgan AI</CardTitle>
-            <p className="text-xs text-white/70">ChatGPT Powered</p>
+            <p className="text-xs text-white/70">Voice Assistant</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -598,19 +599,20 @@ function getFallbackResponse(message: string): string {
   // ============ IT ============
   const askingContact = /contact|number|no|phone|call|rabta/.test(msg)
 
-  if (/shopify/.test(msg)) {
+  if (/shopify|शॉपिफाई/.test(msg)) {
     if (askingContact) return "[IT] Shopify: Kh Mustafa Fazal 0334-3699906"
     return "[IT] Shopify: 3 months. Contact: 0334-3699906"
   }
-  if (/amazon|fba/.test(msg)) {
+  if (/amazon|fba|अमेज़न|ایمیزون/.test(msg)) {
     if (askingContact) return "[IT] Amazon FBA: Kh Mustafa Fazal 0334-3699906"
     return "[IT] Amazon FBA: 4 months. Contact: 0334-3699906"
   }
-  if (/python/.test(msg)) {
+  if (/python|पायथन|پائتھون/.test(msg)) {
     if (askingContact) return "[IT] Python: Kh Mustafa Fazal 0334-3699906"
     return "[IT] Python: 4 months. Contact: 0334-3699906"
   }
-  if (/course|it|training|coding|computer/.test(msg)) {
+  // IT with Hindi/Urdu keywords
+  if (/course|courses|it|training|coding|computer|कोर्स|आईटी|कंप्यूटर|ट्रेनिंग|کورس|آئی ٹی/.test(msg)) {
     if (askingContact) return "[IT] Kh Mustafa Fazal 0334-3699906"
     return "[IT] Shopify (3m), Amazon FBA (4m), Python (4m). Contact: 0334-3699906"
   }

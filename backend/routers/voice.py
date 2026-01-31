@@ -19,14 +19,21 @@ from database import get_db
 from models import ChatHistory
 
 # Check if OpenAI is available
+OPENAI_ERROR = None
 try:
     from openai import OpenAI
     OPENAI_AVAILABLE = bool(os.getenv("OPENAI_API_KEY"))
     if OPENAI_AVAILABLE:
         client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-except ImportError:
+        print("[DEBUG] Voice: OpenAI client initialized")
+    else:
+        print("[ERROR] Voice: OPENAI_API_KEY not set")
+        client = None
+except ImportError as e:
     OPENAI_AVAILABLE = False
+    OPENAI_ERROR = str(e)
     client = None
+    print(f"[ERROR] Voice: OpenAI import failed: {e}")
 
 router = APIRouter(prefix="/api/voice", tags=["Voice"])
 
@@ -85,25 +92,38 @@ async def transcribe_audio(
     try:
         # Read audio data
         audio_data = await audio.read()
+        print(f"[DEBUG] Voice: Received audio, size={len(audio_data)} bytes, type={audio.content_type}, filename={audio.filename}")
 
         # Check file size (25MB limit)
         if len(audio_data) > 25 * 1024 * 1024:
             raise HTTPException(status_code=400, detail="Audio file too large. Max 25MB.")
 
+        if len(audio_data) < 1000:
+            raise HTTPException(status_code=400, detail="Audio file too small. Please record longer.")
+
+        # Determine file extension
+        filename = audio.filename or "recording.webm"
+        ext = os.path.splitext(filename)[1] or ".webm"
+
         # Create temp file for Whisper API
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as tmp:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp:
             tmp.write(audio_data)
             tmp_path = tmp.name
 
+        print(f"[DEBUG] Voice: Temp file created at {tmp_path}")
+
         try:
             # Transcribe with Whisper
+            # Use English to keep Roman Urdu as Roman text (not Hindi script)
             with open(tmp_path, "rb") as audio_file:
                 transcript = client.audio.transcriptions.create(
                     model="whisper-1",
                     file=audio_file,
-                    language=language,  # Auto-detect if None
+                    language=language or "en",  # Default to English for Roman Urdu
                     response_format="verbose_json"
                 )
+
+            print(f"[DEBUG] Voice: Transcription successful: {transcript.text[:50]}...")
 
             return TranscribeResponse(
                 success=True,
@@ -113,9 +133,15 @@ async def transcribe_audio(
             )
         finally:
             # Clean up temp file
-            os.unlink(tmp_path)
+            try:
+                os.unlink(tmp_path)
+            except Exception:
+                pass
 
+    except HTTPException:
+        raise
     except Exception as e:
+        print(f"[ERROR] Voice: Transcription failed: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Transcription failed: {str(e)}")
 
 
@@ -247,5 +273,6 @@ async def voice_health():
         "status": "healthy" if OPENAI_AVAILABLE else "limited",
         "whisper_available": OPENAI_AVAILABLE,
         "tts_available": OPENAI_AVAILABLE,
+        "openai_error": OPENAI_ERROR,
         "message": "Voice services ready" if OPENAI_AVAILABLE else "OpenAI API key required for voice features"
     }

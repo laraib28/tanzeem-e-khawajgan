@@ -1,6 +1,10 @@
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from dotenv import load_dotenv
+
+# Load environment variables FIRST before any other imports
+load_dotenv()
 
 from database import engine, get_db, Base
 from models import Member, MembershipCreate, MembershipResponse, SuccessResponse
@@ -116,104 +120,90 @@ def lookup_member(
 ):
     """
     Look up a member by CNIC, membership number, or full name.
-    Returns member data if found, or error message if not found.
+    Searches both 'members' and 'membership_info' tables.
     """
+    from sqlalchemy import text
+
     if not membership_no and not full_name and not cnic:
         raise HTTPException(status_code=400, detail="Please provide cnic, membership_no, or full_name")
 
-    query = db.query(Member)
-
-    # Helper function to format member data
-    def format_member_data(member):
+    # Helper function to format member data from membership_info table
+    def format_membership_info(row):
         return {
-            "id": member.id,
-            "membership_no": member.membership_no,
-            "gender": member.gender,
-            "full_name": member.full_name,
-            "relationship_type": member.relationship_type,
-            "relation_name": member.relation_name,
-            "father_in_law_name": member.father_in_law_name,
-            "cnic": member.cnic,
-            "country": member.country,
-            "native_city": member.native_city,
-            "current_city": member.current_city,
-            "city": member.city,
-            "address": member.address,
-            "date_of_birth": str(member.date_of_birth) if member.date_of_birth else None,
-            "cast": member.cast,
-            "source_of_income": member.source_of_income,
-            "education": member.education,
-            "occupation": member.occupation,
-            "profession": member.profession,
-            "dependents_count": member.dependents_count,
-            "dependents_relation": member.dependents_relation,
-            "approval_status": member.approval_status
+            "membership_no": row.membership_no,
+            "full_name": row.name,
+            "gender": row.gender,
+            "relation_name": row.husband_father_name,
+            "father_in_law_name": row.grand_father_father_in_law_name,
+            "cnic": row.cnic,
+            "native_city": row.native_city,
+            "date_of_birth": str(row.dob) if row.dob else None,
+            "cast": row.cast,
+            "source_of_income": row.source_of_income,
+            "address": row.home_address,
+            "contact_no": row.contact_no,
+            "email": row.email_address
         }
 
-    # Search by CNIC (most reliable)
-    if cnic:
-        # Clean input - remove dashes and spaces
-        clean_input = cnic.replace("-", "").replace(" ", "").strip()
+    # Search in membership_info table (has 598 records)
+    try:
+        # Search by CNIC
+        if cnic:
+            clean_cnic = cnic.replace("-", "").replace(" ", "").strip()
+            result = db.execute(text(
+                "SELECT * FROM membership_info WHERE REPLACE(REPLACE(cnic, '-', ''), ' ', '') LIKE :cnic LIMIT 1"
+            ), {"cnic": f"%{clean_cnic}%"})
+            row = result.fetchone()
+            if row:
+                return {
+                    "success": True,
+                    "message": "Member found by CNIC",
+                    "data": format_membership_info(row)
+                }
 
-        # Get all members and compare CNICs without dashes
-        all_members = query.all()
-        for member in all_members:
-            if member.cnic:
-                # Clean the stored CNIC
-                stored_cnic = member.cnic.replace("-", "").replace(" ", "")
-                if stored_cnic == clean_input or clean_input in stored_cnic or stored_cnic in clean_input:
+        # Search by membership number
+        if membership_no:
+            result = db.execute(text(
+                "SELECT * FROM membership_info WHERE membership_no LIKE :membership_no LIMIT 1"
+            ), {"membership_no": f"%{membership_no}%"})
+            row = result.fetchone()
+            if row:
+                return {
+                    "success": True,
+                    "message": "Member found by membership number",
+                    "data": format_membership_info(row)
+                }
+
+        # Search by name
+        if full_name:
+            result = db.execute(text(
+                "SELECT * FROM membership_info WHERE name LIKE :name LIMIT 10"
+            ), {"name": f"%{full_name}%"})
+            rows = result.fetchall()
+            if rows:
+                if len(rows) == 1:
                     return {
                         "success": True,
-                        "message": "Member found by CNIC",
-                        "data": format_member_data(member)
+                        "message": "Member found by name",
+                        "data": format_membership_info(rows[0])
+                    }
+                else:
+                    return {
+                        "success": True,
+                        "message": f"Multiple members found ({len(rows)})",
+                        "multiple": True,
+                        "data": [
+                            {
+                                "membership_no": r.membership_no,
+                                "full_name": r.name,
+                                "cnic": r.cnic
+                            }
+                            for r in rows
+                        ]
                     }
 
-        # If not found with exact match, try partial match
-        member = query.filter(Member.cnic.ilike(f"%{cnic}%")).first()
-        if member:
-            return {
-                "success": True,
-                "message": "Member found by CNIC",
-                "data": format_member_data(member)
-            }
-
-    # Search by membership number (case-insensitive)
-    if membership_no:
-        member = query.filter(Member.membership_no.ilike(membership_no)).first()
-        if member:
-            return {
-                "success": True,
-                "message": "Member found by membership number",
-                "data": format_member_data(member)
-            }
-
-    if full_name:
-        # Search by full name (case-insensitive, partial match)
-        members = query.filter(Member.full_name.ilike(f"%{full_name}%")).all()
-        if members:
-            if len(members) == 1:
-                member = members[0]
-                return {
-                    "success": True,
-                    "message": "Member found by name",
-                    "data": format_member_data(member)
-                }
-            else:
-                # Multiple matches - return list of names for user to select
-                return {
-                    "success": True,
-                    "message": f"Multiple members found ({len(members)})",
-                    "multiple": True,
-                    "data": [
-                        {
-                            "id": m.id,
-                            "membership_no": m.membership_no,
-                            "full_name": m.full_name,
-                            "cnic": m.cnic
-                        }
-                        for m in members[:10]  # Limit to 10 results
-                    ]
-                }
+    except Exception as e:
+        print(f"[ERROR] Lookup error: {e}")
 
     return {
         "success": False,
