@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Send, X, Loader2, MessageCircle, Mic, MicOff, Volume2, VolumeX } from 'lucide-react'
+import { Send, X, Loader2, MessageCircle, Mic, MicOff, Volume2, VolumeX, Trash2 } from 'lucide-react'
 import './chat.css'
 
 interface Message {
@@ -13,7 +13,6 @@ interface Message {
   role: 'user' | 'assistant'
   content: string
   timestamp: number
-  isPlaying?: boolean
 }
 
 interface VoiceChatWidgetProps {
@@ -22,65 +21,28 @@ interface VoiceChatWidgetProps {
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
 
-// Comprehensive fallback responses with Roman Urdu support
-function getFallbackResponse(message: string): string {
-  const msg = message.toLowerCase()
-
-  // Greetings
-  if (msg.includes('salam') || msg.includes('assalam') || msg.includes('aoa') || msg.includes('hello') || msg.includes('hi')) {
-    return 'Wa Alaikum Assalam! Tanzeem-e-Khawajgan mein khush aamdeed! Main aapki madad kar sakta/sakti hoon:\n\n- Medical Services\n- IT Courses\n- Sports\n- Banquet Hall Booking\n- Membership\n\nKya jaanna chahte hain?'
-  }
-
-  // Medical
-  if (msg.includes('doctor') || msg.includes('medical') || msg.includes('health') || msg.includes('daaktar')) {
-    return 'Medical Center ki Details:\n\nDr. Qurat Ul Ain - General OPD & Ultrasound (Mon-Fri)\nDr. Farzana - Child Specialist (Mon, Wed, Fri 11 AM)\nDr. Naila Barni - Gynaecologist (Tue, Thu, Sat 10 AM)\nDr. Ahmed - Diabetes (Mon, Wed, Fri 6 PM)\nDr. Sohail - Dentist (Mon-Thu, Sat 5 PM)\n\nSindh Lab bhi available hai Mon-Sat 10:30 AM - 8 PM'
-  }
-
-  // Sports
-  if (msg.includes('sport') || msg.includes('khel') || msg.includes('game') || msg.includes('badminton') || msg.includes('cricket')) {
-    return 'Sports Complex Rates:\n\nBadminton Court - Rs. 1,500/hour\nCricket Net - Rs. 2,000-2,500/hour\nSnooker - Rs. 7/minute\nPool Table - Rs. 100/game\n\nTimings: 10 AM - 4 AM'
-  }
-
-  // IT Courses
-  if (msg.includes('it') || msg.includes('course') || msg.includes('computer') || msg.includes('training') || msg.includes('amazon') || msg.includes('python')) {
-    return 'IT Courses:\n\nAmazon FBA - 4 months\nShopify E-commerce - 3 months\nPython AI Chatbot - 4 months\n\nSummer Camp bhi available hai students ke liye!'
-  }
-
-  // Banquet/Hall
-  if (msg.includes('hall') || msg.includes('banquet') || msg.includes('booking') || msg.includes('wedding') || msg.includes('shadi')) {
-    return 'Banquet Halls:\n\nTehseena Banquet - Rs. 30,000-40,000 (300+ guests)\nIqbal Arena - Rs. 250-300/head (200+ guests)\nAbdul Lateef Hall - Rs. 250-300/head (150+ guests)\n\nBooking ke liye date batayein!'
-  }
-
-  // Membership
-  if (msg.includes('member') || msg.includes('membership') || msg.includes('join')) {
-    return 'Membership Benefits:\n\n- Shed Hospital mein Free OPD\n- Abdul Samad Hospital mein Free Operations\n- Community events mein discounts\n\nForm ke liye: /membership-form'
-  }
-
-  // Default
-  return 'Ji, main Tanzeem-e-Khawajgan ka assistant hoon.\n\nAap pooch sakte hain:\n- Medical/Doctors\n- IT Courses\n- Sports\n- Hall booking\n- Membership\n\nKya jaanna chahte hain?'
-}
-
 export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
   const [messages, setMessages] = useState<Message[]>([])
   const [inputValue, setInputValue] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isRecording, setIsRecording] = useState(false)
   const [isSpeaking, setIsSpeaking] = useState(false)
-  const [autoSpeak, setAutoSpeak] = useState(true)
-  const [sessionId] = useState(() => `voice_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`)
+  const [autoSpeak, setAutoSpeak] = useState(false)
+  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
-  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
 
   // Initialize with greeting
   useEffect(() => {
     const greeting: Message = {
       id: 'greeting',
       role: 'assistant',
-      content: 'Assalam-o-Alaikum!\n\nMain Tanzeem-e-Khawajgan ka AI Assistant hoon. Aap Roman Urdu ya English mein baat kar sakte hain.\n\nMic button se voice message bhej sakte hain!',
+      content: `Assalam-o-Alaikum! Kya madad kar sakta hoon?
+
+Medical, IT courses, sports, hall booking ya membership ke baare mein poochein.`,
       timestamp: Date.now()
     }
     setMessages([greeting])
@@ -100,42 +62,31 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     inputRef.current?.focus()
   }, [])
 
-  // Transcribe audio using Whisper API
-  const transcribeAudio = useCallback(async (audioBlob: Blob) => {
-    setIsLoading(true)
+  // Transcribe audio ref to avoid stale closure
+  const transcribeRef = useRef<((blob: Blob, mimeType?: string) => Promise<void>) | null>(null)
 
-    try {
-      const formData = new FormData()
-      formData.append('audio', audioBlob, 'recording.webm')
-
-      const response = await fetch(`${BACKEND_URL}/api/voice/transcribe`, {
-        method: 'POST',
-        body: formData
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        if (data.success && data.text) {
-          setInputValue(data.text)
-        } else {
-          throw new Error('Transcription failed')
-        }
-      } else {
-        throw new Error('Transcription API error')
-      }
-    } catch {
-      alert('Voice transcription failed. Please try again or type your message.')
-    } finally {
-      setIsLoading(false)
-    }
-  }, [])
-
-  // Start voice recording
+  // Start recording
   const startRecording = useCallback(async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      const mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' })
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          sampleRate: 16000
+        }
+      })
 
+      // Find supported mime type
+      let mimeType = 'audio/webm'
+      const types = ['audio/webm', 'audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg']
+      for (const type of types) {
+        if (MediaRecorder.isTypeSupported(type)) {
+          mimeType = type
+          break
+        }
+      }
+
+      const mediaRecorder = new MediaRecorder(stream, { mimeType })
       audioChunksRef.current = []
 
       mediaRecorder.ondataavailable = (event) => {
@@ -145,20 +96,83 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
       }
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' })
         stream.getTracks().forEach(track => track.stop())
 
-        // Send to Whisper API for transcription
-        await transcribeAudio(audioBlob)
+        if (audioChunksRef.current.length === 0) {
+          alert('Recording empty. Dobara try karein.')
+          return
+        }
+
+        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
+
+        if (audioBlob.size < 1000) {
+          alert('Recording bahut chhoti hai. Thoda lambi recording karein.')
+          return
+        }
+
+        if (transcribeRef.current) {
+          await transcribeRef.current(audioBlob, mimeType)
+        }
       }
 
-      mediaRecorder.start()
+      // Start with timeslice for continuous data collection
+      mediaRecorder.start(250)
       mediaRecorderRef.current = mediaRecorder
       setIsRecording(true)
-    } catch {
-      alert('Microphone access denied. Please allow microphone access to use voice input.')
+    } catch (err) {
+      const error = err as Error
+      if (error.name === 'NotAllowedError') {
+        alert('Mic permission denied. Browser settings mein microphone allow karein.')
+      } else if (error.name === 'NotFoundError') {
+        alert('Microphone nahi mila. Microphone connect karein.')
+      } else {
+        alert('Mic error: ' + error.message)
+      }
     }
-  }, [transcribeAudio])
+  }, [])
+
+  // Keep transcribe function in ref (avoids dependency issues)
+  useEffect(() => {
+    transcribeRef.current = async (audioBlob: Blob, mimeType?: string) => {
+      setIsLoading(true)
+
+      try {
+        // Determine file extension from mime type
+        let ext = 'webm'
+        if (mimeType?.includes('mp4')) ext = 'mp4'
+        else if (mimeType?.includes('ogg')) ext = 'ogg'
+
+        const formData = new FormData()
+        formData.append('audio', audioBlob, `recording.${ext}`)
+
+        const response = await fetch(`${BACKEND_URL}/api/voice/transcribe`, {
+          method: 'POST',
+          body: formData
+        })
+
+        if (!response.ok) {
+          const errorText = await response.text()
+          throw new Error(errorText || 'Server error')
+        }
+
+        const data = await response.json()
+        if (data.success && data.text && data.text.trim()) {
+          await sendMessage(data.text.trim())
+        } else {
+          alert('Awaz samajh nahi aayi. Clear bolein ya type karein.')
+        }
+      } catch (err) {
+        const error = err as Error
+        if (error.message.includes('503')) {
+          alert('Voice service available nahi. Type karein.')
+        } else {
+          alert('Voice error. Type karein.')
+        }
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  })
 
   // Stop recording
   const stopRecording = useCallback(() => {
@@ -177,25 +191,22 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     }
   }, [isRecording, startRecording, stopRecording])
 
-  // Text to Speech using OpenAI TTS
+  // Text to Speech
   const speakText = useCallback(async (text: string) => {
-    // Stop any currently playing audio
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause()
-      currentAudioRef.current = null
-    }
-
     setIsSpeaking(true)
+
+    const cleanText = text
+      .replace(/\*/g, '')
+      .replace(/•/g, '')
+      .replace(/\n+/g, '. ')
+      .replace(/Rs\./g, 'Rupees')
+      .substring(0, 500)
 
     try {
       const response = await fetch(`${BACKEND_URL}/api/voice/speak`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: text,
-          voice: 'nova', // Female voice, good for Urdu/English
-          speed: 0.95
-        })
+        body: JSON.stringify({ text: cleanText, voice: 'nova', speed: 0.95 })
       })
 
       if (response.ok) {
@@ -207,41 +218,42 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
           setIsSpeaking(false)
           URL.revokeObjectURL(audioUrl)
         }
-
         audio.onerror = () => {
           setIsSpeaking(false)
-          URL.revokeObjectURL(audioUrl)
+          playBrowserTTS(cleanText)
         }
 
-        currentAudioRef.current = audio
         await audio.play()
-      } else {
-        throw new Error('TTS API error')
+        return
       }
+      throw new Error('TTS failed')
     } catch {
-      setIsSpeaking(false)
-      // Fallback to browser TTS
-      if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text.replace(/[*•]/g, ''))
-        utterance.lang = 'en-US'
-        utterance.rate = 0.9
-        utterance.onend = () => setIsSpeaking(false)
-        window.speechSynthesis.speak(utterance)
-      }
+      playBrowserTTS(cleanText)
     }
   }, [])
 
+  // Browser TTS fallback
+  const playBrowserTTS = (text: string) => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel()
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = 'hi-IN'
+      utterance.rate = 0.9
+      utterance.onend = () => setIsSpeaking(false)
+      utterance.onerror = () => setIsSpeaking(false)
+      window.speechSynthesis.speak(utterance)
+    } else {
+      setIsSpeaking(false)
+    }
+  }
+
   // Stop speaking
   const stopSpeaking = useCallback(() => {
-    if (currentAudioRef.current) {
-      currentAudioRef.current.pause()
-      currentAudioRef.current = null
-    }
     window.speechSynthesis?.cancel()
     setIsSpeaking(false)
   }, [])
 
-  // Send message
+  // Send message to AI
   const sendMessage = async (text?: string) => {
     const messageText = text || inputValue.trim()
     if (!messageText || isLoading) return
@@ -260,25 +272,24 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     let responseText = ''
 
     try {
-      // Try backend API first
-      const response = await fetch(`${BACKEND_URL}/api/voice/chat`, {
+      // Call ChatGPT-like AI endpoint
+      const response = await fetch(`${BACKEND_URL}/api/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          text: messageText,
-          session_id: sessionId,
-          speak_response: autoSpeak
+          message: messageText,
+          session_id: sessionId
         })
       })
 
       if (response.ok) {
         const data = await response.json()
-        responseText = data.response || getFallbackResponse(messageText)
+        responseText = data.response || 'Sorry, kuch galat ho gaya. Dobara try karein.'
       } else {
         throw new Error('API error')
       }
     } catch {
-      // Use fallback response
+      // Fallback response
       responseText = getFallbackResponse(messageText)
     }
 
@@ -292,10 +303,24 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     setMessages(prev => [...prev, assistantMessage])
     setIsLoading(false)
 
-    // Auto-speak response if enabled
     if (autoSpeak) {
       setTimeout(() => speakText(responseText), 300)
     }
+  }
+
+  // Clear chat
+  const clearChat = async () => {
+    try {
+      await fetch(`${BACKEND_URL}/api/chat/session/${sessionId}`, { method: 'DELETE' })
+    } catch {
+      // Ignore error
+    }
+    setMessages([{
+      id: 'greeting',
+      role: 'assistant',
+      content: 'Chat clear. Kya madad chahiye?',
+      timestamp: Date.now()
+    }])
   }
 
   // Handle form submit
@@ -305,16 +330,24 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
   }
 
   return (
-    <Card className="chat-container fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-96 h-[500px] sm:h-[600px] flex flex-col z-50 border-primary/20 shadow-2xl">
-      {/* Header */}
-      <CardHeader className="chat-header flex flex-row items-center justify-between p-4 rounded-t-lg bg-accent">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+    <>
+      {/* Overlay - click to close */}
+      <div
+        className="chat-overlay"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <Card className="chat-container fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-[420px] h-[500px] sm:h-[550px] flex flex-col z-50 border-none">
+        {/* Header */}
+        <CardHeader className="chat-header flex flex-row items-center justify-between p-3">
+        <div className="flex items-center gap-2">
+          <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
             <MessageCircle className="w-5 h-5 text-white" />
           </div>
           <div>
-            <CardTitle className="text-base font-semibold text-white">Voice Assistant</CardTitle>
-            <p className="text-xs text-white/70">OpenAI Powered</p>
+            <CardTitle className="text-sm font-semibold text-white">Khawajgan AI</CardTitle>
+            <p className="text-xs text-white/70">ChatGPT Powered</p>
           </div>
         </div>
         <div className="flex items-center gap-1">
@@ -322,20 +355,28 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
             type="button"
             variant="ghost"
             size="icon"
+            onClick={clearChat}
+            className="h-7 w-7 text-white hover:bg-white/20"
+            title="Clear Chat"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
             onClick={() => setAutoSpeak(!autoSpeak)}
-            aria-label={autoSpeak ? "Disable auto-speak" : "Enable auto-speak"}
-            className={`h-8 w-8 text-white hover:bg-white/20 ${autoSpeak ? 'bg-white/20' : ''}`}
+            className={`h-7 w-7 text-white hover:bg-white/20 ${autoSpeak ? 'bg-white/20' : ''}`}
             title={autoSpeak ? "Auto-speak ON" : "Auto-speak OFF"}
           >
-            {autoSpeak ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            {autoSpeak ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="icon"
             onClick={onClose}
-            aria-label="Close chat"
-            className="h-8 w-8 text-white hover:bg-white/20"
+            className="h-7 w-7 text-white hover:bg-white/20"
           >
             <X className="w-4 h-4" />
           </Button>
@@ -345,38 +386,34 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
       {/* Messages */}
       <CardContent className="chat-window flex-1 p-0 overflow-hidden">
         <ScrollArea className="h-full">
-          <div className="p-4 space-y-4">
+          <div className="p-3 space-y-3">
             {messages.map(message => (
               <div
                 key={message.id}
-                className={`flex gap-3 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
+                className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
               >
                 <div
-                  className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-                    message.role === 'user' ? 'bg-primary' : 'bg-accent'
+                  className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs ${
+                    message.role === 'user' ? 'bg-primary text-white' : 'bg-accent text-white'
                   }`}
                 >
-                  {message.role === 'user' ? (
-                    <span className="text-xs text-white font-semibold">U</span>
-                  ) : (
-                    <MessageCircle className="w-4 h-4 text-white" />
-                  )}
+                  {message.role === 'user' ? 'U' : 'AI'}
                 </div>
                 <div
-                  className={`flex-1 p-3 rounded-lg text-sm whitespace-pre-wrap ${
+                  className={`flex-1 p-2.5 rounded-lg text-sm whitespace-pre-wrap ${
                     message.role === 'user'
                       ? 'bg-primary text-primary-foreground'
                       : 'bg-muted'
                   }`}
                 >
                   {message.content}
-                  {message.role === 'assistant' && (
+                  {message.role === 'assistant' && message.id !== 'greeting' && (
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => isSpeaking ? stopSpeaking() : speakText(message.content)}
-                      className="mt-2 h-6 text-xs opacity-60 hover:opacity-100"
+                      className="mt-1.5 h-5 text-xs opacity-50 hover:opacity-100 p-1"
                     >
                       {isSpeaking ? <VolumeX className="w-3 h-3 mr-1" /> : <Volume2 className="w-3 h-3 mr-1" />}
                       {isSpeaking ? 'Stop' : 'Sunein'}
@@ -387,14 +424,12 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
             ))}
 
             {isLoading && (
-              <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-accent">
+              <div className="flex gap-2">
+                <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-accent">
                   <Loader2 className="w-4 h-4 text-white animate-spin" />
                 </div>
-                <div className="flex-1 flex items-center">
-                  <p className="text-sm text-muted-foreground">
-                    {isRecording ? 'Recording...' : 'Thinking...'}
-                  </p>
+                <div className="flex-1 flex items-center p-2.5 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">Soch raha hoon...</p>
                 </div>
               </div>
             )}
@@ -405,7 +440,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
       </CardContent>
 
       {/* Input */}
-      <form onSubmit={handleSubmit} className="chat-input border-t p-3">
+      <form onSubmit={handleSubmit} className="chat-input border-t p-2.5">
         <div className="flex gap-2">
           <Button
             type="button"
@@ -413,8 +448,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
             size="icon"
             onClick={toggleRecording}
             disabled={isLoading && !isRecording}
-            aria-label={isRecording ? "Stop recording" : "Start recording"}
-            className={`flex-shrink-0 ${isRecording ? 'animate-pulse bg-red-500 hover:bg-red-600' : ''}`}
+            className={`flex-shrink-0 h-9 w-9 ${isRecording ? 'animate-pulse bg-red-500' : ''}`}
           >
             {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
           </Button>
@@ -423,26 +457,176 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={isRecording ? "Recording... Stop to send" : "Type ya mic use karein..."}
+            placeholder={isRecording ? "Bol rahe hain..." : "Message likhen..."}
             disabled={isLoading || isRecording}
-            className="flex-1 bg-transparent"
+            className="flex-1 h-9 text-sm"
           />
           <Button
             type="submit"
             disabled={isLoading || !inputValue.trim() || isRecording}
             size="icon"
-            aria-label="Send message"
-            className="flex-shrink-0"
+            className="flex-shrink-0 h-9 w-9"
           >
             <Send className="w-4 h-4" />
           </Button>
         </div>
         {isRecording && (
-          <p className="text-xs text-red-500 mt-2 text-center animate-pulse">
-            Recording... Mic button dabayein stop karne ke liye
+          <p className="text-xs text-red-500 mt-1.5 text-center animate-pulse">
+            Recording... Mic dabao stop karne ke liye
           </p>
         )}
       </form>
-    </Card>
+      </Card>
+    </>
   )
+}
+
+// Fallback response when backend is unavailable
+function getFallbackResponse(message: string): string {
+  const msg = message.toLowerCase()
+
+  // ============ SPECIFIC DOCTORS FIRST ============
+
+  // Eye specialist
+  if (/eye|aankh|nazar|ophtha|chasma/.test(msg)) {
+    return "[Medical] Dr. Faiza: Saturday 11 AM-12:30 PM."
+  }
+
+  // Dentist specific
+  if (/dentist|dant|teeth|dental/.test(msg)) {
+    return "[Medical] Dr. Sohail: Mon-Thu, Sat 5-8PM. Dr. Rida: Mon, Wed, Fri 12:30-2PM."
+  }
+
+  // Child specialist
+  if (/child|bacha|bachon|pediatric|kids/.test(msg)) {
+    return "[Medical] Dr. Farzana: Mon, Wed, Fri 11AM-1PM."
+  }
+
+  // Gynaecologist
+  if (/gynae|lady|women|aurat|pregnancy/.test(msg)) {
+    return "[Medical] Dr. Naila Barni: Tue, Thu, Sat 10AM-12:30PM."
+  }
+
+  // Diabetes
+  if (/diabetes|diabetic|sugar|bp/.test(msg)) {
+    return "[Medical] Dr. Ahmed: Mon, Wed, Fri 11AM-1PM & 6-8PM."
+  }
+
+  // Homeopathic
+  if (/homeo|homeopathic|desi/.test(msg)) {
+    return "[Medical] Dr. Akif: Mon-Thu 12-2PM. Dr. Rashid: Mon-Fri 10AM-1PM."
+  }
+
+  // Hijama
+  if (/hijama|hajama|cupping/.test(msg)) {
+    return "[Medical] Dr. Rashid: Mon-Fri 10AM-1PM. Mrs. Saima: Friday 6:30-8:30PM."
+  }
+
+  // General greetings (only if short message)
+  if (/^(salam|hello|hi|aoa|assalam)/.test(msg) && msg.split(' ').length <= 3) {
+    return "[Router] AoA! Kaise madad karun?"
+  }
+
+  // General doctor query - ask which one
+  if (/doctor|medical|daaktar|health|hospital|clinic/.test(msg)) {
+    return "[Medical] Konsa doctor? Eye, Dentist, Child, Gynae, Diabetes, Homeo?"
+  }
+
+  // ============ SPORTS - SPECIFIC SPORT FIRST ============
+  // Check timing/price with typos
+  const askingTiming = /timing|timng|tming|taiming|time|kab|waqt|schedule|open|close|hour|ghanta/.test(msg)
+  const askingPrice = /price|rate|fee|fees|kitna|kitni|cost|rs|rupee|paisa|paise|kiraya|rent/.test(msg)
+
+  // Badminton (with typos)
+  if (/badminton|bedminton|badmintan|badmintun|badmintn|bedmintn/.test(msg)) {
+    if (askingTiming) return "[Sports] Badminton: 10 AM se 4 AM."
+    if (askingPrice) return "[Sports] Badminton: Rs.1500/hour."
+    return "[Sports] Badminton: Rs.1500/hour, 10 AM-4 AM."
+  }
+  // Cricket (with typos)
+  if (/cricket|criket|crickut|crikat|krket|crcket/.test(msg)) {
+    if (askingTiming) return "[Sports] Cricket: 10 AM se 4 AM."
+    if (askingPrice) return "[Sports] Cricket: Rs.2000-2500/hour."
+    return "[Sports] Cricket: Rs.2000-2500/hour, 10 AM-4 AM."
+  }
+  // Snooker (with typos)
+  if (/snooker|snuker|snookr|snukar|snokr|snukar/.test(msg)) {
+    if (askingTiming) return "[Sports] Snooker: 10 AM se 4 AM."
+    if (askingPrice) return "[Sports] Snooker: Rs.7/minute."
+    return "[Sports] Snooker: Rs.7/minute, 10 AM-4 AM."
+  }
+  // Pool
+  if (/pool|pul/.test(msg) && !/swimming/.test(msg)) {
+    if (askingTiming) return "[Sports] Pool: 10 AM se 4 AM."
+    if (askingPrice) return "[Sports] Pool: Rs.100/game."
+    return "[Sports] Pool: Rs.100/game, 10 AM-4 AM."
+  }
+  // General sports - ONLY if no specific sport mentioned
+  if (/sport|sports|khel|gym|fitness/.test(msg)) {
+    if (askingTiming) return "[Sports] Timing: 10 AM se 4 AM."
+    if (askingPrice) return "[Sports] Konsa sport ki fee? Badminton, Cricket, Snooker, Pool?"
+    return "[Sports] Konsa sport? Badminton, Cricket, Snooker, Pool?"
+  }
+
+  // ============ BANQUET - SPECIFIC FIRST ============
+  if (/tehseena/.test(msg)) {
+    return "[Banquet] Tehseena Banquet Rs.30-40K fixed."
+  }
+  if (/iqbal/.test(msg)) {
+    return "[Banquet] Iqbal Arena Rs.250-300/head."
+  }
+  if (/abdul|lateef/.test(msg)) {
+    return "[Banquet] Abdul Lateef Hall Rs.250-300/head."
+  }
+
+  // Guest count matching - BEFORE general hall query
+  if (/\b(300|350|400|500)\b/.test(msg) && /guest|mehmaan|log|booking|banquet|hall/.test(msg)) {
+    return "[Banquet] Tehseena Banquet Rs.30-40K fixed."
+  }
+  if (/\b(200|250)\b/.test(msg) && /guest|mehmaan|log|booking|banquet|hall/.test(msg)) {
+    return "[Banquet] Iqbal Arena Rs.250-300/head."
+  }
+  if (/\b(50|100|150)\b/.test(msg) && /guest|mehmaan|log|booking|banquet|hall/.test(msg)) {
+    return "[Banquet] Abdul Lateef Hall Rs.250-300/head."
+  }
+
+  // General hall query - AFTER guest count matching
+  if (/hall|banquet|wedding|shadi|booking|nikah|walima/.test(msg)) {
+    return "[Banquet] Kitne guests? 50-150: Abdul Lateef, 200-250: Iqbal Arena, 300+: Tehseena."
+  }
+
+  // ============ IT ============
+  if (/shopify/.test(msg)) {
+    return "[IT] 3 months ka course hai."
+  }
+  if (/amazon|fba/.test(msg)) {
+    return "[IT] 4 months ka course hai."
+  }
+  if (/python/.test(msg)) {
+    return "[IT] 4 months ka course hai."
+  }
+  if (/course|it|training|coding|computer/.test(msg)) {
+    return "[IT] Shopify (3m), Amazon FBA (4m), Python (4m)."
+  }
+
+  // ============ GRAVEYARD ============
+  if (/graveyard|qabristan|burial|funeral|janaza/.test(msg)) {
+    return "[Graveyard] Burial plots available. Contact: 0334-3037800"
+  }
+
+  // ============ MEMBERSHIP ============
+  if (/member/.test(msg)) {
+    return "Membership: Free OPD, free operations. Form: /membership-form"
+  }
+
+  // ============ GENERIC ============
+  if (/fee|price|kitna|kitni/.test(msg)) {
+    return "Kis cheez ki fee? Medical, IT, sports ya hall?"
+  }
+
+  if (/timing|kab|waqt/.test(msg)) {
+    return "Kis cheez ka timing? Medical, sports ya hall?"
+  }
+
+  return "Kya jaanna chahte hain? Medical, IT, sports, hall ya membership?"
 }

@@ -8,6 +8,7 @@ from routers.rag import router as rag_router
 from routers.chatbot import router as chatbot_router
 from routers.chatkit import router as chatkit_router
 from routers.voice import router as voice_router
+from routers.ai_chat import router as ai_chat_router
 
 # Create tables
 Base.metadata.create_all(bind=engine)
@@ -38,6 +39,7 @@ app.include_router(rag_router)
 app.include_router(chatbot_router)
 app.include_router(chatkit_router)
 app.include_router(voice_router)
+app.include_router(ai_chat_router)
 
 
 @app.get("/")

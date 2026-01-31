@@ -3,20 +3,12 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import dynamic from 'next/dynamic'
 import { Menu, X, ChevronDown } from 'lucide-react'
 import navigationConfig from '@/config/navigation.json'
 import Image from 'next/image'
 
-// Dynamically import ChatInterface to avoid SSR issues
-const ChatInterface = dynamic(
-  () => import('@/components/ai/ChatInterface').then((mod) => mod.ChatInterface),
-  { ssr: false }
-)
-
 export function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-  const [chatOpen, setChatOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const pathname = usePathname()
 
@@ -34,30 +26,30 @@ export function Navbar() {
   return (
     <nav className="sticky top-0 z-50 w-full bg-accent shadow-lg">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           {/* Logo - Center on mobile, left on desktop */}
-          <div className="flex-1 flex justify-center md:justify-start">
+          <div className="flex justify-center md:justify-start">
             <Link href="/" className="block">
               <Image
                 src="/logo-khawajgan.png"
                 alt="Tanzeem-e-Khawajgan Logo"
-                width={60}
-                height={60}
+                width={80}
+                height={80}
                 className="object-contain"
                 priority
               />
             </Link>
           </div>
 
-          {/* Desktop Navigation - Center */}
-          <ul className="hidden md:flex md:flex-1 md:justify-center md:items-center md:gap-x-1">
+          {/* Desktop Navigation - Center with equal spacing */}
+          <ul className="hidden md:flex flex-1 justify-evenly items-center mx-8">
             {navigationConfig.mainMenu.map((item) => (
               <li key={item.id} className="relative group">
                 {item.submenu ? (
                   <>
                     <button
                       type="button"
-                      className={`inline-flex items-center gap-x-1 px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
+                      className={`inline-flex items-center gap-x-1 px-4 py-2 text-sm font-medium transition-colors hover:text-primary ${
                         isActive(item.submenu[0].href) ? 'text-primary' : 'text-white'
                       }`}
                     >
@@ -85,7 +77,7 @@ export function Navbar() {
                 ) : (
                   <Link
                     href={item.href!}
-                    className={`inline-flex items-center px-3 py-2 text-sm font-medium transition-colors hover:text-primary ${
+                    className={`inline-flex items-center px-4 py-2 text-sm font-medium transition-colors hover:text-primary ${
                       isActive(item.href!) ? 'text-primary' : 'text-white'
                     }`}
                   >
@@ -95,17 +87,6 @@ export function Navbar() {
               </li>
             ))}
           </ul>
-
-          {/* Ask With Me Button - Right */}
-          <div className="hidden md:flex md:flex-1 md:justify-end">
-            <button
-              type="button"
-              onClick={() => setChatOpen(true)}
-              className="inline-flex items-center px-4 py-2 min-h-[44px] rounded-md bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors"
-            >
-              {navigationConfig.aiAction.label.en}
-            </button>
-          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -176,25 +157,10 @@ export function Navbar() {
                   )}
                 </li>
               ))}
-              <li className="px-4 pt-4">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setChatOpen(true)
-                    setMobileMenuOpen(false)
-                    setOpenDropdown(null)
-                  }}
-                  className="w-full px-4 py-3 rounded-md bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors min-h-[44px]"
-                >
-                  {navigationConfig.aiAction.label.en}
-                </button>
-              </li>
             </ul>
           </div>
         )}
 
-        {/* AI Chat Interface */}
-        {chatOpen && <ChatInterface onClose={() => setChatOpen(false)} />}
       </div>
     </nav>
   )

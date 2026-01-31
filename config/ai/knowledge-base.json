@@ -9,6 +9,7 @@
     "medical": {
       "name": "Medical Center",
       "description": "Quality healthcare services with experienced doctors and modern facilities.",
+      "contact": {"name": "Dr. Fabiha", "phone": "0334-8277714"},
       "doctors": [
         {"name": "Dr. Qurat Ul Ain", "specialty": "General OPD & Ultrasound", "timing": "Mon to Fri"},
         {"name": "Dr. Farzana", "specialty": "Child Specialist (Pediatrics)", "timing": "Mon, Wed, Fri (11 AM - 1 PM)"},
@@ -31,6 +32,7 @@
     "it": {
       "name": "IT Services",
       "description": "Professional IT training for modern technical skills.",
+      "contact": {"name": "Kh Mustafa Fazal", "phone": "0334-3699906"},
       "courses": [
         {"title": "Amazon Private Label (FBA)", "duration": "4 months", "level": "Beginner to Intermediate", "description": "Master Amazon FBA business from product research to launching your private label brand."},
         {"title": "Shopify E-commerce", "duration": "3 months", "level": "Beginner", "description": "Build and manage professional online stores with Shopify."},
@@ -43,6 +45,7 @@
     "sports": {
       "name": "Sports Complex",
       "description": "Premium sports facilities for everyone.",
+      "contact": {"name": "Kh. Baber Hafeez", "phone": "0300-2211433"},
       "timings": "10:00 AM - 4:00 AM",
       "facilities": [
         {"title": "Badminton Court", "price": "Rs. 1,500/hour", "description": "Professional indoor badminton courts"},
@@ -55,6 +58,7 @@
     "banquets": {
       "name": "Banquet Halls",
       "description": "Elegant venues for weddings, receptions, and events.",
+      "contact": {"name": "Banquet Booking", "phone": "0321-3037800"},
       "halls": [
         {"name": "Tehseena Banquet", "price": "Rs. 30,000 - 40,000 per event", "capacity": "300+", "features": ["Grand Décor", "AC Hall", "Parking", "Catering Available", "Stage & Lighting"]},
         {"name": "Iqbal Arena", "price": "Rs. 250 - 300 per head", "capacity": "200+", "features": ["Full Catering", "AC Hall", "Sound System", "Parking"]},
@@ -73,6 +77,10 @@
       "name": "Graveyard Services",
       "description": "Peaceful and well-maintained resting place with burial services.",
       "services": ["Burial Plots", "Funeral Services", "Maintenance"],
+      "contact": [
+        {"name": "Kh Waseem Ahmed", "phone": "0334-3037800"},
+        {"name": "Kh Nasir Jameel", "phone": "0321-2221433"}
+      ],
       "page": "/services/graveyard"
     }
   },

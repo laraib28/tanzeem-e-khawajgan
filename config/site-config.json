@@ -13,12 +13,12 @@
     "email": "info@tanzeem-e-khawajgan.org",
     "phone": "+92 300 1234567",
     "address": {
-      "en": "123 Main Street, Lahore, Punjab, Pakistan",
-      "ur": "123 مین سٹریٹ، لاہور، پنجاب، پاکستان"
+      "en": "F-90, Block F, North Nazimabad, Karachi, Pakistan",
+      "ur": "F-90، بلاک F، نارتھ ناظم آباد، کراچی، پاکستان"
     },
     "coordinates": {
-      "lat": 31.5204,
-      "lng": 74.3587
+      "lat": 24.9426,
+      "lng": 67.0735
     }
   },
   "social": {

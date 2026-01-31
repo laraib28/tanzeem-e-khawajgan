@@ -1,11 +1,20 @@
-from .information_agent import InformationAgent
-from .chatbot import ChatbotService, get_chatbot_service
-from .openai_agent import OpenAIAgentController, get_agent_controller
+"""
+Khawajgan AI - Multi-Agent System
+OpenAI Agents SDK with Handoffs
+"""
+
+from .openai_agent import (
+    KhawajganAI,
+    get_khawajgan_ai,
+    get_agent_controller,
+    OpenAIAgentController,
+    AgentResponse
+)
 
 __all__ = [
-    "InformationAgent",
-    "ChatbotService",
-    "get_chatbot_service",
+    "KhawajganAI",
+    "get_khawajgan_ai",
+    "get_agent_controller",
     "OpenAIAgentController",
-    "get_agent_controller"
+    "AgentResponse"
 ]

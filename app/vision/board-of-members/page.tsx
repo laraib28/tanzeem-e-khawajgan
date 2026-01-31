@@ -8,7 +8,7 @@ import Image from 'next/image'
 const president = {
   name: 'Khawaja Javed Iqbal',
   designation: 'President & Chairman',
-  image: '/ijaz.jpeg',
+  image: '/javed.jpeg',
   description: 'Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth.',
   message: 'Welcome to Tanzeem-e-Khawjgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives.',
   email: 'president@tanzeem-e-khawjgan.org',
@@ -40,7 +40,7 @@ const boardMembers = [
   {
     name: 'Zafar Jawed Khawaja',
     designation: 'Finance Secretary',
-    image: '/board-members/zafar-jawed-khawaja.jpg',
+    image: '/zafar.jpeg',
     description: 'Overseeing financial management and accountability.',
     email: 'finance@tanzeem-e-khawjgan.org'
   },
@@ -79,19 +79,22 @@ function PresidentCard() {
   return (
     <div className="bg-[#FDF6E9] rounded-xl p-6 md:p-10 shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
       <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-center">
-        <div className="w-full lg:w-[45%] aspect-[4/3] rounded-lg overflow-hidden bg-gradient-to-br from-[#D4C4A8] via-[#B8C4B8] to-[#A8C4C4] flex items-center justify-center">
-          {imageError ? (
-            <User className="w-24 h-24 text-primary/60" />
-          ) : (
-            <Image
-              src={president.image}
-              alt={president.name}
-              width={500}
-              height={375}
-              className="w-full h-full object-cover"
-              onError={() => setImageError(true)}
-            />
-          )}
+        <div className="w-full lg:w-[280px] flex-shrink-0">
+          <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-xl border-4 border-white bg-gradient-to-br from-[#D4C4A8] via-[#B8C4B8] to-[#A8C4C4]">
+            {imageError ? (
+              <div className="w-full h-full flex items-center justify-center">
+                <User className="w-20 h-20 text-primary/60" />
+              </div>
+            ) : (
+              <Image
+                src={president.image}
+                alt={president.name}
+                fill
+                className="object-cover object-top"
+                onError={() => setImageError(true)}
+              />
+            )}
+          </div>
         </div>
         <div className="flex-1 text-left">
           <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
@@ -139,40 +142,38 @@ function MemberCard({ name, designation, image, description, email }: MemberCard
 
   return (
     <div className="bg-white rounded-xl shadow-md overflow-hidden h-full flex flex-col transition-all duration-300 hover:shadow-xl hover:-translate-y-2 hover:scale-[1.02] cursor-pointer">
-      <div className="relative w-full aspect-[4/3] bg-gradient-to-br from-[#D4C4A8] via-[#B8C4B8] to-[#A8C4C4] flex items-center justify-center">
+      <div className="relative w-full h-44 bg-gradient-to-br from-[#D4C4A8] via-[#B8C4B8] to-[#A8C4C4] flex items-center justify-center overflow-hidden">
         {showFallback ? (
-          <User className="w-16 h-16 text-primary/60" />
+          <User className="w-12 h-12 text-primary/60" />
         ) : (
           <Image
             src={image}
             alt={name}
             fill
-            className="object-cover"
+            className="object-contain"
             onError={() => setImageError(true)}
           />
         )}
       </div>
-      <div className="p-5 flex flex-col flex-1 bg-white">
-        <h3 className="text-lg font-bold text-foreground text-left">
+      <div className="p-4 flex flex-col flex-1 bg-white">
+        <h3 className="text-base font-bold text-foreground text-left">
           {name}
         </h3>
         <p className="text-sm font-semibold text-primary text-left mt-1">
           {designation}
         </p>
         {description && (
-          <p className="text-sm text-foreground/70 text-left mt-3 leading-relaxed">
+          <p className="text-sm text-foreground/70 text-left mt-2 leading-relaxed">
             {description}
           </p>
         )}
         {email && (
-          <>
-            <div className="border-t border-foreground/10 mt-4 pt-4">
-              <div className="flex items-center gap-2 text-foreground/70">
-                <Mail className="w-4 h-4 text-accent" />
-                <span className="text-xs">{email}</span>
-              </div>
+          <div className="border-t border-foreground/10 mt-3 pt-3">
+            <div className="flex items-center gap-2 text-foreground/70">
+              <Mail className="w-4 h-4 text-accent" />
+              <span className="text-xs">{email}</span>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>

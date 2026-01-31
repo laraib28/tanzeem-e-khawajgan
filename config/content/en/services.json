@@ -5,6 +5,10 @@
       "subtitle": "Empowering the future through technology education and training"
     },
     "description": "Our IT department offers comprehensive training programs designed to equip individuals with modern technical skills. From web development to software engineering, we provide quality education that prepares students for successful careers in technology.",
+    "contact": {
+      "name": "Kh Mustafa Fazal",
+      "phone": "0334-3699906"
+    },
     "courses": [
       {
         "title": "Amazon Private Label (FBA)",
@@ -33,6 +37,10 @@
       "subtitle": "Quality healthcare services for the community"
     },
     "description": "Our medical center provides accessible, affordable healthcare services with experienced doctors and modern facilities. We offer a wide range of medical services including general OPD, specialist consultations, dental care, eye care, and laboratory services.",
+    "contact": {
+      "name": "Dr. Fabiha",
+      "phone": "0334-8277714"
+    },
     "doctors": [
       {
         "name": "Dr. Qurat Ul Ain",
@@ -132,6 +140,10 @@
       "subtitle": "Premium sports facilities for everyone"
     },
     "description": "Experience top-notch sports facilities at affordable rates. Our modern sports complex offers Badminton, Cricket, Snooker, and Pool with professional-grade equipment and well-maintained playing areas.",
+    "contact": {
+      "name": "Kh. Baber Hafeez",
+      "phone": "0300-2211433"
+    },
     "timings": "10:00 AM - 4:00 AM",
     "facilities": [
       {
@@ -166,6 +178,10 @@
       "subtitle": "Elegant venues for your memorable occasions"
     },
     "description": "Host your weddings, receptions, corporate events, and family gatherings in our beautifully designed banquet halls. We offer premium venues with excellent catering services to make your events truly special.",
+    "contact": {
+      "name": "Banquet Booking",
+      "phone": "0321-3037800"
+    },
     "halls": [
       {
         "name": "Tehseena Banquet",
@@ -204,6 +220,6 @@
       { "title": "Funeral Services", "description": "Complete funeral arrangements and support" },
       { "title": "Maintenance", "description": "Regular upkeep of cemetery grounds" }
     ],
-    "contact": "For arrangements, contact: +92 XXX XXXXXXX (Mon-Fri, 9AM-5PM)"
+    "contact": "For arrangements, contact: Kh Waseem Ahmed 0334-3037800 | Kh Nasir Jameel 0321-2221433"
   }
 }

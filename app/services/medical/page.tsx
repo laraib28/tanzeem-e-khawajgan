@@ -462,8 +462,8 @@ export default function MedicalServicePage() {
                 <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Phone className="w-7 h-7 text-primary" />
                 </div>
-                <h3 className="font-bold text-foreground mb-2">Call Us</h3>
-                <p className="text-foreground/60">+92 XXX XXXXXXX</p>
+                <h3 className="font-bold text-foreground mb-2">Dr. Fabiha</h3>
+                <p className="text-foreground/60">0334-8277714</p>
               </div>
 
               <div className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
@@ -479,7 +479,7 @@ export default function MedicalServicePage() {
                   <MapPin className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="font-bold text-foreground mb-2">Location</h3>
-                <p className="text-foreground/60">Khawajgan Complex</p>
+                <p className="text-foreground/60">F-90, Block F, North Nazimabad</p>
               </div>
             </div>
           </div>

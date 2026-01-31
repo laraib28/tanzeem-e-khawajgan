@@ -1,8 +1,6 @@
 """
-ChatKit Router
-Provides ChatKit-compatible endpoint for the frontend.
-
-Uses OpenAI ChatKit Python SDK to handle streaming responses.
+ChatKit Router - OpenAI Agents SDK ChatKit Integration
+Uses official SDK ChatKit for streaming responses.
 """
 
 from fastapi import APIRouter, Request
@@ -12,114 +10,97 @@ import json
 import os
 from datetime import datetime
 
-# Conditional import based on ChatKit SDK availability
-try:
-    from chatkit import ChatKitServer, Message, event
-    CHATKIT_AVAILABLE = True
-except ImportError:
-    CHATKIT_AVAILABLE = False
-
-# Use OpenAI Agent if OPENAI_API_KEY is set, otherwise fallback
-if os.getenv("OPENAI_API_KEY"):
-    from ai_agents.openai_agent import get_agent_controller
-else:
-    from ai_agents.chatbot import get_chatbot_service as get_agent_controller
-
 router = APIRouter(prefix="/chatkit", tags=["ChatKit"])
 
+# Check for OpenAI API Key
+OPENAI_AVAILABLE = bool(os.getenv("OPENAI_API_KEY"))
+IMPORT_ERROR = None
 
-class TanzeemChatKitServer:
+# Import our multi-agent system
+if OPENAI_AVAILABLE:
+    try:
+        from ai_agents.agents import triage_agent
+        from agents import Runner
+        AGENTS_AVAILABLE = True
+        print("[DEBUG] Agents SDK loaded successfully")
+    except ImportError as e:
+        AGENTS_AVAILABLE = False
+        IMPORT_ERROR = str(e)
+        print(f"[ERROR] Failed to import agents: {e}")
+else:
+    AGENTS_AVAILABLE = False
+    print("[ERROR] OPENAI_API_KEY not set")
+
+
+async def stream_agent_response(user_message: str, session_id: str = None) -> AsyncGenerator[str, None]:
     """
-    Custom ChatKit server for Tanzeem-e-Khawajgan.
+    Stream response from Khawajgan AI multi-agent system.
 
-    Integrates with the OpenAI Agent controller to provide
-    streaming responses using MCP tools.
+    Uses OpenAI Agents SDK Runner for execution.
     """
+    # Signal start
+    yield f"event: start\ndata: {json.dumps({'timestamp': datetime.now().isoformat()})}\n\n"
 
-    def __init__(self):
-        self.agent = get_agent_controller()
+    if not AGENTS_AVAILABLE:
+        # Fallback response
+        from routers.ai_chat import get_fallback_response, detect_language
+        lang = detect_language(user_message)
+        response = get_fallback_response(user_message, lang)
 
-    async def respond(self, messages: list, session_id: str = None) -> AsyncGenerator[str, None]:
-        """
-        Handle incoming chat messages and stream responses.
+        # Stream in chunks
+        for i in range(0, len(response), 30):
+            chunk = response[i:i + 30]
+            yield f"event: text\ndata: {json.dumps({'content': chunk})}\n\n"
 
-        Args:
-            messages: List of conversation messages
-            session_id: Session identifier for conversation tracking
+        yield f"event: end\ndata: {json.dumps({'timestamp': datetime.now().isoformat()})}\n\n"
+        return
 
-        Yields:
-            SSE events with response chunks
-        """
-        if not messages:
-            yield self._format_sse_event("error", {"message": "No messages provided"})
-            return
+    try:
+        print(f"[DEBUG] Processing message: {user_message}")
 
-        # Get the last user message
-        user_message = None
-        for msg in reversed(messages):
-            if msg.get("role") == "user":
-                user_message = msg.get("content", "")
-                break
+        # Run triage agent - it will handoff to appropriate agent
+        result = await Runner.run(
+            triage_agent,
+            user_message
+        )
 
-        if not user_message:
-            yield self._format_sse_event("error", {"message": "No user message found"})
-            return
+        response_text = result.final_output or "System mein masla hai, thodi dair baad try karein."
 
-        # Signal start of response
-        yield self._format_sse_event("start", {"timestamp": datetime.now().isoformat()})
+        # Detect which agent responded
+        agent_name = "triage"
+        if hasattr(result, 'last_agent') and result.last_agent:
+            agent_name = result.last_agent.name
 
-        try:
-            # Get response from agent
-            response = self.agent.chat(user_message, session_id)
+        print(f"[DEBUG] Agent: {agent_name}, Response: {response_text[:100]}")
 
-            # Stream the response in chunks for better UX
-            response_text = response.get("response", "")
-            chunk_size = 50  # Characters per chunk
+        # Stream response in chunks for smooth UX
+        chunk_size = 30
+        for i in range(0, len(response_text), chunk_size):
+            chunk = response_text[i:i + chunk_size]
+            yield f"event: text\ndata: {json.dumps({'content': chunk})}\n\n"
 
-            for i in range(0, len(response_text), chunk_size):
-                chunk = response_text[i:i + chunk_size]
-                yield self._format_sse_event("text", {"content": chunk})
+        # Send metadata
+        yield f"event: metadata\ndata: {json.dumps({'agent': agent_name})}\n\n"
 
-            # Send metadata
-            yield self._format_sse_event("metadata", {
-                "intent": response.get("intent"),
-                "service": response.get("service"),
-                "sources": response.get("sources", []),
-                "confidence": response.get("confidence", 0)
-            })
+        # Signal end
+        yield f"event: end\ndata: {json.dumps({'timestamp': datetime.now().isoformat()})}\n\n"
 
-            # Signal end of response
-            yield self._format_sse_event("end", {
-                "timestamp": datetime.now().isoformat(),
-                "follow_up": response.get("follow_up")
-            })
-
-        except Exception as e:
-            yield self._format_sse_event("error", {"message": str(e)})
-
-    def _format_sse_event(self, event_type: str, data: dict) -> str:
-        """Format data as SSE event."""
-        return f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
-
-
-# Singleton instance
-_chatkit_server = None
-
-
-def get_chatkit_server() -> TanzeemChatKitServer:
-    """Get or create ChatKit server singleton."""
-    global _chatkit_server
-    if _chatkit_server is None:
-        _chatkit_server = TanzeemChatKitServer()
-    return _chatkit_server
+    except Exception as e:
+        error_msg = "System mein masla hai, thodi dair baad try karein."
+        yield f"event: text\ndata: {json.dumps({'content': error_msg})}\n\n"
+        yield f"event: end\ndata: {json.dumps({'timestamp': datetime.now().isoformat(), 'error': True})}\n\n"
 
 
 @router.post("")
 async def chatkit_endpoint(request: Request):
     """
-    ChatKit endpoint for streaming chat responses.
+    ChatKit SSE endpoint for streaming chat.
 
-    Accepts ChatKit-formatted requests and returns SSE stream.
+    Request format:
+    {
+        "messages": [{"role": "user", "content": "..."}],
+        "session_id": "optional-session-id"
+    }
     """
     try:
         body = await request.json()
@@ -129,10 +110,20 @@ async def chatkit_endpoint(request: Request):
     messages = body.get("messages", [])
     session_id = body.get("session_id") or body.get("thread_id")
 
-    server = get_chatkit_server()
+    # Get last user message
+    user_message = ""
+    for msg in reversed(messages):
+        if msg.get("role") == "user":
+            user_message = msg.get("content", "")
+            break
+
+    if not user_message:
+        async def error_stream():
+            yield f"event: error\ndata: {json.dumps({'message': 'No user message'})}\n\n"
+        return StreamingResponse(error_stream(), media_type="text/event-stream")
 
     return StreamingResponse(
-        server.respond(messages, session_id),
+        stream_agent_response(user_message, session_id),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",
@@ -142,12 +133,68 @@ async def chatkit_endpoint(request: Request):
     )
 
 
+@router.post("/chat")
+async def chatkit_chat(request: Request):
+    """
+    Non-streaming chat endpoint.
+    Returns complete response at once.
+    """
+    try:
+        body = await request.json()
+    except Exception:
+        return {"success": False, "error": "Invalid request"}
+
+    messages = body.get("messages", [])
+    session_id = body.get("session_id")
+
+    # Get last user message
+    user_message = ""
+    for msg in reversed(messages):
+        if msg.get("role") == "user":
+            user_message = msg.get("content", "")
+            break
+
+    if not user_message:
+        return {"success": False, "error": "No user message"}
+
+    if not AGENTS_AVAILABLE:
+        from routers.ai_chat import get_fallback_response, detect_language
+        lang = detect_language(user_message)
+        response = get_fallback_response(user_message, lang)
+        return {
+            "success": True,
+            "response": response,
+            "agent": "fallback"
+        }
+
+    try:
+        result = await Runner.run(triage_agent, user_message)
+        response_text = result.final_output or "System mein masla hai."
+
+        agent_name = "triage"
+        if hasattr(result, 'last_agent') and result.last_agent:
+            agent_name = result.last_agent.name
+
+        return {
+            "success": True,
+            "response": response_text,
+            "agent": agent_name
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "response": "System mein masla hai, thodi dair baad try karein.",
+            "agent": "error"
+        }
+
+
 @router.get("/health")
 async def chatkit_health():
     """Check ChatKit endpoint health."""
     return {
         "status": "healthy",
-        "chatkit_sdk": CHATKIT_AVAILABLE,
-        "openai_configured": bool(os.getenv("OPENAI_API_KEY")),
+        "openai_key_set": OPENAI_AVAILABLE,
+        "agents_sdk_loaded": AGENTS_AVAILABLE,
+        "import_error": IMPORT_ERROR,
         "timestamp": datetime.now().isoformat()
     }

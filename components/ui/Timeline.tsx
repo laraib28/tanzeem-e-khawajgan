@@ -29,30 +29,29 @@ export function Timeline({ events }: TimelineProps) {
           >
             {/* Event Content */}
             <div className={`flex-1 ${index % 2 === 0 ? 'md:text-right md:pr-8' : 'md:text-left md:pl-8'} pl-12 md:pl-0`}>
-              <div className="relative rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group">
-                {/* Background Image */}
+              <div className="relative rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group bg-white">
+                {/* Image */}
                 {event.image && (
-                  <div className="absolute inset-0">
+                  <div className="relative w-full h-48 overflow-hidden">
                     <Image
                       src={event.image}
                       alt={event.title}
                       fill
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      className="object-contain bg-gray-100"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-black/30" />
                   </div>
                 )}
 
                 {/* Content */}
-                <div className={`relative p-6 ${event.image ? 'text-white' : 'bg-white'}`}>
-                  <div className={`flex items-center gap-2 mb-2 font-semibold ${event.image ? 'text-primary' : 'text-accent'}`}>
+                <div className="relative p-6">
+                  <div className="flex items-center gap-2 mb-2 font-semibold text-accent">
                     <Calendar className="w-4 h-4" />
                     <span>{event.year}</span>
                   </div>
-                  <h3 className={`text-xl font-bold mb-2 ${event.image ? 'text-white' : 'text-foreground'}`}>
+                  <h3 className="text-xl font-bold mb-2 text-foreground">
                     {event.title}
                   </h3>
-                  <p className={event.image ? 'text-white/90' : 'text-foreground/70'}>{event.description}</p>
+                  <p className="text-foreground/70">{event.description}</p>
                 </div>
               </div>
             </div>
