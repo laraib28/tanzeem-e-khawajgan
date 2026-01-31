@@ -18,7 +18,7 @@ const Map = dynamic(
 )
 
 export default function ContactPage() {
-  const { banner, contactInfo, map, feedback } = contactContent
+  const { banner, contactInfo, departments, map, feedback } = contactContent
 
   return (
     <div className="min-h-screen">
@@ -71,6 +71,29 @@ export default function ContactPage() {
                 <p className="text-foreground/80">{contactInfo.hours.value}</p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Department Contacts Section */}
+      <section className="py-16 px-4 bg-foreground/5">
+        <div className="container mx-auto max-w-6xl">
+          <h2 className="text-3xl font-bold text-foreground mb-4">{departments.heading}</h2>
+          <p className="text-foreground/80 mb-8">Contact our departments directly for specific inquiries.</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {departments.list.map((dept: { name: string; contact: string; phone: string; icon: string }, index: number) => (
+              <div key={index} className="flex items-start gap-4 p-6 bg-background border border-foreground/10 rounded-lg hover:shadow-lg transition-shadow">
+                <span className="text-3xl">{dept.icon}</span>
+                <div>
+                  <h3 className="font-semibold text-lg text-primary">{dept.name}</h3>
+                  <p className="text-foreground/80 text-sm mb-1">{dept.contact}</p>
+                  <a href={`tel:${dept.phone}`} className="text-foreground font-medium hover:text-primary transition-colors">
+                    {dept.phone}
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>

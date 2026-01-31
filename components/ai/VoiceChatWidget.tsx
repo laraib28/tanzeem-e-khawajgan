@@ -596,17 +596,23 @@ function getFallbackResponse(message: string): string {
   }
 
   // ============ IT ============
+  const askingContact = /contact|number|no|phone|call|rabta/.test(msg)
+
   if (/shopify/.test(msg)) {
-    return "[IT] 3 months ka course hai."
+    if (askingContact) return "[IT] Shopify: Kh Mustafa Fazal 0334-3699906"
+    return "[IT] Shopify: 3 months. Contact: 0334-3699906"
   }
   if (/amazon|fba/.test(msg)) {
-    return "[IT] 4 months ka course hai."
+    if (askingContact) return "[IT] Amazon FBA: Kh Mustafa Fazal 0334-3699906"
+    return "[IT] Amazon FBA: 4 months. Contact: 0334-3699906"
   }
   if (/python/.test(msg)) {
-    return "[IT] 4 months ka course hai."
+    if (askingContact) return "[IT] Python: Kh Mustafa Fazal 0334-3699906"
+    return "[IT] Python: 4 months. Contact: 0334-3699906"
   }
   if (/course|it|training|coding|computer/.test(msg)) {
-    return "[IT] Shopify (3m), Amazon FBA (4m), Python (4m)."
+    if (askingContact) return "[IT] Kh Mustafa Fazal 0334-3699906"
+    return "[IT] Shopify (3m), Amazon FBA (4m), Python (4m). Contact: 0334-3699906"
   }
 
   // ============ GRAVEYARD ============

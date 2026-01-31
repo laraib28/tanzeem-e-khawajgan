@@ -13,7 +13,7 @@
     },
     "phone": {
       "label": "Phone",
-      "value": "+92 300 1234567",
+      "value": "+92 321-3037800",
       "icon": "📞"
     },
     "email": {
@@ -23,9 +23,50 @@
     },
     "hours": {
       "label": "Business Hours",
-      "value": "Monday - Friday: 9:00 AM - 5:00 PM",
+      "value": "Monday - Saturday: 10:00 AM - 8:00 PM",
       "icon": "🕐"
     }
+  },
+  "departments": {
+    "heading": "Department Contacts",
+    "list": [
+      {
+        "name": "Medical Center",
+        "contact": "Dr. Fabiha",
+        "phone": "0334-8277714",
+        "icon": "🏥"
+      },
+      {
+        "name": "IT Training",
+        "contact": "Kh Mustafa Fazal",
+        "phone": "0334-3699906",
+        "icon": "💻"
+      },
+      {
+        "name": "Sports Complex",
+        "contact": "Kh. Baber Hafeez",
+        "phone": "0300-2211433",
+        "icon": "🏏"
+      },
+      {
+        "name": "Banquet / Hall Booking",
+        "contact": "Booking Office",
+        "phone": "0321-3037800",
+        "icon": "🏛️"
+      },
+      {
+        "name": "Graveyard Services",
+        "contact": "Kh Waseem Ahmed",
+        "phone": "0334-3037800",
+        "icon": "🕌"
+      },
+      {
+        "name": "Graveyard Services",
+        "contact": "Kh Nasir Jameel",
+        "phone": "0321-2221433",
+        "icon": "🕌"
+      }
+    ]
   },
   "map": {
     "heading": "Find Us",
