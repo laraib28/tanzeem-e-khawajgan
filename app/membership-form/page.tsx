@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Banner } from '@/components/ui/Banner'
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://khawajgan.org'
 
 // All countries list
 const COUNTRIES = [

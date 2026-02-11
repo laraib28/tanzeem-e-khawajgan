@@ -1,13 +1,16 @@
+import Image from 'next/image'
 import { Banner } from '@/components/ui/Banner'
-import { ServiceCard } from '@/components/cards/ServiceCard'
 import servicesContent from '@/config/content/en/services.json'
+
+const cardImages = ['/graveyard6.jpeg', '/graveyard.jpeg', '/graveyard3.jpeg']
+const cardIcons = ['🕊️', '🙏', '🌿']
 
 export default function GraveyardServicePage() {
   const { banner, description, services, contact } = servicesContent.graveyard
 
   return (
     <main className="min-h-screen">
-      <Banner title={banner.title} subtitle={banner.subtitle} />
+      <Banner title={banner.title} subtitle={banner.subtitle} backgroundImage="/graveyard4.jpeg" />
 
       <section className="py-12 md:py-16">
         <div className="container mx-auto px-4">
@@ -21,12 +24,24 @@ export default function GraveyardServicePage() {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {services.map((service, index) => (
-                <ServiceCard
-                  key={index}
-                  title={service.title}
-                  description={service.description}
-                  icon={['🕊️', '🙏', '🌿'][index]}
-                />
+                <div key={index} className="rounded-lg bg-white shadow-md border-t-4 border-accent overflow-hidden">
+                  <div className="relative w-full h-48">
+                    <Image
+                      src={cardImages[index]}
+                      alt={service.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                    <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                      <span className="text-5xl">{cardIcons[index]}</span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-foreground mb-3">{service.title}</h3>
+                    <p className="text-sm text-foreground/70 line-clamp-3">{service.description}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>

@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import { AnimatedSection } from '@/components/ui/AnimatedSection'
 
 interface Counter {
   value: number
@@ -14,16 +15,28 @@ interface ImpactCountersProps {
 
 export function ImpactCounters({ counters }: ImpactCountersProps) {
   const [counts, setCounts] = useState<number[]>(counters.map(() => 0))
-  const [isVisible, setIsVisible] = useState(false)
+  const [hasStarted, setHasStarted] = useState(false)
+  const sectionRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
-    setIsVisible(true)
-  }, [])
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !hasStarted) {
+          setHasStarted(true)
+          observer.unobserve(entry.target)
+        }
+      },
+      { threshold: 0.3 }
+    )
+
+    if (sectionRef.current) observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [hasStarted])
 
   useEffect(() => {
-    if (!isVisible) return
+    if (!hasStarted) return
 
-    const duration = 2000 // 2 seconds animation
+    const duration = 2000
     const steps = 60
     const stepDuration = duration / steps
 
@@ -49,25 +62,29 @@ export function ImpactCounters({ counters }: ImpactCountersProps) {
     return () => {
       intervals.forEach((interval) => clearInterval(interval))
     }
-  }, [isVisible, counters])
+  }, [hasStarted, counters])
 
   return (
-    <section className="w-full py-12 md:py-16 bg-accent/5">
+    <section ref={sectionRef} className="w-full py-16 md:py-24 bg-accent">
       <div className="container mx-auto px-6 md:px-12 lg:px-16">
+        <AnimatedSection animation="fade-up">
+          <h2 className="text-3xl md:text-4xl font-bold text-center text-white mb-12">
+            Our Impact
+          </h2>
+        </AnimatedSection>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {counters.map((counter, index) => (
-            <div
-              key={index}
-              className="text-center p-6 rounded-lg bg-white shadow-md hover:shadow-lg transition-shadow"
-            >
-              <div className="text-4xl md:text-5xl font-bold text-accent mb-2">
-                {counts[index].toLocaleString()}
-                {counter.suffix}
+            <AnimatedSection key={index} animation="zoom-in" delay={index * 100}>
+              <div className="text-center p-6 rounded-xl bg-white/10 backdrop-blur-sm hover:bg-white/20 transition-all duration-300">
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2">
+                  {counts[index].toLocaleString()}
+                  {counter.suffix}
+                </div>
+                <div className="text-sm md:text-base text-white/80 font-medium">
+                  {counter.label}
+                </div>
               </div>
-              <div className="text-sm md:text-base text-foreground/70 font-medium">
-                {counter.label}
-              </div>
-            </div>
+            </AnimatedSection>
           ))}
         </div>
       </div>

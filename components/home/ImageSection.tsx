@@ -1,8 +1,17 @@
+import Image from 'next/image'
+
 interface ImageSectionProps {
   title: string
   description: string
   imageAlt?: string
 }
+
+const sectionImages = [
+  { src: '/banquet6.jpeg', label: 'Banquet Services', icon: '🎉' },
+  { src: '/banquet7.jpeg', label: 'Event Management', icon: '🏥' },
+  { src: '/banquet8.jpeg', label: 'Community Hall', icon: '⚽' },
+  { src: '/banquet9.jpeg', label: 'Premium Venues', icon: '🤝' },
+]
 
 export function ImageSection({ title, description }: ImageSectionProps) {
   return (
@@ -20,29 +29,22 @@ export function ImageSection({ title, description }: ImageSectionProps) {
 
           {/* Image Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-            {[1, 2, 3, 4].map((index) => (
+            {sectionImages.map((image, index) => (
               <div
                 key={index}
-                className="relative w-full h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow"
+                className="relative w-full h-64 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow group"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-accent/20">
-                  {/* Placeholder - Replace with actual images */}
-                  <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-accent/10">
-                    <div className="text-center p-4">
-                      <div className="text-4xl mb-2">
-                        {index === 1 && '📚'}
-                        {index === 2 && '🏥'}
-                        {index === 3 && '⚽'}
-                        {index === 4 && '🤝'}
-                      </div>
-                      <p className="text-sm text-foreground/60">
-                        {index === 1 && 'Education Programs'}
-                        {index === 2 && 'Healthcare Services'}
-                        {index === 3 && 'Sports Activities'}
-                        {index === 4 && 'Community Engagement'}
-                      </p>
-                    </div>
-                  </div>
+                <Image
+                  src={image.src}
+                  alt={image.label}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4 text-white">
+                  <span className="text-2xl mr-2">{image.icon}</span>
+                  <span className="font-semibold">{image.label}</span>
                 </div>
               </div>
             ))}

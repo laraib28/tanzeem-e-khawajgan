@@ -1,6 +1,8 @@
 'use client'
 
+import Image from 'next/image'
 import { Banner } from '@/components/ui/Banner'
+import { ImageCarousel } from '@/components/ui/ImageCarousel'
 import servicesContent from '@/config/content/en/services.json'
 import {
   Clock,
@@ -38,6 +40,21 @@ export default function BanquetsServicePage() {
     { icon: Star, label: 'Anniversaries' },
   ]
 
+  const hallImages = ['/banquet3.jpeg', '/banquet4.jpeg', '/banquet5.jpeg']
+
+  const carouselImages = [
+    { src: '/banquet1.jpeg', alt: 'Banquet Hall View 1' },
+    { src: '/banquet2.jpeg', alt: 'Banquet Hall View 2' },
+    { src: '/banquet3.jpeg', alt: 'Banquet Hall View 3' },
+    { src: '/banquet4.jpeg', alt: 'Banquet Hall View 4' },
+    { src: '/banquet5.jpeg', alt: 'Banquet Hall View 5' },
+    { src: '/banquet6.jpeg', alt: 'Banquet Hall View 6' },
+    { src: '/banquet7.jpeg', alt: 'Banquet Hall View 7' },
+    { src: '/banquet8.jpeg', alt: 'Banquet Hall View 8' },
+    { src: '/banquet9.jpeg', alt: 'Banquet Hall View 9' },
+    { src: '/banquet10.jpeg', alt: 'Banquet Hall View 10' },
+  ]
+
   const getFeatureIcon = (feature: string) => {
     if (feature.toLowerCase().includes('catering') || feature.toLowerCase().includes('menu')) {
       return <UtensilsCrossed className="w-4 h-4" />
@@ -59,7 +76,7 @@ export default function BanquetsServicePage() {
 
   return (
     <main className="min-h-screen">
-      <Banner title={banner.title} subtitle={banner.subtitle} />
+      <Banner title={banner.title} subtitle={banner.subtitle} backgroundImage="/banquet1.jpeg" />
 
       {/* Hero Section */}
       <section className="py-16 md:py-20 bg-gradient-to-b from-accent/5 to-transparent">
@@ -95,28 +112,8 @@ export default function BanquetsServicePage() {
                 </div>
               </div>
 
-              {/* Right - Image Placeholder */}
-              <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-accent/10 to-primary/10 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-                    <PartyPopper className="w-12 h-12 text-accent" />
-                  </div>
-                  <p className="text-foreground/40 text-sm">Banquet Hall Image</p>
-                  <p className="text-foreground/30 text-xs mt-1">Add: /public/banquets/main.jpg</p>
-                </div>
-                {/* Floating Badge */}
-                <div className="absolute bottom-6 left-6 bg-white p-4 rounded-xl shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-accent/10 rounded-full flex items-center justify-center">
-                      <Star className="w-6 h-6 text-accent" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-foreground/60">Rated</p>
-                      <p className="text-xl font-bold text-foreground">4.9/5</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {/* Right - Image Carousel */}
+              <ImageCarousel images={carouselImages} autoPlay interval={4000} />
             </div>
           </div>
         </div>
@@ -159,15 +156,15 @@ export default function BanquetsServicePage() {
                   className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
                 >
                   <div className="grid grid-cols-1 lg:grid-cols-2">
-                    {/* Image Placeholder */}
-                    <div className={`relative h-64 lg:h-auto bg-gradient-to-br from-accent/10 to-primary/10 flex items-center justify-center ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
-                      <div className="text-center">
-                        <div className="w-20 h-20 bg-white/80 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg">
-                          <Sparkles className="w-10 h-10 text-accent" />
-                        </div>
-                        <p className="text-foreground/40 text-sm">{hall.name} Image</p>
-                        <p className="text-foreground/30 text-xs mt-1">Add: /public/banquets/{hall.name.toLowerCase().replace(/\s+/g, '-')}.jpg</p>
-                      </div>
+                    {/* Hall Image */}
+                    <div className={`relative h-64 lg:h-auto min-h-[280px] ${index % 2 === 1 ? 'lg:order-2' : ''}`}>
+                      <Image
+                        src={hallImages[index] || '/banquet3.jpeg'}
+                        alt={hall.name}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 1024px) 100vw, 50vw"
+                      />
                       {/* Price Badge */}
                       <div className="absolute top-4 right-4 bg-accent text-white px-4 py-2 rounded-full font-bold shadow-lg">
                         {hall.price}
