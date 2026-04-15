@@ -35,6 +35,7 @@ lerna-debug.log*
 # Local env files (per constitution: no .env files in project)
 .env*
 !.env.example
+!.env.prod.example
 
 # Vercel
 .vercel
