@@ -145,6 +145,54 @@ def lookup_member(
             "email": row.email_address
         }
 
+    def format_member(m: Member):
+        return {
+            "membership_no": m.membership_no,
+            "full_name": m.full_name,
+            "relation_name": m.relation_name,
+            "cnic": m.cnic,
+            "native_city": m.native_city,
+            "phone": m.phone,
+            "blood_group": m.blood_group,
+            "occupation": m.occupation,
+            "address": m.address,
+            "category": m.category,
+            "cast": m.cast,
+            "dependents_count": m.dependents_count,
+            "approval_status": m.approval_status,
+            "qr_url": m.qr_url,
+            "date_of_birth": str(m.date_of_birth) if m.date_of_birth else None,
+        }
+
+    # Search in members table first (newly imported data)
+    try:
+        if cnic:
+            clean_cnic = cnic.replace("-", "").replace(" ", "").strip()
+            m = db.query(Member).filter(Member.cnic.ilike(f"%{clean_cnic}%")).first()
+            if m:
+                return {"success": True, "message": "Member found", "data": format_member(m)}
+
+        if membership_no:
+            mn_variants = [membership_no, membership_no.upper(), membership_no.replace(" ", "-"), membership_no.replace("-", " ")]
+            for v in mn_variants:
+                m = db.query(Member).filter(Member.membership_no == v).first()
+                if m:
+                    return {"success": True, "message": "Member found", "data": format_member(m)}
+
+        if full_name:
+            results = db.query(Member).filter(Member.full_name.ilike(f"%{full_name}%")).limit(10).all()
+            if len(results) == 1:
+                return {"success": True, "message": "Member found", "data": format_member(results[0])}
+            elif len(results) > 1:
+                return {
+                    "success": True,
+                    "message": f"Multiple members found ({len(results)})",
+                    "multiple": True,
+                    "data": [{"membership_no": r.membership_no, "full_name": r.full_name, "cnic": r.cnic} for r in results]
+                }
+    except Exception as e:
+        print(f"[ERROR] members table lookup: {e}")
+
     # Search in membership_info table (has 598 records)
     try:
         # Search by CNIC

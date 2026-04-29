@@ -65,3 +65,10 @@ __pycache__/
 *.pyc
 nul
 backend/nul
+
+# Python virtual environment
+backend/.venv/
+backend/venv/
+
+# CSV data files (sensitive member data)
+backend/*.csv

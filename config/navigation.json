@@ -107,12 +107,29 @@
       ]
     },
     {
-      "id": "membership-form",
+      "id": "membership",
       "label": {
         "en": "Membership",
         "ur": "رکنیت"
       },
-      "href": "/membership-form"
+      "submenu": [
+        {
+          "id": "membership-form",
+          "label": {
+            "en": "Apply for Membership",
+            "ur": "رکنیت کے لیے درخواست"
+          },
+          "href": "/membership-form"
+        },
+        {
+          "id": "member-lookup",
+          "label": {
+            "en": "Member Lookup",
+            "ur": "ممبر تلاش"
+          },
+          "href": "/member-lookup"
+        }
+      ]
     },
     {
       "id": "contact",

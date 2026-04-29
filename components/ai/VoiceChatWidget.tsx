@@ -65,6 +65,10 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
 
   // Start recording
   const startRecording = useCallback(async () => {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      alert('Microphone access available nahi. Site HTTPS pe honi chahiye ya localhost pe test karein.')
+      return
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {

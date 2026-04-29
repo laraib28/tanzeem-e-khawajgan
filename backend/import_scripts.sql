@@ -87,7 +87,6 @@ country_id int,
 city_id int,
 PROFESSSION_ID INT,
 qualifaction_id INT,
-membership_info
 FOREIGN KEY (country_id) REFERENCES country_mast (country_id),
 FOREIGN KEY (city_id) REFERENCES city_mast (city_id),
 FOREIGN KEY (PROFESSSION_ID) REFERENCES PROFESSION_MAST (PROFESSSION_ID),
