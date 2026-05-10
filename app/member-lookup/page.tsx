@@ -35,9 +35,9 @@ export default function MemberLookupPage() {
   const [error, setError] = useState('')
 
   const placeholders = {
-    membership_no: 'KA-001 ya KA 001',
+    membership_no: 'e.g. KA-001 or KA 001',
     cnic: '42301-1234567-1',
-    full_name: 'Member ka naam',
+    full_name: 'Enter member name',
   }
 
   const handleSearch = async () => {
@@ -59,10 +59,10 @@ export default function MemberLookupPage() {
           setMember(data.data)
         }
       } else {
-        setError(data.message || 'Member nahi mila.')
+        setError(data.message || 'Member not found.')
       }
     } catch {
-      setError('Server se connection nahi ho saka. Backend chal raha hai?')
+      setError('Could not connect to server. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -78,7 +78,7 @@ export default function MemberLookupPage() {
     <div className="min-h-screen bg-background">
       <Banner
         title="Member Lookup"
-        subtitle="Membership number, CNIC, ya naam se member ki details dekhen"
+        subtitle="Search member details by membership number, CNIC, or name"
         backgroundImage="/banner-bg.jpg"
       />
 
@@ -91,7 +91,7 @@ export default function MemberLookupPage() {
             {([
               { key: 'membership_no', label: 'Membership #' },
               { key: 'cnic', label: 'CNIC' },
-              { key: 'full_name', label: 'Naam' },
+              { key: 'full_name', label: 'Name' },
             ] as const).map((tab) => (
               <button
                 key={tab.key}
@@ -123,7 +123,7 @@ export default function MemberLookupPage() {
               className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
             >
               <Search size={18} />
-              {loading ? 'Dhundh raha...' : 'Search'}
+              {loading ? 'Searching...' : 'Search'}
             </button>
           </div>
         </div>
@@ -138,7 +138,7 @@ export default function MemberLookupPage() {
         {/* Multiple Results */}
         {multipleResults.length > 0 && (
           <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
-            <p className="text-sm text-gray-500 mb-4">{multipleResults.length} members mile — ek select karein:</p>
+            <p className="text-sm text-gray-500 mb-4">{multipleResults.length} members found — please select one:</p>
             <div className="space-y-2">
               {multipleResults.map((m, idx) => (
                 <button

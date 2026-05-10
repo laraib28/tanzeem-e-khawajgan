@@ -255,5 +255,5 @@ def lookup_member(
 
     return {
         "success": False,
-        "message": "Record nahi mila. CNIC, Membership Number ya Name check karein."
+        "message": "Member not found. Please check your CNIC, Membership Number or Name."
     }

@@ -1,0 +1,55 @@
+name: Deploy Backend to Digital Ocean
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Digital Ocean via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            set -e
+
+            # Repo clone ya update
+            if [ -d "/app/tanzeem-backend/.git" ]; then
+              cd /app/tanzeem-backend
+              git pull origin main
+            else
+              git clone https://github.com/${{ github.repository }} /app/tanzeem-backend
+              cd /app/tanzeem-backend
+            fi
+
+            # .env file banana
+            cat > /app/tanzeem-backend/backend/.env << 'ENVEOF'
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            ENVEOF
+
+            # Docker build aur run
+            cd /app/tanzeem-backend/backend
+            docker build -t tanzeem-backend .
+            docker stop tanzeem-api 2>/dev/null || true
+            docker rm tanzeem-api 2>/dev/null || true
+            docker run -d \
+              --name tanzeem-api \
+              --restart always \
+              -p 8000:8000 \
+              --env-file .env \
+              tanzeem-backend
+
+            echo "✅ Backend deployed!"
+            docker ps | grep tanzeem-api

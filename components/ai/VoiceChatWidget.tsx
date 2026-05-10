@@ -66,7 +66,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
   // Start recording
   const startRecording = useCallback(async () => {
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Microphone access available nahi. Site HTTPS pe honi chahiye ya localhost pe test karein.')
+      alert('Microphone access not available. Site must be on HTTPS or localhost.')
       return
     }
     try {
@@ -101,14 +101,14 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
         stream.getTracks().forEach(track => track.stop())
 
         if (audioChunksRef.current.length === 0) {
-          alert('Recording empty. Dobara try karein.')
+          alert('Recording is empty. Please try again.')
           return
         }
 
         const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
 
         if (audioBlob.size < 1000) {
-          alert('Recording bahut chhoti hai. Thoda lambi recording karein.')
+          alert('Recording too short. Please record a longer message.')
           return
         }
 
@@ -124,9 +124,9 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     } catch (err) {
       const error = err as Error
       if (error.name === 'NotAllowedError') {
-        alert('Mic permission denied. Browser settings mein microphone allow karein.')
+        alert('Microphone permission denied. Please allow microphone access in browser settings.')
       } else if (error.name === 'NotFoundError') {
-        alert('Microphone nahi mila. Microphone connect karein.')
+        alert('No microphone found. Please connect a microphone.')
       } else {
         alert('Mic error: ' + error.message)
       }
@@ -161,15 +161,15 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
         if (data.success && data.text && data.text.trim()) {
           await sendMessage(data.text.trim())
         } else {
-          alert('Awaz samajh nahi aayi. Clear bolein ya type karein.')
+          alert('Could not understand audio. Please speak clearly or type your message.')
         }
       } catch (err) {
         const error = err as Error
         console.error('Voice transcription error:', error)
         if (error.message.includes('503')) {
-          alert('Voice service available nahi. OPENAI_API_KEY check karein.')
+          alert('Voice service unavailable. Please check OPENAI_API_KEY.')
         } else if (error.message.includes('500')) {
-          alert('Server error. Backend logs check karein.')
+          alert('Server error. Please check backend logs.')
         } else {
           alert(`Voice error: ${error.message}`)
         }
@@ -289,7 +289,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
 
       if (response.ok) {
         const data = await response.json()
-        responseText = data.response || 'Sorry, kuch galat ho gaya. Dobara try karein.'
+        responseText = data.response || 'Sorry, something went wrong. Please try again.'
       } else {
         throw new Error('API error')
       }
@@ -421,7 +421,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
                       className="mt-1.5 h-5 text-xs opacity-50 hover:opacity-100 p-1"
                     >
                       {isSpeaking ? <VolumeX className="w-3 h-3 mr-1" /> : <Volume2 className="w-3 h-3 mr-1" />}
-                      {isSpeaking ? 'Stop' : 'Sunein'}
+                      {isSpeaking ? 'Stop' : 'Listen'}
                     </Button>
                   )}
                 </div>
@@ -434,7 +434,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
                   <Loader2 className="w-4 h-4 text-white animate-spin" />
                 </div>
                 <div className="flex-1 flex items-center p-2.5 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground">Soch raha hoon...</p>
+                  <p className="text-sm text-muted-foreground">Thinking...</p>
                 </div>
               </div>
             )}
@@ -462,7 +462,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={isRecording ? "Bol rahe hain..." : "Message likhen..."}
+            placeholder={isRecording ? "Listening..." : "Type a message..."}
             disabled={isLoading || isRecording}
             className="flex-1 h-9 text-sm"
           />
@@ -477,7 +477,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
         </div>
         {isRecording && (
           <p className="text-xs text-red-500 mt-1.5 text-center animate-pulse">
-            Recording... Mic dabao stop karne ke liye
+            Recording... Press mic button to stop
           </p>
         )}
       </form>

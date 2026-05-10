@@ -219,7 +219,7 @@ export default function MembershipFormPage() {
       } else if (data.multiple) {
         setLookupMessage(`Multiple members found. Please be more specific or use membership number.`)
       } else {
-        setLookupMessage('Record nahi mila')
+        setLookupMessage('Record not found.')
       }
     } catch {
       setLookupMessage('Error looking up member. Please try again.')
@@ -299,7 +299,7 @@ export default function MembershipFormPage() {
           <div className="bg-accent/10 border border-accent/30 rounded-lg p-6 mb-8">
             <h3 className="text-lg font-semibold text-foreground mb-4">Member Lookup / Record Search</h3>
             <p className="text-sm text-foreground/70 mb-4">
-              Already a member? CNIC, Membership Number ya Name se apna record search karein.
+              Already a member? Search your existing record by CNIC, Membership Number, or Name.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <select
@@ -323,10 +323,10 @@ export default function MembershipFormPage() {
                 }}
                 placeholder={
                   lookupType === 'cnic'
-                    ? 'CNIC likhen (e.g., 35202-1234567-1)'
+                    ? 'Enter CNIC (e.g., 35202-1234567-1)'
                     : lookupType === 'membership_no'
-                      ? 'Membership number likhen (e.g., AB123)'
-                      : 'Naam likhen'
+                      ? 'Enter membership number (e.g., AB123)'
+                      : 'Enter full name'
                 }
                 className={`${inputClass} flex-1`}
               />
