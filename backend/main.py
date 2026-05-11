@@ -164,6 +164,8 @@ def lookup_member(
             "date_of_birth": str(m.date_of_birth) if m.date_of_birth else None,
         }
 
+    db_errors = []
+
     # Search in members table first (newly imported data)
     try:
         if cnic:
@@ -192,6 +194,8 @@ def lookup_member(
                 }
     except Exception as e:
         print(f"[ERROR] members table lookup: {e}")
+        db_errors.append(f"members table: {e}")
+        db.rollback()
 
     # Search in membership_info table (has 598 records)
     try:
@@ -251,7 +255,11 @@ def lookup_member(
                     }
 
     except Exception as e:
-        print(f"[ERROR] Lookup error: {e}")
+        print(f"[ERROR] membership_info table lookup: {e}")
+        db_errors.append(f"membership_info table: {e}")
+
+    if db_errors:
+        raise HTTPException(status_code=500, detail=f"Database error: {'; '.join(db_errors)}")
 
     return {
         "success": False,
