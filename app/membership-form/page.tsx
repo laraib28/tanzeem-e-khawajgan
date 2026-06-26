@@ -246,7 +246,6 @@ export default function MembershipFormPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          membership_no: formData.membershipNumber || null,
           gender: formData.gender,
           full_name: formData.fullName,
           relationship_type: formData.relationshipType,
@@ -272,8 +271,7 @@ export default function MembershipFormPage() {
       const data = await response.json()
 
       if (data.success) {
-        setSubmitMessage('Membership application submitted successfully!')
-        // Optionally reset form
+        setSubmitMessage('آپ کی درخواست جمع ہو گئی ہے۔ منظوری کا انتظار کریں — آپ کا ممبرشپ نمبر منظوری کے بعد جاری کیا جائے گا۔')
       } else {
         setSubmitMessage(data.detail || 'Error submitting application')
       }
@@ -379,22 +377,10 @@ export default function MembershipFormPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Membership Number */}
                 <div>
-                  <label htmlFor="membershipNumber" className={labelClass}>
-                    Membership Number
-                  </label>
-                  <input
-                    type="text"
-                    id="membershipNumber"
-                    name="membershipNumber"
-                    value={formData.membershipNumber}
-                    onChange={handleChange}
-                    className={`${inputClass} ${errors.membershipNumber ? 'border-red-500' : ''}`}
-                    placeholder="e.g., AB123 (5 alphanumeric characters)"
-                    maxLength={5}
-                  />
-                  {errors.membershipNumber && (
-                    <p className={errorClass}>{errors.membershipNumber}</p>
-                  )}
+                  <label className={labelClass}>Membership Number</label>
+                  <div className="w-full px-4 py-3 border border-foreground/10 rounded-md bg-foreground/5 text-foreground/50 text-sm">
+                    Will be assigned after approval
+                  </div>
                 </div>
 
                 {/* Gender */}
@@ -736,109 +722,42 @@ export default function MembershipFormPage() {
             </div>
 
             {/* ===== OFFICE USE ONLY ===== */}
-            <div className="p-8 bg-foreground/5 space-y-6">
+            <div className="p-8 bg-foreground/5 space-y-4 opacity-60 pointer-events-none select-none">
               <h3 className="text-lg font-semibold text-foreground border-b border-foreground/10 pb-2">
                 Office Use Only
               </h3>
+              <p className="text-sm text-foreground/50 italic">This section is filled by the office only.</p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Form Received Date */}
                 <div>
-                  <label htmlFor="formReceivedDate" className={labelClass}>
-                    Form Received Date
-                  </label>
-                  <input
-                    type="date"
-                    id="formReceivedDate"
-                    name="formReceivedDate"
-                    value={formData.formReceivedDate}
-                    onChange={handleChange}
-                    className={inputClass}
-                  />
+                  <p className={labelClass}>Form Received Date</p>
+                  <div className="w-full px-4 py-3 border border-foreground/10 rounded-md bg-foreground/5 text-foreground/30 text-sm">—</div>
                 </div>
-
-                {/* Verified By */}
                 <div>
-                  <label htmlFor="verifiedBy" className={labelClass}>
-                    Verified By
-                  </label>
-                  <input
-                    type="text"
-                    id="verifiedBy"
-                    name="verifiedBy"
-                    value={formData.verifiedBy}
-                    onChange={handleChange}
-                    className={inputClass}
-                    placeholder="Verifier name"
-                  />
+                  <p className={labelClass}>Verified By</p>
+                  <div className="w-full px-4 py-3 border border-foreground/10 rounded-md bg-foreground/5 text-foreground/30 text-sm">—</div>
                 </div>
-
-                {/* Verification Remarks */}
                 <div className="md:col-span-2">
-                  <label htmlFor="verificationRemarks" className={labelClass}>
-                    Verification Remarks
-                  </label>
-                  <textarea
-                    id="verificationRemarks"
-                    name="verificationRemarks"
-                    value={formData.verificationRemarks}
-                    onChange={handleChange}
-                    className={`${inputClass} resize-none`}
-                    rows={3}
-                    placeholder="Enter remarks"
-                  />
+                  <p className={labelClass}>Verification Remarks</p>
+                  <div className="w-full px-4 py-3 border border-foreground/10 rounded-md bg-foreground/5 text-foreground/30 text-sm h-16">—</div>
                 </div>
-
-                {/* Approval Status */}
                 <div>
-                  <label htmlFor="approvalStatus" className={labelClass}>
-                    Approval Status
-                  </label>
-                  <select
-                    id="approvalStatus"
-                    name="approvalStatus"
-                    value={formData.approvalStatus}
-                    onChange={handleChange}
-                    className={inputClass}
-                  >
-                    <option value="">Select Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                  </select>
+                  <p className={labelClass}>Approval Status</p>
+                  <div className="w-full px-4 py-3 border border-foreground/10 rounded-md bg-foreground/5 text-foreground/30 text-sm">Pending</div>
                 </div>
-
-                {/* Membership Issued Date */}
                 <div>
-                  <label htmlFor="membershipIssuedDate" className={labelClass}>
-                    Membership Issued Date
-                  </label>
-                  <input
-                    type="date"
-                    id="membershipIssuedDate"
-                    name="membershipIssuedDate"
-                    value={formData.membershipIssuedDate}
-                    onChange={handleChange}
-                    className={inputClass}
-                  />
+                  <p className={labelClass}>Membership Issued Date</p>
+                  <div className="w-full px-4 py-3 border border-foreground/10 rounded-md bg-foreground/5 text-foreground/30 text-sm">—</div>
                 </div>
-
-                {/* Official Signature */}
                 <div>
-                  <label htmlFor="officialSignature" className={labelClass}>
-                    Official Signature
-                  </label>
-                  <div className="h-24 border-2 border-dashed border-foreground/30 rounded-md flex items-center justify-center text-foreground/40 text-sm">
+                  <p className={labelClass}>Official Signature</p>
+                  <div className="h-24 border-2 border-dashed border-foreground/20 rounded-md flex items-center justify-center text-foreground/25 text-sm">
                     Signature Area
                   </div>
                 </div>
-
-                {/* Office Stamp / Seal */}
                 <div>
-                  <label htmlFor="officeStamp" className={labelClass}>
-                    Office Stamp / Seal
-                  </label>
-                  <div className="h-24 border-2 border-dashed border-foreground/30 rounded-md flex items-center justify-center text-foreground/40 text-sm">
+                  <p className={labelClass}>Office Stamp / Seal</p>
+                  <div className="h-24 border-2 border-dashed border-foreground/20 rounded-md flex items-center justify-center text-foreground/25 text-sm">
                     Stamp Area
                   </div>
                 </div>
@@ -848,9 +767,9 @@ export default function MembershipFormPage() {
             {/* ===== SUBMIT BUTTON ===== */}
             <div className="p-8 border-t border-foreground/10">
               {submitMessage && (
-                <p className={`mb-4 text-center ${submitMessage.includes('success') ? 'text-green-600' : 'text-red-500'}`}>
+                <div className={`mb-4 p-4 rounded-md text-center text-sm ${submitMessage.includes('درخواست') ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-600'}`}>
                   {submitMessage}
-                </p>
+                </div>
               )}
               <button
                 type="submit"

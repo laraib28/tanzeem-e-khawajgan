@@ -11,18 +11,20 @@
       "description": "Quality healthcare services with experienced doctors and modern facilities.",
       "contact": {"name": "Dr. Fabiha", "phone": "0334-8277714"},
       "doctors": [
-        {"name": "Dr. Qurat Ul Ain", "specialty": "General OPD & Ultrasound", "timing": "Mon to Fri"},
-        {"name": "Dr. Farzana", "specialty": "Child Specialist (Pediatrics)", "timing": "Mon, Wed, Fri (11 AM - 1 PM)"},
-        {"name": "Dr. Naila Barni", "specialty": "Gynaecologist", "timing": "Tue, Thu, Sat (10 AM - 12:30 PM)"},
-        {"name": "Dr. Ahmed", "specialty": "Diabetes & General Physician", "timing": "Mon, Wed, Fri (6 PM - 8 PM & 11 AM - 1 PM)"},
-        {"name": "Dr. Sohail", "specialty": "Dentist", "timing": "Mon to Thu, Sat (5 PM - 8 PM)"},
-        {"name": "Dr. Rida", "specialty": "Dentist", "timing": "Mon, Wed, Fri (12:30 PM - 2 PM)"},
-        {"name": "Dr. Faiza", "specialty": "Eye Specialist", "timing": "Sat (11 AM - 12:30 PM)"},
-        {"name": "Dr. Akif", "specialty": "Homeopathic", "timing": "Mon to Thu (12 PM - 2 PM)"},
-        {"name": "Dr. Rashid Mehmood", "specialty": "Homeopathic & Hajama", "timing": "Mon to Fri (10 AM - 1 PM)"},
-        {"name": "Mrs. Saima Rashid", "specialty": "Hajama Therapy", "timing": "Fri (6:30 PM - 8:30 PM)"}
+        {"name": "Dr. Qurat Ul Ain", "specialty": "General OPD & Ultrasound", "days": "Mon–Fri", "timing": "11:00 am – 1:00 pm"},
+        {"name": "Dr. Farzana", "specialty": "Child OPD", "days": "Mon, Wed, Fri", "timing": "10:30 am – 12:30 pm"},
+        {"name": "Dr. Naila Barni", "specialty": "Gynaecologist", "days": "Tue & Thu", "timing": "6:00 pm – 8:00 pm", "extra": "Saturday: 11:00 am – 1:00 pm"},
+        {"name": "Dr. Ahmed", "specialty": "Diabetes & General Physician", "days": "Mon, Wed, Fri", "timing": "5:00 pm – 8:00 pm"},
+        {"name": "Dr. Sohail", "specialty": "Dentist", "days": "Mon–Thu & Sat", "timing": "12:30 pm – 2:00 pm"},
+        {"name": "Dr. Rida", "specialty": "Dentist", "days": "Mon, Wed, Fri", "timing": "11:00 am – 12:30 pm"},
+        {"name": "Dr. Umme Rubab", "specialty": "Physiotherapist", "days": "Mon–Fri", "timing": "10:30 am – 2:00 pm"},
+        {"name": "Eye Technician", "specialty": "Eye OPD", "days": "Saturday", "timing": "12:00 pm – 2:00 pm"},
+        {"name": "Dr. Akif", "specialty": "Homeopathic", "days": "Mon–Thu", "timing": "10:00 am – 1:00 pm"},
+        {"name": "Dr. Rashid Mehmood", "specialty": "Homeopathic & Hajama", "days": "Mon–Fri", "timing": "6:30 pm – 8:30 pm"},
+        {"name": "Mrs. Saima Rashid", "specialty": "Hajama Therapy", "days": "Friday", "timing": "6:30 pm – 8:30 pm"},
+        {"name": "Dr. Amna Athar Jaffery", "specialty": "Diet & Nutrition", "days": "Mon, Tue, Wed", "timing": "10:30 am – 1:00 pm"}
       ],
-      "laboratory": {"name": "Sindh Lab", "timing": "Mon to Sat (10:30 AM - 8 PM)"},
+      "laboratory": {"name": "Laboratory", "timing": "Mon–Sat: 10:00 am – 2:00 pm & 4:00 pm – 7:00 pm"},
       "partnerHospitals": [
         {"name": "Shed Hospital", "benefit": "Free OPD for Khawajgan members"},
         {"name": "Abdul Samad Hospital", "benefit": "Free Operations & Delivery for Khawajgan members"}

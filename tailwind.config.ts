@@ -17,6 +17,8 @@ const config: Config = {
         primary: 'var(--primary)',
         accent: 'var(--accent)',
         border: 'var(--border)',
+        muted: 'var(--muted)',
+        'muted-foreground': 'var(--muted-foreground)',
       },
       screens: {
         'mobile': { 'max': '767px' },

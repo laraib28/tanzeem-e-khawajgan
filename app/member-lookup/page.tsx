@@ -165,9 +165,13 @@ export default function MemberLookupPage() {
                 </div>
                 <div>
                   <h2 className="text-white font-bold text-xl">{member.full_name || member.name}</h2>
-                  {member.membership_no && (
-                    <p className="text-emerald-100 text-sm"># {member.membership_no}</p>
-                  )}
+                  {member.approval_status === 'approved' && member.membership_no ? (
+                    <p className="text-emerald-100 text-sm font-semibold"># {member.membership_no}</p>
+                  ) : member.approval_status === 'pending' ? (
+                    <p className="text-yellow-200 text-xs">Membership number will be issued after approval</p>
+                  ) : member.approval_status === 'rejected' ? (
+                    <p className="text-red-200 text-xs">Application rejected — no membership number assigned</p>
+                  ) : null}
                 </div>
               </div>
               {member.approval_status && (

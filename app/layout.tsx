@@ -1,12 +1,17 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
+import { Inter, Playfair_Display } from 'next/font/google'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { ChatWidget } from '@/components/ai/ChatWidget'
 import './globals.css'
 
-// Using system fonts as fallback
-const inter = {
-  variable: '--font-inter',
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-display', weight: ['700', '800'], display: 'swap' })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
 }
 
 export const metadata: Metadata = {
@@ -23,11 +28,6 @@ export const metadata: Metadata = {
     email: false,
     address: false,
     telephone: false,
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
   },
   robots: {
     index: true,
@@ -68,7 +68,7 @@ export default function RootLayout({
   return (
     <html lang="en" dir="ltr" className="scroll-smooth bg-background">
       <head />
-      <body className={`${inter.variable} font-sans bg-background text-foreground antialiased`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans bg-background text-foreground antialiased`}>
         <div className="flex min-h-screen flex-col bg-background">
           <Navbar />
           <main className="flex-1">{children}</main>

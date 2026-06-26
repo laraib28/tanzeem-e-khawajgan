@@ -45,68 +45,80 @@
       {
         "name": "Dr. Qurat Ul Ain",
         "specialty": "General OPD & Ultrasound",
-        "timing": "Mon to Fri",
+        "timing": "Mon – Fri  |  11:00 am – 1:00 pm",
         "icon": "general"
       },
       {
         "name": "Dr. Farzana",
-        "specialty": "Child Specialist (Pediatrics)",
-        "timing": "Mon, Wed, Fri (11 AM - 1 PM)",
+        "specialty": "Child OPD",
+        "timing": "Mon, Wed, Fri  |  10:30 am – 12:30 pm",
         "icon": "child"
       },
       {
         "name": "Dr. Naila Barni",
         "specialty": "Gynaecologist",
-        "timing": "Tue, Thu, Sat (10 AM - 12:30 PM)",
+        "timing": "Tue & Thu: 6:00 pm – 8:00 pm  |  Sat: 11:00 am – 1:00 pm",
         "icon": "gynae"
       },
       {
         "name": "Dr. Ahmed",
         "specialty": "Diabetes & General Physician",
-        "timing": "Mon, Wed, Fri (6 PM - 8 PM & 11 AM - 1 PM)",
+        "timing": "Mon, Wed, Fri  |  5:00 pm – 8:00 pm",
         "icon": "diabetes"
       },
       {
         "name": "Dr. Sohail",
         "specialty": "Dentist",
-        "timing": "Mon to Thu, Sat (5 PM - 8 PM)",
+        "timing": "Mon – Thu & Sat  |  12:30 pm – 2:00 pm",
         "icon": "dental"
       },
       {
         "name": "Dr. Rida",
         "specialty": "Dentist",
-        "timing": "Mon, Wed, Fri (12:30 PM - 2 PM)",
+        "timing": "Mon, Wed, Fri  |  11:00 am – 12:30 pm",
         "icon": "dental"
       },
       {
-        "name": "Dr. Faiza",
-        "specialty": "Eye Specialist (Ophthalmology)",
-        "timing": "Sat (11 AM - 12:30 PM)",
+        "name": "Dr. Umme Rubab",
+        "specialty": "Physiotherapist",
+        "timing": "Mon – Fri  |  10:30 am – 2:00 pm",
+        "icon": "therapy"
+      },
+      {
+        "name": "Eye Technician",
+        "specialty": "Eye OPD",
+        "timing": "Saturday  |  12:00 pm – 2:00 pm",
         "icon": "eye"
       },
       {
         "name": "Dr. Akif",
         "specialty": "Homeopathic",
-        "timing": "Mon to Thu (12 PM - 2 PM)",
+        "timing": "Mon – Thu  |  10:00 am – 1:00 pm",
         "icon": "homeo"
       },
       {
         "name": "Dr. Rashid Mehmood",
         "specialty": "Homeopathic & Hajama",
-        "timing": "Mon to Fri (10 AM - 1 PM)",
+        "timing": "Mon – Fri  |  6:30 pm – 8:30 pm",
         "icon": "homeo"
       },
       {
         "name": "Mrs. Saima Rashid",
         "specialty": "Hajama Therapy",
-        "timing": "Fri (6:30 PM - 8:30 PM)",
+        "timing": "Friday  |  6:30 pm – 8:30 pm",
         "icon": "therapy"
+      },
+      {
+        "name": "Dr. Amna Athar Jaffery",
+        "specialty": "Diet & Nutrition",
+        "timing": "Mon, Tue, Wed  |  10:30 am – 1:00 pm",
+        "icon": "general"
       }
     ],
     "laboratory": {
-      "name": "Sindh Lab",
+      "name": "Laboratory",
       "services": "Complete Laboratory Services",
-      "timing": "Mon to Sat (10:30 AM - 8 PM)"
+      "timing": "Mon – Sat  |  10:00 am – 2:00 pm  &  4:00 pm – 7:00 pm"
     },
     "partnerHospitals": [
       {
