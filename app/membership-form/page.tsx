@@ -136,7 +136,7 @@ export default function MembershipFormPage() {
     officeStamp: ''
   })
 
-  const [errors, setErrors] = useState<ValidationErrors>({})
+  const [, setErrors] = useState<ValidationErrors>({})
   const [lookupQuery, setLookupQuery] = useState('')
   const [lookupType, setLookupType] = useState<'membership_no' | 'full_name' | 'cnic'>('cnic')
   const [lookupMessage, setLookupMessage] = useState('')
