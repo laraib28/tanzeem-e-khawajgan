@@ -284,7 +284,7 @@ export default function MembershipFormPage() {
 
   const inputClass = "w-full px-4 py-3 border border-foreground/20 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background"
   const labelClass = "block text-sm font-medium text-foreground mb-2"
-  const errorClass = "text-red-500 text-xs mt-1"
+  // const errorClass = "text-red-500 text-xs mt-1"
 
   return (
     <div className="min-h-screen">

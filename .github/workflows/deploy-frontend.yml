@@ -1,0 +1,54 @@
+name: Deploy Frontend to Server
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USER }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          script: |
+            set -e
+
+            # Pull latest code
+            if [ -d "/app/tanzeem-frontend/.git" ]; then
+              cd /app/tanzeem-frontend
+              git pull origin main
+            else
+              git clone https://github.com/${{ github.repository }} /app/tanzeem-frontend
+              cd /app/tanzeem-frontend
+            fi
+
+            # Build Docker image
+            cd /app/tanzeem-frontend
+            docker build \
+              --build-arg NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }} \
+              -t tanzeem-frontend .
+
+            # Stop and remove old container
+            docker stop tanzeem-web 2>/dev/null || true
+            docker rm tanzeem-web 2>/dev/null || true
+
+            # Run new container
+            docker run -d \
+              --name tanzeem-web \
+              --restart always \
+              -p 3000:3000 \
+              tanzeem-frontend
+
+            echo "✅ Frontend deployed!"
+            docker ps | grep tanzeem-web
