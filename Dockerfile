@@ -17,7 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 ARG NEXT_PUBLIC_BACKEND_URL
 ENV NEXT_PUBLIC_BACKEND_URL=$NEXT_PUBLIC_BACKEND_URL
 
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=1536" npm run build
 
 # Production image
 FROM base AS runner
