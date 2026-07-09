@@ -173,7 +173,7 @@ export default function BanquetsServicePage() {
                     </div>
 
                     {/* Content */}
-                    <div className="p-8">
+                    <div className="p-4 md:p-8">
                       <div className="flex items-center gap-3 mb-4">
                         <h3 className="text-2xl md:text-3xl font-bold text-foreground">{hall.name}</h3>
                       </div>

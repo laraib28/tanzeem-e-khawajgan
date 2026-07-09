@@ -6,7 +6,19 @@ import { Input } from '@/components/ui/input'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Send, X, Loader2, MessageCircle, Mic, MicOff, Volume2, VolumeX, Trash2 } from 'lucide-react'
+import { getErrorMessage, ApiError } from '@/lib/api-client'
 import './chat.css'
+
+// ── Types ────────────────────────────────────────────────────────────────────
+
+// Single state machine — replaces isLoading + isRecording + isSpeaking booleans
+// Inspired by voice skill onTurn/onInterrupt/onCallEnd lifecycle pattern
+type VoicePhase =
+  | 'idle'         // ready for input
+  | 'listening'    // mic open, VAD running
+  | 'transcribing' // audio sent, waiting for STT
+  | 'thinking'     // LLM streaming
+  | 'speaking'     // TTS playing
 
 interface Message {
   id: string
@@ -15,630 +27,553 @@ interface Message {
   timestamp: number
 }
 
+interface HistoryItem {
+  role: 'user' | 'assistant'
+  content: string
+}
+
 interface VoiceChatWidgetProps {
   onClose: () => void
 }
 
+// ── Constants ────────────────────────────────────────────────────────────────
+
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000'
+const STORAGE_KEY = 'tk_voice_history'
+
+const GREETING: Message = {
+  id: 'greeting',
+  role: 'assistant',
+  content: 'اسلام علیکم! Khawajgan Bot mein khush aamdeed 🌙\n\nAap mic se baat kar sakte hain ya type kar sakte hain.',
+  timestamp: 0,
+}
+
+const PHASE_STATUS: Record<VoicePhase, string> = {
+  idle: '',
+  listening: '🔴 Listening...',
+  transcribing: 'Transcribing...',
+  thinking: 'Thinking...',
+  speaking: '🔊 Speaking...',
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function loadPersisted(): { messages: Message[]; history: HistoryItem[] } {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (raw) return JSON.parse(raw)
+  } catch { /* ignore */ }
+  return { messages: [GREETING], history: [] }
+}
+
+function savePersisted(messages: Message[], history: HistoryItem[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ messages, history }))
+  } catch { /* ignore */ }
+}
+
+function cleanForTTS(text: string) {
+  return text
+    .replace(/\*\*/g, '').replace(/\*/g, '').replace(/•/g, '')
+    .replace(/\n+/g, '. ').replace(/Rs\./g, 'Rupees')
+    .replace(/[🌙🏥🏸💻🏛️🎫👩‍⚕️👶🦷👁️🌿💆🔬📅💰📞📍✅✨👥👑🎪🏠📦🛒🤖☀️🤝🙏⏰⏱️📊🏏🎱]/g, '')
+    .substring(0, 500)
+}
+
+// ── Component ────────────────────────────────────────────────────────────────
 
 export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
-  const [messages, setMessages] = useState<Message[]>([])
+  const [messages, setMessages] = useState<Message[]>([GREETING])
+  const [history, setHistory] = useState<HistoryItem[]>([])
   const [inputValue, setInputValue] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
-  const [isRecording, setIsRecording] = useState(false)
-  const [isSpeaking, setIsSpeaking] = useState(false)
+  const [phase, setPhase] = useState<VoicePhase>('idle')
+  const [statusMsg, setStatusMsg] = useState('')
   const [autoSpeak, setAutoSpeak] = useState(false)
-  const [sessionId] = useState(() => `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
+  const rafIdRef = useRef<number>(0)
+  // AbortController pattern from streaming-chat skill — cancel in-flight requests on interrupt
+  const abortCtrlRef = useRef<AbortController | null>(null)
+  const historyRef = useRef<HistoryItem[]>([])
 
-  // Initialize with greeting
+  // Keep historyRef in sync (avoids stale closure in onTurn)
+  useEffect(() => { historyRef.current = history }, [history])
+
   useEffect(() => {
-    const greeting: Message = {
-      id: 'greeting',
-      role: 'assistant',
-      content: `Assalam o Alaikum, how may I help you?`,
-      timestamp: Date.now()
-    }
-    setMessages([greeting])
+    const saved = loadPersisted()
+    setMessages(saved.messages)
+    setHistory(saved.history)
   }, [])
 
-  // Auto scroll
-  const scrollToBottom = useCallback(() => {
+  useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
-  }, [])
+  }, [messages])
 
-  useEffect(() => {
-    scrollToBottom()
-  }, [messages, scrollToBottom])
-
-  // Focus input
   useEffect(() => {
     inputRef.current?.focus()
   }, [])
 
-  // Transcribe audio ref to avoid stale closure
-  const transcribeRef = useRef<((blob: Blob, mimeType?: string) => Promise<void>) | null>(null)
+  // ── TTS ─────────────────────────────────────────────────────────────────────
 
-  // Start recording
+  const stopSpeaking = useCallback(() => {
+    currentAudioRef.current?.pause()
+    currentAudioRef.current = null
+    window.speechSynthesis?.cancel()
+  }, [])
+
+  function browserTTS(text: string, onEnd: () => void) {
+    if (!('speechSynthesis' in window)) { onEnd(); return }
+    window.speechSynthesis.cancel()
+    const utt = new SpeechSynthesisUtterance(text)
+    utt.lang = 'en-US'; utt.rate = 0.9
+    utt.onend = onEnd
+    utt.onerror = onEnd
+    window.speechSynthesis.speak(utt)
+  }
+
+  const speakText = useCallback(async (text: string) => {
+    setPhase('speaking')
+    setStatusMsg(PHASE_STATUS.speaking)
+    const clean = cleanForTTS(text)
+    const done = () => { setPhase('idle'); setStatusMsg('') }
+
+    try {
+      const res = await fetch(`${BACKEND_URL}/api/voice/speak`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: clean, voice: 'nova', speed: 0.95 }),
+        signal: AbortSignal.timeout(8000),
+      })
+      if (!res.ok) throw new Error('TTS unavailable')
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      const audio = new Audio(url)
+      currentAudioRef.current = audio
+      audio.onended = () => { URL.revokeObjectURL(url); done() }
+      audio.onerror = () => { URL.revokeObjectURL(url); browserTTS(clean, done) }
+      await audio.play()
+    } catch {
+      browserTTS(clean, done)
+    }
+  }, [])
+
+  // ── onInterrupt — voice skill pattern ────────────────────────────────────────
+  // User clicks mic while AI is speaking → stop TTS + cancel request + start listening
+  const onInterrupt = useCallback(() => {
+    stopSpeaking()
+    abortCtrlRef.current?.abort()
+    abortCtrlRef.current = null
+    setPhase('idle')
+    setStatusMsg('')
+  }, [stopSpeaking])
+
+  // ── onTurn — voice skill pattern ─────────────────────────────────────────────
+  // Single entry point: transcript → LLM stream → (optionally) TTS
+  const onTurn = useCallback(async (text: string) => {
+    if (!text.trim()) return
+
+    // messageConcurrency: "latest" — cancel any in-flight request
+    abortCtrlRef.current?.abort()
+    abortCtrlRef.current = new AbortController()
+    const signal = abortCtrlRef.current.signal
+
+    const userMsg: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: text,
+      timestamp: Date.now(),
+    }
+    const assistantId = (Date.now() + 1).toString()
+    const assistantMsg: Message = {
+      id: assistantId,
+      role: 'assistant',
+      content: '',
+      timestamp: Date.now() + 1,
+    }
+
+    setMessages(prev => [...prev, userMsg, assistantMsg])
+    setInputValue('')
+    setPhase('thinking')
+    setStatusMsg(PHASE_STATUS.thinking)
+
+    try {
+      const res = await fetch('/ai-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text, history: historyRef.current }),
+        signal,
+      })
+
+      if (!res.ok || !res.body) {
+        const body = await res.json().catch(() => ({}))
+        throw new ApiError(res.status, body)
+      }
+
+      const reader = res.body.getReader()
+      const decoder = new TextDecoder()
+      let fullText = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        const lines = decoder.decode(value, { stream: true }).split('\n')
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue
+          const data = line.slice(6)
+          if (data === '[DONE]') break
+          let parsed: Record<string, string> | null = null
+          try { parsed = JSON.parse(data) } catch { continue }
+          if (!parsed) continue
+          if (parsed.error) throw new Error(parsed.error)
+          if (parsed.text) {
+            fullText += parsed.text
+            setMessages(prev =>
+              prev.map(m => m.id === assistantId ? { ...m, content: fullText } : m)
+            )
+          }
+        }
+      }
+
+      const nextHistory: HistoryItem[] = [
+        ...historyRef.current,
+        { role: 'user', content: text },
+        { role: 'assistant', content: fullText },
+      ]
+      setHistory(nextHistory)
+      setMessages(prev => {
+        const updated = prev.map(m =>
+          m.id === assistantId ? { ...m, content: fullText } : m
+        )
+        savePersisted(updated, nextHistory)
+        return updated
+      })
+
+      if (signal.aborted) return
+
+      if (autoSpeak && fullText) {
+        await speakText(fullText)
+      } else {
+        setPhase('idle')
+        setStatusMsg('')
+      }
+    } catch (err) {
+      if ((err as Error)?.name === 'AbortError') return
+      const errMsg = getErrorMessage(err)
+      setMessages(prev =>
+        prev.map(m => m.id === assistantId ? { ...m, content: errMsg } : m)
+      )
+      setPhase('idle')
+      setStatusMsg('')
+    }
+  }, [autoSpeak, speakText])
+
+  // ── Recording ────────────────────────────────────────────────────────────────
+
+  const stopRecording = useCallback(() => {
+    cancelAnimationFrame(rafIdRef.current)
+    audioCtxRef.current?.close()
+    audioCtxRef.current = null
+    if (mediaRecorderRef.current && phase === 'listening') {
+      mediaRecorderRef.current.stop()
+    }
+    setPhase('idle')
+    setStatusMsg('')
+  }, [phase])
+
   const startRecording = useCallback(async () => {
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      alert('Microphone access not available. Site must be on HTTPS or localhost.')
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setStatusMsg('Microphone not available (HTTPS required).')
       return
     }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 16000
-        }
+        audio: { echoCancellation: true, noiseSuppression: true, sampleRate: 16000 },
       })
 
-      // Find supported mime type
-      let mimeType = 'audio/webm'
-      const types = ['audio/webm', 'audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg']
-      for (const type of types) {
-        if (MediaRecorder.isTypeSupported(type)) {
-          mimeType = type
-          break
-        }
-      }
-
-      const mediaRecorder = new MediaRecorder(stream, { mimeType })
+      const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg']
+      const mimeType = types.find(t => MediaRecorder.isTypeSupported(t)) || 'audio/webm'
+      const recorder = new MediaRecorder(stream, { mimeType })
       audioChunksRef.current = []
 
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data)
-        }
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) audioChunksRef.current.push(e.data)
       }
 
-      mediaRecorder.onstop = async () => {
-        stream.getTracks().forEach(track => track.stop())
+      recorder.onstop = async () => {
+        cancelAnimationFrame(rafIdRef.current)
+        audioCtxRef.current?.close()
+        audioCtxRef.current = null
+        stream.getTracks().forEach(t => t.stop())
 
-        if (audioChunksRef.current.length === 0) {
-          alert('Recording is empty. Please try again.')
+        const blob = new Blob(audioChunksRef.current, { type: mimeType })
+        if (blob.size < 1000) {
+          setStatusMsg('Recording too short. Please try again.')
+          setPhase('idle')
           return
         }
 
-        const audioBlob = new Blob(audioChunksRef.current, { type: mimeType })
+        // ── onTurn pipeline: STT → LLM → TTS ───────────────────────────────
+        setPhase('transcribing')
+        setStatusMsg(PHASE_STATUS.transcribing)
 
-        if (audioBlob.size < 1000) {
-          alert('Recording too short. Please record a longer message.')
-          return
-        }
-
-        if (transcribeRef.current) {
-          await transcribeRef.current(audioBlob, mimeType)
-        }
-      }
-
-      // Start with timeslice for continuous data collection
-      mediaRecorder.start(250)
-      mediaRecorderRef.current = mediaRecorder
-      setIsRecording(true)
-    } catch (err) {
-      const error = err as Error
-      if (error.name === 'NotAllowedError') {
-        alert('Microphone permission denied. Please allow microphone access in browser settings.')
-      } else if (error.name === 'NotFoundError') {
-        alert('No microphone found. Please connect a microphone.')
-      } else {
-        alert('Mic error: ' + error.message)
-      }
-    }
-  }, [])
-
-  // Keep transcribe function in ref (avoids dependency issues)
-  useEffect(() => {
-    transcribeRef.current = async (audioBlob: Blob, mimeType?: string) => {
-      setIsLoading(true)
-
-      try {
-        // Determine file extension from mime type
-        let ext = 'webm'
-        if (mimeType?.includes('mp4')) ext = 'mp4'
-        else if (mimeType?.includes('ogg')) ext = 'ogg'
-
+        const ext = mimeType.includes('mp4') ? 'mp4' : mimeType.includes('ogg') ? 'ogg' : 'webm'
         const formData = new FormData()
-        formData.append('audio', audioBlob, `recording.${ext}`)
+        formData.append('audio', blob, `recording.${ext}`)
 
-        const response = await fetch(`${BACKEND_URL}/api/voice/transcribe`, {
-          method: 'POST',
-          body: formData
-        })
+        try {
+          const res = await fetch(`${BACKEND_URL}/api/voice/transcribe`, {
+            method: 'POST',
+            body: formData,
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.detail || 'Transcription failed')
 
-        if (!response.ok) {
-          const errorText = await response.text()
-          throw new Error(errorText || 'Server error')
+          if (data.success && data.text?.trim()) {
+            setInputValue(data.text.trim())   // show in input like ChatGPT
+            await onTurn(data.text.trim())
+          } else {
+            setStatusMsg('Could not understand audio. Please speak clearly.')
+            setPhase('idle')
+          }
+        } catch (err) {
+          setStatusMsg(err instanceof Error ? err.message : getErrorMessage(err))
+          setPhase('idle')
         }
-
-        const data = await response.json()
-        if (data.success && data.text && data.text.trim()) {
-          await sendMessage(data.text.trim())
-        } else {
-          alert('Could not understand audio. Please speak clearly or type your message.')
-        }
-      } catch (err) {
-        const error = err as Error
-        console.error('Voice transcription error:', error)
-        if (error.message.includes('503')) {
-          alert('Voice service unavailable. Please check OPENAI_API_KEY.')
-        } else if (error.message.includes('500')) {
-          alert('Server error. Please check backend logs.')
-        } else {
-          alert(`Voice error: ${error.message}`)
-        }
-      } finally {
-        setIsLoading(false)
       }
-    }
-  })
 
-  // Stop recording
-  const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop()
-      setIsRecording(false)
-    }
-  }, [isRecording])
+      recorder.start(250)
+      mediaRecorderRef.current = recorder
+      setPhase('listening')
+      setStatusMsg(PHASE_STATUS.listening)
 
-  // Toggle recording
-  const toggleRecording = useCallback(() => {
-    if (isRecording) {
+      // ── Silence detection (VAD) ───────────────────────────────────────────
+      const audioCtx = new AudioContext()
+      const analyser = audioCtx.createAnalyser()
+      analyser.fftSize = 512
+      audioCtx.createMediaStreamSource(stream).connect(analyser)
+      audioCtxRef.current = audioCtx
+
+      const dataArray = new Uint8Array(analyser.frequencyBinCount)
+      const startTime = Date.now()
+      const SILENCE_THRESHOLD = 18   // raised for real mics (background noise varies)
+      const SILENCE_AFTER_MS = 2000  // 2s of silence to auto-stop
+      const MIN_RECORD_MS = 1000     // ignore VAD in first 1s
+      let silenceStart: number | null = null
+
+      const detect = () => {
+        analyser.getByteFrequencyData(dataArray)
+        const avg = dataArray.reduce((s, v) => s + v, 0) / dataArray.length
+
+        if (Date.now() - startTime > MIN_RECORD_MS) {
+          if (avg < SILENCE_THRESHOLD) {
+            if (silenceStart === null) silenceStart = Date.now()
+            else if (Date.now() - silenceStart > SILENCE_AFTER_MS) {
+              recorder.stop()
+              return
+            }
+            const remaining = Math.ceil(
+              (SILENCE_AFTER_MS - (Date.now() - (silenceStart ?? Date.now()))) / 1000
+            )
+            setStatusMsg(`⏸ Sending in ${remaining}s...`)
+          } else {
+            silenceStart = null
+            setStatusMsg(PHASE_STATUS.listening)
+          }
+        }
+        rafIdRef.current = requestAnimationFrame(detect)
+      }
+      rafIdRef.current = requestAnimationFrame(detect)
+    } catch (err) {
+      const e = err as { name?: string; message?: string }
+      if (e.name === 'NotAllowedError') setStatusMsg('Microphone permission denied.')
+      else if (e.name === 'NotFoundError') setStatusMsg('No microphone found.')
+      else setStatusMsg('Mic error: ' + (e.message || 'unknown'))
+      setPhase('idle')
+    }
+  }, [onTurn])
+
+  // ── Mic button handler — implements onInterrupt pattern ───────────────────
+  const handleMicClick = useCallback(() => {
+    if (phase === 'speaking') {
+      onInterrupt()
+      // Brief delay then start listening (matches voice skill onInterrupt → onTurn flow)
+      setTimeout(() => startRecording(), 100)
+    } else if (phase === 'listening') {
       stopRecording()
-    } else {
+    } else if (phase === 'idle') {
       startRecording()
     }
-  }, [isRecording, startRecording, stopRecording])
+    // thinking/transcribing phases: ignore (or could abort)
+  }, [phase, onInterrupt, startRecording, stopRecording])
 
-  // Text to Speech
-  const speakText = useCallback(async (text: string) => {
-    setIsSpeaking(true)
-
-    const cleanText = text
-      .replace(/\*/g, '')
-      .replace(/•/g, '')
-      .replace(/\n+/g, '. ')
-      .replace(/Rs\./g, 'Rupees')
-      .substring(0, 500)
-
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/voice/speak`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: cleanText, voice: 'nova', speed: 0.95 })
-      })
-
-      if (response.ok) {
-        const audioBlob = await response.blob()
-        const audioUrl = URL.createObjectURL(audioBlob)
-        const audio = new Audio(audioUrl)
-
-        audio.onended = () => {
-          setIsSpeaking(false)
-          URL.revokeObjectURL(audioUrl)
-        }
-        audio.onerror = () => {
-          setIsSpeaking(false)
-          playBrowserTTS(cleanText)
-        }
-
-        await audio.play()
-        return
-      }
-      throw new Error('TTS failed')
-    } catch {
-      playBrowserTTS(cleanText)
-    }
-  }, [])
-
-  // Browser TTS fallback
-  const playBrowserTTS = (text: string) => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel()
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = 'hi-IN'
-      utterance.rate = 0.9
-      utterance.onend = () => setIsSpeaking(false)
-      utterance.onerror = () => setIsSpeaking(false)
-      window.speechSynthesis.speak(utterance)
-    } else {
-      setIsSpeaking(false)
-    }
-  }
-
-  // Stop speaking
-  const stopSpeaking = useCallback(() => {
-    window.speechSynthesis?.cancel()
-    setIsSpeaking(false)
-  }, [])
-
-  // Send message to AI
-  const sendMessage = async (text?: string) => {
-    const messageText = text || inputValue.trim()
-    if (!messageText || isLoading) return
-
-    const userMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: messageText,
-      timestamp: Date.now()
-    }
-
-    setMessages(prev => [...prev, userMessage])
-    setInputValue('')
-    setIsLoading(true)
-
-    let responseText = ''
-
-    try {
-      // Call ChatGPT-like AI endpoint
-      const response = await fetch(`${BACKEND_URL}/api/chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: messageText,
-          session_id: sessionId
-        })
-      })
-
-      if (response.ok) {
-        const data = await response.json()
-        responseText = data.response || 'Sorry, something went wrong. Please try again.'
-      } else {
-        throw new Error('API error')
-      }
-    } catch {
-      // Fallback response
-      responseText = getFallbackResponse(messageText)
-    }
-
-    const assistantMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: responseText,
-      timestamp: Date.now()
-    }
-
-    setMessages(prev => [...prev, assistantMessage])
-    setIsLoading(false)
-
-    if (autoSpeak) {
-      setTimeout(() => speakText(responseText), 300)
-    }
-  }
-
-  // Clear chat
-  const clearChat = async () => {
-    try {
-      await fetch(`${BACKEND_URL}/api/chat/session/${sessionId}`, { method: 'DELETE' })
-    } catch {
-      // Ignore error
-    }
-    setMessages([{
-      id: 'greeting',
-      role: 'assistant',
-      content: 'Assalam o Alaikum, how may I help you?',
-      timestamp: Date.now()
-    }])
-  }
-
-  // Handle form submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    sendMessage()
+    const text = inputValue.trim()
+    if (text && phase === 'idle') onTurn(text)
   }
+
+  const clearChat = () => {
+    stopSpeaking()
+    abortCtrlRef.current?.abort()
+    setMessages([GREETING])
+    setHistory([])
+    setPhase('idle')
+    setStatusMsg('')
+    localStorage.removeItem(STORAGE_KEY)
+  }
+
+  // ── Derived UI state ─────────────────────────────────────────────────────
+  const isListening = phase === 'listening'
+  const isBusy = phase === 'thinking' || phase === 'transcribing'
+  const isSpeaking = phase === 'speaking'
+  const micDisabled = isBusy  // allow interrupt during speaking, block only thinking/transcribing
 
   return (
     <>
-      {/* Overlay - click to close */}
-      <div
-        className="chat-overlay"
-        onClick={onClose}
-        aria-hidden="true"
-      />
+      <div className="chat-overlay" onClick={onClose} aria-hidden="true" />
 
-      <Card className="chat-container fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-[420px] h-[500px] sm:h-[550px] flex flex-col z-50 border-none">
+      <Card className="chat-container fixed bottom-4 right-4 w-[calc(100%-2rem)] sm:w-[420px] h-[520px] sm:h-[580px] flex flex-col z-50 border-none">
         {/* Header */}
         <CardHeader className="chat-header flex flex-row items-center justify-between p-3">
-        <div className="flex items-center gap-2">
-          <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
-            <MessageCircle className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-white/20 flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <CardTitle className="text-sm font-semibold text-white">Khawajgan AI</CardTitle>
+              <p className="text-xs text-white/70">
+                {phase === 'idle' ? 'Voice + Chat Assistant' : PHASE_STATUS[phase]}
+              </p>
+            </div>
           </div>
-          <div>
-            <CardTitle className="text-sm font-semibold text-white">Khawajgan AI</CardTitle>
-            <p className="text-xs text-white/70">Voice Assistant</p>
+          <div className="flex items-center gap-1">
+            <Button
+              type="button" variant="ghost" size="icon"
+              onClick={clearChat}
+              className="h-7 w-7 text-white hover:bg-white/20"
+              title="Clear chat"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </Button>
+            <Button
+              type="button" variant="ghost" size="icon"
+              onClick={() => setAutoSpeak(v => !v)}
+              className={`h-7 w-7 text-white hover:bg-white/20 ${autoSpeak ? 'bg-white/20' : ''}`}
+              title={autoSpeak ? 'Auto-speak ON' : 'Auto-speak OFF'}
+            >
+              {autoSpeak ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
+            </Button>
+            <Button
+              type="button" variant="ghost" size="icon"
+              onClick={onClose}
+              className="h-7 w-7 text-white hover:bg-white/20"
+            >
+              <X className="w-4 h-4" />
+            </Button>
           </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={clearChat}
-            className="h-7 w-7 text-white hover:bg-white/20"
-            title="Clear Chat"
-          >
-            <Trash2 className="w-3.5 h-3.5" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => setAutoSpeak(!autoSpeak)}
-            className={`h-7 w-7 text-white hover:bg-white/20 ${autoSpeak ? 'bg-white/20' : ''}`}
-            title={autoSpeak ? "Auto-speak ON" : "Auto-speak OFF"}
-          >
-            {autoSpeak ? <Volume2 className="w-3.5 h-3.5" /> : <VolumeX className="w-3.5 h-3.5" />}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-7 w-7 text-white hover:bg-white/20"
-          >
-            <X className="w-4 h-4" />
-          </Button>
-        </div>
-      </CardHeader>
+        </CardHeader>
 
-      {/* Messages */}
-      <CardContent className="chat-window flex-1 p-0 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="p-3 space-y-3">
-            {messages.map(message => (
-              <div
-                key={message.id}
-                className={`flex gap-2 ${message.role === 'user' ? 'flex-row-reverse' : ''}`}
-              >
-                <div
-                  className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs ${
-                    message.role === 'user' ? 'bg-primary text-white' : 'bg-accent text-white'
-                  }`}
-                >
-                  {message.role === 'user' ? 'U' : 'AI'}
+        {/* Messages */}
+        <CardContent className="chat-window flex-1 p-0 overflow-hidden">
+          <ScrollArea className="h-full">
+            <div className="p-3 space-y-3">
+              {messages.map(msg => (
+                <div key={msg.id} className={`flex gap-2 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+                  <div className={`flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-xs font-medium ${
+                    msg.role === 'user' ? 'bg-primary text-white' : 'bg-accent text-white'
+                  }`}>
+                    {msg.role === 'user' ? 'U' : 'AI'}
+                  </div>
+                  <div className={`flex-1 p-2.5 rounded-lg text-sm whitespace-pre-wrap ${
+                    msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
+                  }`}>
+                    {msg.content || (
+                      <span className="flex items-center gap-1 text-muted-foreground">
+                        <Loader2 className="w-3 h-3 animate-spin" /> Thinking...
+                      </span>
+                    )}
+                    {msg.role === 'assistant' && msg.id !== 'greeting' && msg.content && (
+                      <Button
+                        type="button" variant="ghost" size="sm"
+                        onClick={() => isSpeaking ? stopSpeaking() : speakText(msg.content)}
+                        className="mt-1.5 h-5 text-xs opacity-50 hover:opacity-100 p-1"
+                      >
+                        {isSpeaking
+                          ? <><VolumeX className="w-3 h-3 mr-1" />Stop</>
+                          : <><Volume2 className="w-3 h-3 mr-1" />Listen</>
+                        }
+                      </Button>
+                    )}
+                  </div>
                 </div>
-                <div
-                  className={`flex-1 p-2.5 rounded-lg text-sm whitespace-pre-wrap ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
-                >
-                  {message.content}
-                  {message.role === 'assistant' && message.id !== 'greeting' && (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => isSpeaking ? stopSpeaking() : speakText(message.content)}
-                      className="mt-1.5 h-5 text-xs opacity-50 hover:opacity-100 p-1"
-                    >
-                      {isSpeaking ? <VolumeX className="w-3 h-3 mr-1" /> : <Volume2 className="w-3 h-3 mr-1" />}
-                      {isSpeaking ? 'Stop' : 'Listen'}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
+              <div ref={messagesEndRef} />
+            </div>
+          </ScrollArea>
+        </CardContent>
 
-            {isLoading && (
-              <div className="flex gap-2">
-                <div className="flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center bg-accent">
-                  <Loader2 className="w-4 h-4 text-white animate-spin" />
-                </div>
-                <div className="flex-1 flex items-center p-2.5 bg-muted rounded-lg">
-                  <p className="text-sm text-muted-foreground">Thinking...</p>
-                </div>
-              </div>
-            )}
-
-            <div ref={messagesEndRef} />
+        {/* Status bar */}
+        {statusMsg && !isListening && (
+          <div className="px-3 py-1.5 text-xs text-muted-foreground bg-muted/50 border-t">
+            {statusMsg}
           </div>
-        </ScrollArea>
-      </CardContent>
-
-      {/* Input */}
-      <form onSubmit={handleSubmit} className="chat-input border-t p-2.5">
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant={isRecording ? "destructive" : "outline"}
-            size="icon"
-            onClick={toggleRecording}
-            disabled={isLoading && !isRecording}
-            className={`flex-shrink-0 h-9 w-9 ${isRecording ? 'animate-pulse bg-red-500' : ''}`}
-          >
-            {isRecording ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
-          </Button>
-          <Input
-            ref={inputRef}
-            type="text"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={isRecording ? "Listening..." : "Type a message..."}
-            disabled={isLoading || isRecording}
-            className="flex-1 h-9 text-sm"
-          />
-          <Button
-            type="submit"
-            disabled={isLoading || !inputValue.trim() || isRecording}
-            size="icon"
-            className="flex-shrink-0 h-9 w-9"
-          >
-            <Send className="w-4 h-4" />
-          </Button>
-        </div>
-        {isRecording && (
-          <p className="text-xs text-red-500 mt-1.5 text-center animate-pulse">
-            Recording... Press mic button to stop
-          </p>
         )}
-      </form>
+
+        {/* Input */}
+        <form onSubmit={handleSubmit} className="chat-input border-t p-2.5">
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant={isListening ? 'destructive' : isSpeaking ? 'outline' : 'outline'}
+              size="icon"
+              onClick={handleMicClick}
+              disabled={micDisabled}
+              className={`flex-shrink-0 h-9 w-9 ${isListening ? 'animate-pulse' : ''} ${isSpeaking ? 'border-accent text-accent' : ''}`}
+              title={
+                phase === 'speaking' ? 'Interrupt and speak' :
+                phase === 'listening' ? 'Stop recording' :
+                'Start voice input'
+              }
+            >
+              {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            </Button>
+            <Input
+              ref={inputRef}
+              type="text"
+              value={inputValue}
+              onChange={e => setInputValue(e.target.value)}
+              placeholder={
+                phase === 'listening' ? 'Listening... speak now' :
+                phase === 'transcribing' ? 'Transcribing...' :
+                phase === 'thinking' ? 'Thinking...' :
+                phase === 'speaking' ? 'AI is speaking...' :
+                'Type or use mic...'
+              }
+              disabled={!['idle'].includes(phase)}
+              className="flex-1 h-9 text-sm"
+            />
+            <Button
+              type="submit"
+              disabled={phase !== 'idle' || !inputValue.trim()}
+              size="icon"
+              className="flex-shrink-0 h-9 w-9"
+            >
+              <Send className="w-4 h-4" />
+            </Button>
+          </div>
+          {isListening && statusMsg && (
+            <p className="text-xs text-red-500 mt-1.5 text-center animate-pulse font-medium">
+              {statusMsg}
+            </p>
+          )}
+        </form>
       </Card>
     </>
   )
-}
-
-// Fallback response when backend is unavailable
-function getFallbackResponse(message: string): string {
-  const msg = message.toLowerCase()
-
-  // ============ SPECIFIC DOCTORS FIRST ============
-
-  // Eye specialist
-  if (/eye|aankh|nazar|ophtha|chasma/.test(msg)) {
-    return "[Medical] Dr. Faiza: Saturday 11 AM-12:30 PM."
-  }
-
-  // Dentist specific
-  if (/dentist|dant|teeth|dental/.test(msg)) {
-    return "[Medical] Dr. Sohail: Mon-Thu, Sat 5-8PM. Dr. Rida: Mon, Wed, Fri 12:30-2PM."
-  }
-
-  // Child specialist
-  if (/child|bacha|bachon|pediatric|kids/.test(msg)) {
-    return "[Medical] Dr. Farzana: Mon, Wed, Fri 11AM-1PM."
-  }
-
-  // Gynaecologist
-  if (/gynae|lady|women|aurat|pregnancy/.test(msg)) {
-    return "[Medical] Dr. Naila Barni: Tue, Thu, Sat 10AM-12:30PM."
-  }
-
-  // Diabetes
-  if (/diabetes|diabetic|sugar|bp/.test(msg)) {
-    return "[Medical] Dr. Ahmed: Mon, Wed, Fri 11AM-1PM & 6-8PM."
-  }
-
-  // Homeopathic
-  if (/homeo|homeopathic|desi/.test(msg)) {
-    return "[Medical] Dr. Akif: Mon-Thu 12-2PM. Dr. Rashid: Mon-Fri 10AM-1PM."
-  }
-
-  // Hijama
-  if (/hijama|hajama|cupping/.test(msg)) {
-    return "[Medical] Dr. Rashid: Mon-Fri 10AM-1PM. Mrs. Saima: Friday 6:30-8:30PM."
-  }
-
-  // General greetings (only if short message)
-  if (/^(salam|hello|hi|aoa|assalam)/.test(msg) && msg.split(' ').length <= 3) {
-    return "[Router] AoA! Kaise madad karun?"
-  }
-
-  // General doctor query - ask which one
-  if (/doctor|medical|daaktar|health|hospital|clinic/.test(msg)) {
-    return "[Medical] Konsa doctor? Eye, Dentist, Child, Gynae, Diabetes, Homeo?"
-  }
-
-  // ============ SPORTS - SPECIFIC SPORT FIRST ============
-  // Check timing/price with typos
-  const askingTiming = /timing|timng|tming|taiming|time|kab|waqt|schedule|open|close|hour|ghanta/.test(msg)
-  const askingPrice = /price|rate|fee|fees|kitna|kitni|cost|rs|rupee|paisa|paise|kiraya|rent/.test(msg)
-
-  // Badminton (with typos)
-  if (/badminton|bedminton|badmintan|badmintun|badmintn|bedmintn/.test(msg)) {
-    if (askingTiming) return "[Sports] Badminton: 10 AM se 4 AM."
-    if (askingPrice) return "[Sports] Badminton: Rs.1500/hour."
-    return "[Sports] Badminton: Rs.1500/hour, 10 AM-4 AM."
-  }
-  // Cricket (with typos)
-  if (/cricket|criket|crickut|crikat|krket|crcket/.test(msg)) {
-    if (askingTiming) return "[Sports] Cricket: 10 AM se 4 AM."
-    if (askingPrice) return "[Sports] Cricket: Rs.2000-2500/hour."
-    return "[Sports] Cricket: Rs.2000-2500/hour, 10 AM-4 AM."
-  }
-  // Snooker (with typos)
-  if (/snooker|snuker|snookr|snukar|snokr|snukar/.test(msg)) {
-    if (askingTiming) return "[Sports] Snooker: 10 AM se 4 AM."
-    if (askingPrice) return "[Sports] Snooker: Rs.7/minute."
-    return "[Sports] Snooker: Rs.7/minute, 10 AM-4 AM."
-  }
-  // Pool
-  if (/pool|pul/.test(msg) && !/swimming/.test(msg)) {
-    if (askingTiming) return "[Sports] Pool: 10 AM se 4 AM."
-    if (askingPrice) return "[Sports] Pool: Rs.100/game."
-    return "[Sports] Pool: Rs.100/game, 10 AM-4 AM."
-  }
-  // General sports - ONLY if no specific sport mentioned
-  if (/sport|sports|khel|gym|fitness/.test(msg)) {
-    if (askingTiming) return "[Sports] Timing: 10 AM se 4 AM."
-    if (askingPrice) return "[Sports] Konsa sport ki fee? Badminton, Cricket, Snooker, Pool?"
-    return "[Sports] Konsa sport? Badminton, Cricket, Snooker, Pool?"
-  }
-
-  // ============ BANQUET - SPECIFIC FIRST ============
-  if (/tehseena/.test(msg)) {
-    return "[Banquet] Tehseena Banquet Rs.30-40K fixed."
-  }
-  if (/iqbal/.test(msg)) {
-    return "[Banquet] Iqbal Arena Rs.250-300/head."
-  }
-  if (/abdul|lateef/.test(msg)) {
-    return "[Banquet] Abdul Lateef Hall Rs.250-300/head."
-  }
-
-  // Guest count matching - BEFORE general hall query
-  if (/\b(300|350|400|500)\b/.test(msg) && /guest|mehmaan|log|booking|banquet|hall/.test(msg)) {
-    return "[Banquet] Tehseena Banquet Rs.30-40K fixed."
-  }
-  if (/\b(200|250)\b/.test(msg) && /guest|mehmaan|log|booking|banquet|hall/.test(msg)) {
-    return "[Banquet] Iqbal Arena Rs.250-300/head."
-  }
-  if (/\b(50|100|150)\b/.test(msg) && /guest|mehmaan|log|booking|banquet|hall/.test(msg)) {
-    return "[Banquet] Abdul Lateef Hall Rs.250-300/head."
-  }
-
-  // General hall query - AFTER guest count matching
-  if (/hall|banquet|wedding|shadi|booking|nikah|walima/.test(msg)) {
-    return "[Banquet] Kitne guests? 50-150: Abdul Lateef, 200-250: Iqbal Arena, 300+: Tehseena."
-  }
-
-  // ============ IT ============
-  const askingContact = /contact|number|no|phone|call|rabta/.test(msg)
-
-  if (/shopify|शॉपिफाई/.test(msg)) {
-    if (askingContact) return "[IT] Shopify: Kh Mustafa Fazal 0334-3699906"
-    return "[IT] Shopify: 3 months. Contact: 0334-3699906"
-  }
-  if (/amazon|fba|अमेज़न|ایمیزون/.test(msg)) {
-    if (askingContact) return "[IT] Amazon FBA: Kh Mustafa Fazal 0334-3699906"
-    return "[IT] Amazon FBA: 4 months. Contact: 0334-3699906"
-  }
-  if (/python|पायथन|پائتھون/.test(msg)) {
-    if (askingContact) return "[IT] Python: Kh Mustafa Fazal 0334-3699906"
-    return "[IT] Python: 4 months. Contact: 0334-3699906"
-  }
-  // IT with Hindi/Urdu keywords
-  if (/course|courses|it|training|coding|computer|कोर्स|आईटी|कंप्यूटर|ट्रेनिंग|کورس|آئی ٹی/.test(msg)) {
-    if (askingContact) return "[IT] Kh Mustafa Fazal 0334-3699906"
-    return "[IT] Shopify (3m), Amazon FBA (4m), Python (4m). Contact: 0334-3699906"
-  }
-
-  // ============ GRAVEYARD ============
-  if (/graveyard|qabristan|burial|funeral|janaza/.test(msg)) {
-    return "[Graveyard] Burial plots available. Contact: 0334-3037800"
-  }
-
-  // ============ MEMBERSHIP ============
-  if (/member/.test(msg)) {
-    return "Membership: Free OPD, free operations. Form: /membership-form"
-  }
-
-  // ============ GENERIC ============
-  if (/fee|price|kitna|kitni/.test(msg)) {
-    return "Kis cheez ki fee? Medical, IT, sports ya hall?"
-  }
-
-  if (/timing|kab|waqt/.test(msg)) {
-    return "Kis cheez ka timing? Medical, sports ya hall?"
-  }
-
-  return "Kya jaanna chahte hain? Medical, IT, sports, hall ya membership?"
 }

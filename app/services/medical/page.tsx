@@ -162,7 +162,7 @@ export default function MedicalServicePage() {
       <section className="py-12 bg-primary">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               {stats.map((stat, index) => (
                 <div key={index} className="text-center">
                   <stat.icon className="w-10 h-10 text-white/80 mx-auto mb-3" />
@@ -329,24 +329,24 @@ export default function MedicalServicePage() {
               <table className="w-full bg-background rounded-xl overflow-hidden shadow-lg">
                 <thead className="bg-primary text-white">
                   <tr>
-                    <th className="px-6 py-4 text-left font-semibold">Doctor</th>
-                    <th className="px-6 py-4 text-left font-semibold">Specialty</th>
-                    <th className="px-6 py-4 text-left font-semibold">Timings</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-sm">Doctor</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-sm">Specialty</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-left font-semibold text-sm">Timings</th>
                   </tr>
                 </thead>
                 <tbody>
                   {doctors.map((doctor, index) => (
                     <tr key={index} className="border-b border-foreground/10 hover:bg-primary/5 transition-colors">
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-10 h-10 rounded-full flex items-center justify-center ${getSpecialtyColor(doctor.icon)}`}>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
+                          <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center flex-shrink-0 ${getSpecialtyColor(doctor.icon)}`}>
                             {getSpecialtyIcon(doctor.icon)}
                           </div>
-                          <span className="font-medium text-foreground">{doctor.name}</span>
+                          <span className="font-medium text-foreground text-sm sm:text-base">{doctor.name}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-foreground/70">{doctor.specialty}</td>
-                      <td className="px-6 py-4">
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-foreground/70 text-sm">{doctor.specialty}</td>
+                      <td className="px-3 sm:px-6 py-3 sm:py-4 text-sm">
                         <span className="inline-flex items-center gap-2 bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
                           <Clock className="w-3 h-3" />
                           {doctor.timing}

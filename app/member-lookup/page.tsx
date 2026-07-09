@@ -108,7 +108,7 @@ export default function MemberLookupPage() {
           </div>
 
           {/* Input */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <input
               type="text"
               value={query}
@@ -120,7 +120,7 @@ export default function MemberLookupPage() {
             <button
               onClick={handleSearch}
               disabled={loading || !query.trim()}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center gap-2"
+              className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 sm:px-5 py-3 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center gap-2"
             >
               <Search size={18} />
               {loading ? 'Searching...' : 'Search'}
@@ -158,7 +158,7 @@ export default function MemberLookupPage() {
         {member && (
           <div className="bg-white rounded-2xl shadow-md overflow-hidden">
             {/* Header */}
-            <div className="bg-emerald-600 px-6 py-5 flex items-center justify-between">
+            <div className="bg-emerald-600 px-4 md:px-6 py-4 md:py-5 flex items-center justify-between gap-2">
               <div className="flex items-center gap-4">
                 <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center">
                   <User size={28} className="text-white" />
@@ -167,8 +167,11 @@ export default function MemberLookupPage() {
                   <h2 className="text-white font-bold text-xl">{member.full_name || member.name}</h2>
                   {member.approval_status === 'approved' && member.membership_no ? (
                     <p className="text-emerald-100 text-sm font-semibold"># {member.membership_no}</p>
-                  ) : member.approval_status === 'pending' ? (
-                    <p className="text-yellow-200 text-xs">Membership number will be issued after approval</p>
+                  ) : !member.membership_no && member.approval_status !== 'rejected' ? (
+                    <p className="text-yellow-200 text-xs font-medium">
+                      Membership number will be issued after approval —{' '}
+                      <span className="uppercase tracking-wide">Pending</span>
+                    </p>
                   ) : member.approval_status === 'rejected' ? (
                     <p className="text-red-200 text-xs">Application rejected — no membership number assigned</p>
                   ) : null}

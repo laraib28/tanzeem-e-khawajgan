@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.109.1",
     "@hookform/resolvers": "^3.3.4",
     "@openai/chatkit": "^1.5.0",
     "@openai/chatkit-react": "^1.4.3",
@@ -21,6 +22,7 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.378.0",
     "next": "^14.2.0",
+    "openai": "^6.45.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
     "react-hook-form": "^7.51.4",

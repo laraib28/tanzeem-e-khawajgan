@@ -13,9 +13,9 @@ export function Footer() {
 
   return (
     <>
-      <footer className="w-full bg-accent text-white">
+      <footer className="w-full bg-[#004d40] text-white">
         {/* Donate CTA strip */}
-        <div className="bg-primary/90 py-4 px-4">
+        <div className="bg-primary py-4 px-4">
           <div className="container mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <p className="text-white text-sm font-medium text-center sm:text-left">
               Support our community — every contribution makes a difference.

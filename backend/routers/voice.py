@@ -119,7 +119,7 @@ async def transcribe_audio(
                 transcript = client.audio.transcriptions.create(
                     model="whisper-1",
                     file=audio_file,
-                    language=language or "en",  # Default to English for Roman Urdu
+                    language=language,  # None = auto-detect (preserves Urdu script)
                     response_format="verbose_json"
                 )
 

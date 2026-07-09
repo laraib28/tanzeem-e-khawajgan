@@ -346,30 +346,30 @@ export default function MembershipFormPage() {
 
           <form onSubmit={handleSubmit} className="bg-background border border-foreground/10 rounded-lg shadow-sm">
             {/* ===== HEADER SECTION ===== */}
-            <div className="border-b border-foreground/10 p-8">
-              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="border-b border-foreground/10 p-4 md:p-8">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-4 md:gap-6">
                 {/* Logo Placeholder */}
-                <div className="w-24 h-24 border-2 border-dashed border-foreground/30 rounded-lg flex items-center justify-center text-foreground/40 text-xs text-center">
+                <div className="w-16 h-16 md:w-24 md:h-24 border-2 border-dashed border-foreground/30 rounded-lg flex items-center justify-center text-foreground/40 text-xs text-center">
                   Logo<br/>Placeholder
                 </div>
 
                 {/* Organization Info */}
                 <div className="text-center flex-1">
-                  <h1 className="text-2xl font-bold text-primary">Tanzeem-e-Khawajgan</h1>
-                  <p className="text-foreground/70 mt-1">Organization Address</p>
+                  <h1 className="text-xl md:text-2xl font-bold text-primary">Tanzeem-e-Khawajgan</h1>
+                  <p className="text-foreground/70 mt-1 text-sm md:text-base">Organization Address</p>
                 </div>
 
                 {/* Applicant Photo Placeholder */}
-                <div className="w-24 h-32 border-2 border-dashed border-foreground/30 rounded-lg flex items-center justify-center text-foreground/40 text-xs text-center">
+                <div className="w-16 h-20 md:w-24 md:h-32 border-2 border-dashed border-foreground/30 rounded-lg flex items-center justify-center text-foreground/40 text-xs text-center">
                   Applicant<br/>Photo
                 </div>
               </div>
 
-              <h2 className="text-xl font-semibold text-center mt-6 text-foreground">Membership Form</h2>
+              <h2 className="text-lg md:text-xl font-semibold text-center mt-4 md:mt-6 text-foreground">Membership Form</h2>
             </div>
 
             {/* ===== APPLICANT INFORMATION ===== */}
-            <div className="p-8 space-y-6">
+            <div className="p-4 md:p-8 space-y-4 md:space-y-6">
               <h3 className="text-lg font-semibold text-foreground border-b border-foreground/10 pb-2">
                 Applicant Information
               </h3>

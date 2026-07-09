@@ -163,6 +163,33 @@ def health_check():
     return {"status": "healthy"}
 
 
+@app.get("/api/context/live")
+def get_live_context(db: Session = Depends(get_db)):
+    """Returns live data for the AI chatbot: banquet booked dates for next 90 days."""
+    from datetime import date, timedelta
+    from sqlalchemy import text
+
+    today = date.today()
+    cutoff = today + timedelta(days=90)
+    try:
+        result = db.execute(text("""
+            SELECT b.booking_date, bh.name AS hall_name, b.status
+            FROM bookings b
+            JOIN banquet_halls bh ON b.hall_id = bh.id
+            WHERE b.booking_date >= :today AND b.booking_date <= :cutoff
+              AND b.status IN ('confirmed', 'pending')
+            ORDER BY b.booking_date
+        """), {"today": today, "cutoff": cutoff})
+        rows = result.fetchall()
+        booked: dict = {}
+        for row in rows:
+            ds = str(row.booking_date)
+            booked.setdefault(ds, []).append({"hall": row.hall_name, "status": row.status})
+        return {"success": True, "banquet_booked_dates": booked, "as_of": str(today)}
+    except Exception as e:
+        return {"success": False, "banquet_booked_dates": {}, "error": str(e)}
+
+
 @app.get("/lookup-member")
 def lookup_member(
     membership_no: str = None,

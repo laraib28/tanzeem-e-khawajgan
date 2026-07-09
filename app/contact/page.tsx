@@ -26,15 +26,15 @@ export default function ContactPage() {
       <Banner title={banner.title} subtitle={banner.subtitle} />
 
       {/* Contact Information Section */}
-      <section className="py-16 px-4">
+      <section className="py-10 md:py-16 px-4">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-foreground mb-4">{contactInfo.heading}</h2>
-          <p className="text-foreground/80 mb-12 max-w-3xl">{contactInfo.description}</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">{contactInfo.heading}</h2>
+          <p className="text-foreground/80 mb-8 md:mb-12 max-w-3xl text-sm md:text-base">{contactInfo.description}</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             {/* Address */}
-            <div className="flex items-start gap-4 p-6 bg-background border border-foreground/10 rounded-lg">
-              <span className="text-3xl">{contactInfo.address.icon}</span>
+            <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-background border border-foreground/10 rounded-lg">
+              <span className="text-2xl md:text-3xl">{contactInfo.address.icon}</span>
               <div>
                 <h3 className="font-semibold text-lg mb-2">{contactInfo.address.label}</h3>
                 <p className="text-foreground/80">{contactInfo.address.value}</p>
@@ -42,8 +42,8 @@ export default function ContactPage() {
             </div>
 
             {/* Phone */}
-            <div className="flex items-start gap-4 p-6 bg-background border border-foreground/10 rounded-lg">
-              <span className="text-3xl">{contactInfo.phone.icon}</span>
+            <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-background border border-foreground/10 rounded-lg">
+              <span className="text-2xl md:text-3xl">{contactInfo.phone.icon}</span>
               <div>
                 <h3 className="font-semibold text-lg mb-2">{contactInfo.phone.label}</h3>
                 <a href={`tel:${contactInfo.phone.value}`} className="text-foreground/80 hover:text-primary transition-colors">
@@ -53,7 +53,7 @@ export default function ContactPage() {
             </div>
 
             {/* Email */}
-            <div className="flex items-start gap-4 p-6 bg-background border border-foreground/10 rounded-lg">
+            <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-background border border-foreground/10 rounded-lg">
               <span className="text-3xl">{contactInfo.email.icon}</span>
               <div>
                 <h3 className="font-semibold text-lg mb-2">{contactInfo.email.label}</h3>
@@ -64,8 +64,8 @@ export default function ContactPage() {
             </div>
 
             {/* Business Hours */}
-            <div className="flex items-start gap-4 p-6 bg-background border border-foreground/10 rounded-lg">
-              <span className="text-3xl">{contactInfo.hours.icon}</span>
+            <div className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-background border border-foreground/10 rounded-lg">
+              <span className="text-2xl md:text-3xl">{contactInfo.hours.icon}</span>
               <div>
                 <h3 className="font-semibold text-lg mb-2">{contactInfo.hours.label}</h3>
                 <p className="text-foreground/80">{contactInfo.hours.value}</p>
@@ -76,15 +76,15 @@ export default function ContactPage() {
       </section>
 
       {/* Department Contacts Section */}
-      <section className="py-16 px-4 bg-foreground/5">
+      <section className="py-10 md:py-16 px-4 bg-foreground/5">
         <div className="container mx-auto max-w-6xl">
-          <h2 className="text-3xl font-bold text-foreground mb-4">{departments.heading}</h2>
-          <p className="text-foreground/80 mb-8">Contact our departments directly for specific inquiries.</p>
+          <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4">{departments.heading}</h2>
+          <p className="text-foreground/80 mb-6 md:mb-8 text-sm md:text-base">Contact our departments directly for specific inquiries.</p>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {departments.list.map((dept: { name: string; contact: string; phone: string; icon: string }, index: number) => (
-              <div key={index} className="flex items-start gap-4 p-6 bg-background border border-foreground/10 rounded-lg hover:shadow-lg transition-shadow">
-                <span className="text-3xl">{dept.icon}</span>
+              <div key={index} className="flex items-start gap-3 md:gap-4 p-4 md:p-6 bg-background border border-foreground/10 rounded-lg hover:shadow-lg transition-shadow">
+                <span className="text-2xl md:text-3xl">{dept.icon}</span>
                 <div>
                   <h3 className="font-semibold text-lg text-primary">{dept.name}</h3>
                   <p className="text-foreground/80 text-sm mb-1">{dept.contact}</p>
