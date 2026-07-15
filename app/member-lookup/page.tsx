@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Banner } from '@/components/ui/Banner'
-import { Search, User, Phone, MapPin, CreditCard, Droplets, Briefcase, Users, QrCode } from 'lucide-react'
+import { Search, User, Briefcase } from 'lucide-react'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'https://khawajgan.org'
 
@@ -189,54 +189,13 @@ export default function MemberLookupPage() {
               {(member.relation_name) && (
                 <Detail icon={<User size={16} />} label="Father's Name" value={member.relation_name} />
               )}
-              {(member.cnic) && (
-                <Detail icon={<CreditCard size={16} />} label="CNIC" value={member.cnic} />
-              )}
-              {(member.phone || member.contact_no) && (
-                <Detail icon={<Phone size={16} />} label="Phone" value={member.phone || member.contact_no} />
-              )}
-              {member.native_city && (
-                <Detail icon={<MapPin size={16} />} label="Native City" value={member.native_city} />
-              )}
-              {member.blood_group && (
-                <Detail icon={<Droplets size={16} />} label="Blood Group" value={member.blood_group} />
-              )}
-              {member.occupation && (
-                <Detail icon={<Briefcase size={16} />} label="Work" value={member.occupation} />
-              )}
-              {member.category && (
-                <Detail icon={<Users size={16} />} label="Category" value={member.category} />
-              )}
               {member.cast && (
                 <Detail icon={<User size={16} />} label="Cast" value={member.cast} />
               )}
-              {(member.dependents_count !== undefined && member.dependents_count !== null && member.dependents_count > 0) && (
-                <Detail icon={<Users size={16} />} label="Dependents" value={String(member.dependents_count)} />
-              )}
-              {member.address && (
-                <div className="sm:col-span-2">
-                  <Detail icon={<MapPin size={16} />} label="Address" value={member.address} />
-                </div>
+              {(member.occupation) && (
+                <Detail icon={<Briefcase size={16} />} label="Profession" value={member.occupation} />
               )}
             </div>
-
-            {/* QR Code */}
-            {member.qr_url && (
-              <div className="border-t border-gray-100 px-6 py-5 flex items-center gap-4">
-                <QrCode size={20} className="text-emerald-600 shrink-0" />
-                <div className="min-w-0">
-                  <p className="text-xs text-gray-500 mb-1">Membership QR</p>
-                  <a
-                    href={member.qr_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-emerald-600 text-sm hover:underline break-all"
-                  >
-                    {member.qr_url}
-                  </a>
-                </div>
-              </div>
-            )}
           </div>
         )}
       </div>

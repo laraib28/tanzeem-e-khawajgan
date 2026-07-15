@@ -24,16 +24,16 @@ echo "Server URL: $SERVER_URL"
 echo "Building and starting containers..."
 
 # Stop existing containers
-docker compose -f docker-compose.prod.yml --env-file .env.prod down
+docker-compose -f docker-compose.prod.yml --env-file .env.prod down
 
 # Build fresh and start
-docker compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
+docker-compose -f docker-compose.prod.yml --env-file .env.prod up --build -d
 
 echo ""
 echo "=== Deployment Complete ==="
 echo "Site is running at: $SERVER_URL"
 echo ""
 echo "Useful commands:"
-echo "  View logs:    docker compose -f docker-compose.prod.yml logs -f"
-echo "  Stop:         docker compose -f docker-compose.prod.yml down"
-echo "  Restart:      docker compose -f docker-compose.prod.yml restart"
+echo "  View logs:    docker-compose -f docker-compose.prod.yml logs -f"
+echo "  Stop:         docker-compose -f docker-compose.prod.yml down"
+echo "  Restart:      docker-compose -f docker-compose.prod.yml restart"

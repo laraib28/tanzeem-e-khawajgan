@@ -16,14 +16,14 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: {
-    default: 'Tanzeem-e-Khawajgan | Community Organization',
-    template: '%s | Tanzeem-e-Khawajgan',
+    default: 'Tanzeem-e-Khawajgan Registered Karachi | Community Organization',
+    template: '%s | Tanzeem-e-Khawajgan Registered Karachi',
   },
-  description: 'Tanzeem-e-Khawajgan is a community-focused organization providing IT training, medical services, education programs, sports facilities, and more.',
-  keywords: ['Tanzeem-e-Khawajgan', 'community organization', 'IT training', 'medical services', 'education', 'sports facilities'],
-  authors: [{ name: 'Tanzeem-e-Khawajgan' }],
-  creator: 'Tanzeem-e-Khawajgan',
-  publisher: 'Tanzeem-e-Khawajgan',
+  description: 'Tanzeem-e-Khawajgan Registered Karachi is a community-focused organization providing IT training, medical services, education programs, sports facilities, and more.',
+  keywords: ['Tanzeem-e-Khawajgan', 'Tanzeem-e-Khawajgan Registered Karachi', 'community organization', 'IT training', 'medical services', 'education', 'sports facilities'],
+  authors: [{ name: 'Tanzeem-e-Khawajgan Registered Karachi' }],
+  creator: 'Tanzeem-e-Khawajgan Registered Karachi',
+  publisher: 'Tanzeem-e-Khawajgan Registered Karachi',
   formatDetection: {
     email: false,
     address: false,

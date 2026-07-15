@@ -1,9 +1,59 @@
 {
   "organization": {
-    "name": "Tanzeem-e-Khawajgan",
-    "description": "Tanzeem-e-Khawajgan is a community-focused organization dedicated to serving society through various programs and services including medical, IT, education, sports, and banquet facilities.",
+    "name": "Tanzeem-e-Khawajgan Registered Karachi",
+    "registeredAs": "Tanzeem-e-Khawajgan Registered Karachi",
+    "foundedYear": "1977",
+    "totalMembers": "595+",
+    "location": "F-90, Block F, North Nazimabad, Karachi",
+    "contact": "0321-3037800",
+    "description": "Tanzeem-e-Khawajgan Registered Karachi is a community-focused organization dedicated to serving society through various programs and services including medical, IT, education, sports, and banquet facilities. Founded in 1977, the organization serves 595+ members.",
     "mission": "To improve the community and enhance people's lives through quality services and programs in education, health, sports, and social welfare.",
-    "values": ["Integrity", "Service", "Community Responsibility", "Excellence", "Compassion"]
+    "values": ["Integrity", "Service", "Community Responsibility", "Excellence", "Compassion"],
+    "leadership": {
+      "president": {
+        "name": "Khawaja Javed Iqbal",
+        "designation": "President & Chairman",
+        "role": "Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth."
+      },
+      "boardMembers": [
+        { "name": "Khawaja Haji Muhammad Ahmed", "designation": "Sr. Vice President" },
+        { "name": "Khawaja Muhammad Ahmed", "designation": "Vice President" },
+        { "name": "Khawaja Babar Hafeez", "designation": "General Secretary", "phone": "0300-2211433" },
+        { "name": "Zafar Jawed Khawaja", "designation": "Finance Secretary" },
+        { "name": "Khawaja Mutayyab Shareef", "designation": "Joint Secretary" },
+        { "name": "Khawaja Haseeb Mazher", "designation": "Social Secretary" }
+      ],
+      "committeeMembers": [
+        "Khawaja Mustafa Fazal",
+        "Khawaja Masood Ahmed",
+        "Khawaja Irfan Munir",
+        "Khawaja Junaid Ahmed",
+        "Khawaja Rehan Saeed",
+        "Khawaja Abdul Mannan",
+        "Khawaja Aijaz Ahmed",
+        "Khawaja Bilal Ahmed",
+        "Khawaja Adeel Tahir",
+        "Khawaja Rizwan Waqar"
+      ]
+    },
+    "website": {
+      "pages": {
+        "home": "/",
+        "about": "/about",
+        "boardOfMembers": "/vision/board-of-members",
+        "mission": "/vision/mission",
+        "newsEvents": "/vision/news-events",
+        "medicalServices": "/services/medical",
+        "itServices": "/services/it",
+        "sportsServices": "/services/sports",
+        "banquetServices": "/services/banquets",
+        "educationServices": "/services/education",
+        "graveyardServices": "/services/graveyard",
+        "membership": "/membership-form",
+        "memberLookup": "/member-lookup",
+        "contact": "/contact"
+      }
+    }
   },
   "services": {
     "medical": {

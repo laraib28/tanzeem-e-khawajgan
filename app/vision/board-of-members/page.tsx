@@ -6,7 +6,7 @@ import { User, Mail, Phone } from 'lucide-react'
 import Image from 'next/image'
 
 const president = {
-  name: 'Khawaja Javed Iqbal',
+  name: 'Khawaja Javed Iqbal (Mehta)',
   designation: 'President & Chairman',
   image: '/javed.jpeg',
   description: 'Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth.',
@@ -18,6 +18,7 @@ const president = {
 const boardMembers = [
   {
     name: 'Khawaja Haji Muhammad Ahmed',
+    cast: 'Mehta',
     designation: 'Sr. Vice President',
     image: '/ahmed.jpeg',
     description: 'Supporting organizational leadership and strategic initiatives.',
@@ -25,6 +26,7 @@ const boardMembers = [
   },
   {
     name: 'Khawaja Muhammad Ahmed',
+    cast: 'Mehta',
     designation: 'Vice President',
     image: '/board-members/khawaja-muhammad-ahmed.jpg',
     description: 'Guiding organizational growth and community relations.',
@@ -32,6 +34,7 @@ const boardMembers = [
   },
   {
     name: 'Khawaja Babar Hafeez',
+    cast: 'Vohra',
     designation: 'General Secretary',
     image: '/baber.jpeg',
     description: 'Managing organizational operations and administrative affairs.',
@@ -39,6 +42,7 @@ const boardMembers = [
   },
   {
     name: 'Zafar Jawed Khawaja',
+    cast: 'Vohra',
     designation: 'Finance Secretary',
     image: '/zafar.jpeg',
     description: 'Overseeing financial management and accountability.',
@@ -46,6 +50,7 @@ const boardMembers = [
   },
   {
     name: 'Khawaja Mutayyab Shareef',
+    cast: 'Mehta',
     designation: 'Joint Secretary',
     image: '/mutayab.jpeg',
     description: 'Coordinating organizational activities and member engagement.',
@@ -53,6 +58,7 @@ const boardMembers = [
   },
   {
     name: 'Khawaja Haseeb Mazher',
+    cast: 'Kapoor',
     designation: 'Social Secretary',
     image: '/haseeb.jpeg',
     description: 'Leading social programs and community events.',
@@ -61,16 +67,16 @@ const boardMembers = [
 ]
 
 const committeeMembers = [
-  { name: 'Khawaja Mustafa Fazal', image: '/mustafa.jpeg', description: 'Active contributor to community initiatives.' },
-  { name: 'Khawaja Masood Ahmed', image: '/masood.jpeg', description: 'Dedicated member serving the organization.' },
-  { name: 'Khawaja Irfan Munir', image: '/irfan.jpeg', description: 'Supporting organizational activities.' },
-  { name: 'Khawaja Junaid Ahmed', image: '/junaid.jpeg', description: 'Committed to community development.' },
-  { name: 'Khawaja Rehan Saeed', image: '/rehan.jpeg', description: 'Contributing to welfare programs.' },
-  { name: 'Khawaja Abdul Mannan', image: '/adul-manan.jpeg', description: 'Active participant in community service.' },
-  { name: 'Khawaja Aijaz Ahmed', image: '/ijaz.jpeg', description: 'Supporting organizational growth.' },
-  { name: 'Khawaja Bilal Ahmed', image: '/bilal.jpeg', description: 'Dedicated to community welfare.' },
-  { name: 'Khawaja Adeel Tahir', image: '/adeel.jpeg', description: 'Contributing to organizational success.' },
-  { name: 'Khawaja Rizwan Waqar', image: '/rizwan.jpeg', description: 'Active member in community programs.' },
+  { name: 'Khawaja Mustafa Fazal', cast: 'Sehgal', image: '/mustafa.jpeg', description: 'Active contributor to community initiatives.' },
+  { name: 'Khawaja Masood Ahmed', cast: 'Qazi', image: '/masood.jpeg', description: 'Dedicated member serving the organization.' },
+  { name: 'Khawaja Irfan Munir', cast: 'Qazi', image: '/irfan.jpeg', description: 'Supporting organizational activities.' },
+  { name: 'Khawaja Junaid Ahmed', cast: 'Vohra', image: '/junaid.jpeg', description: 'Committed to community development.' },
+  { name: 'Khawaja Rehan Saeed', cast: 'Kapoor', image: '/rehan.jpeg', description: 'Contributing to welfare programs.' },
+  { name: 'Khawaja Abdul Mannan', cast: 'Vohra', image: '/adul-manan.jpeg', description: 'Active participant in community service.' },
+  { name: 'Khawaja Aijaz Ahmed', cast: 'Vohra', image: '/ijaz.jpeg', description: 'Supporting organizational growth.' },
+  { name: 'Khawaja Bilal Ahmed', cast: 'Roar', image: '/bilal.jpeg', description: 'Dedicated to community welfare.' },
+  { name: 'Khawaja Adeel Tahir', cast: 'Vohra', image: '/adeel.jpeg', description: 'Contributing to organizational success.' },
+  { name: 'Khawaja Rizwan Waqar', cast: 'Duggal', image: '/rizwan.jpeg', description: 'Active member in community programs.' },
 ]
 
 function PresidentCard() {
@@ -129,13 +135,14 @@ function PresidentCard() {
 
 interface MemberCardProps {
   name: string
+  cast?: string
   designation: string
   image?: string
   description?: string
   email?: string
 }
 
-function MemberCard({ name, designation, image, description, email }: MemberCardProps) {
+function MemberCard({ name, cast, designation, image, description, email }: MemberCardProps) {
   const [imageError, setImageError] = useState(false)
 
   const showFallback = !image || imageError
@@ -157,7 +164,7 @@ function MemberCard({ name, designation, image, description, email }: MemberCard
       </div>
       <div className="p-4 flex flex-col flex-1 bg-white">
         <h3 className="text-base font-bold text-foreground text-left">
-          {name}
+          {name}{cast && <span className="text-sm font-normal text-accent ml-1">({cast})</span>}
         </h3>
         <p className="text-sm font-semibold text-primary text-left mt-1">
           {designation}
@@ -207,11 +214,12 @@ export default function BoardOfMembersPage() {
                 <MemberCard
                   key={index}
                   name={member.name}
+                  cast={member.cast}
                   designation={member.designation}
                   image={member.image}
                   description={member.description}
                   email={member.email}
-                                  />
+                />
               ))}
             </div>
           </div>
@@ -229,10 +237,11 @@ export default function BoardOfMembersPage() {
                 <MemberCard
                   key={index}
                   name={member.name}
+                  cast={member.cast}
                   designation="Committee Member"
                   image={member.image}
                   description={member.description}
-                                  />
+                />
               ))}
             </div>
           </div>

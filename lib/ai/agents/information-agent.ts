@@ -65,7 +65,7 @@ export class InformationAgent {
   }
 
   private isBoardQuery(query: string): boolean {
-    const patterns = [/board/i, /member/i, /committee/i, /leader/i, /president/i, /ممبر/i]
+    const patterns = [/board/i, /member/i, /committee/i, /leader/i, /president/i, /secretary/i, /chairman/i, /ممبر/i, /صدر/i, /قیادت/i, /name/i, /nam/i, /kon/i, /kaun/i, /who/i]
     return patterns.some(pattern => pattern.test(query))
   }
 
@@ -128,8 +128,8 @@ export class InformationAgent {
   private getBoardInfo(language: Language): AgentResponse {
     const message =
       language === 'ur'
-        ? 'ہماری تنظیم کی قیادت ایک سرشار بورڈ کرتا ہے۔ تفصیلات "Board of Members" صفحہ پر دیکھیں۔'
-        : 'Our organization is led by a dedicated board. See the Board of Members page for details.'
+        ? `تنظیم خواجگان رجسٹرڈ کراچی کی قیادت:\n\n👑 صدر: خواجہ جاوید اقبال (President & Chairman)\n\nبورڈ ممبران:\n• خواجہ حاجی محمد احمد — Sr. Vice President\n• خواجہ محمد احمد — Vice President\n• خواجہ بابر حفیظ — General Secretary\n• ظفر جاوید خواجہ — Finance Secretary\n• خواجہ معتصب شریف — Joint Secretary\n• خواجہ حسیب مظہر — Social Secretary\n\nکمیٹی ممبران: خواجہ مصطفیٰ فضل، خواجہ مسعود احمد، خواجہ عرفان منیر، خواجہ جنید احمد، خواجہ ریحان سعید، خواجہ عبدالمنان، خواجہ اعجاز احمد، خواجہ بلال احمد، خواجہ عدیل طاہر، خواجہ رضوان وقار`
+        : `Tanzeem-e-Khawajgan Registered Karachi Leadership:\n\n👑 President: Khawaja Javed Iqbal (President & Chairman)\n\nBoard Members:\n• Khawaja Haji Muhammad Ahmed — Sr. Vice President\n• Khawaja Muhammad Ahmed — Vice President\n• Khawaja Babar Hafeez — General Secretary\n• Zafar Jawed Khawaja — Finance Secretary\n• Khawaja Mutayyab Shareef — Joint Secretary\n• Khawaja Haseeb Mazher — Social Secretary\n\nCommittee Members: Khawaja Mustafa Fazal, Khawaja Masood Ahmed, Khawaja Irfan Munir, Khawaja Junaid Ahmed, Khawaja Rehan Saeed, Khawaja Abdul Mannan, Khawaja Aijaz Ahmed, Khawaja Bilal Ahmed, Khawaja Adeel Tahir, Khawaja Rizwan Waqar`
 
     return {
       success: true,

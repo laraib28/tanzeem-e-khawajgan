@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
-import { inquirySchema } from '@/lib/forms/validation'
 import siteConfig from '@/config/site-config.json'
 
-const resend = new Resend(siteConfig.email.resendApiKey)
+const resend = new Resend(process.env.RESEND_API_KEY || siteConfig.email.resendApiKey)
 
-// Simple XSS sanitization function
 function sanitizeInput(input: string): string {
   return input
     .replace(/</g, '&lt;')
@@ -17,69 +15,67 @@ function sanitizeInput(input: string): string {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json()
+    const formData = await request.formData()
 
-    // Validate input data
-    const validationResult = inquirySchema.safeParse(body)
+    const name = formData.get('name') as string
+    const fatherName = formData.get('fatherName') as string
+    const membershipNo = formData.get('membershipNo') as string
+    const email = formData.get('email') as string
+    const course = formData.get('course') as string
+    const picture = formData.get('picture') as File | null
 
-    if (!validationResult.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Invalid form data',
-          fields: validationResult.error.flatten().fieldErrors,
-        },
-        { status: 400 }
-      )
+    if (!name || !fatherName || !email || !course) {
+      return NextResponse.json({ success: false, error: 'Required fields are missing.' }, { status: 400 })
     }
 
-    const { name, email, phone, course, message } = validationResult.data
+    if (!picture || picture.size === 0) {
+      return NextResponse.json({ success: false, error: 'Please upload your picture.' }, { status: 400 })
+    }
 
-    // Sanitize inputs to prevent XSS
-    const sanitizedData = {
+    const sanitized = {
       name: sanitizeInput(name),
+      fatherName: sanitizeInput(fatherName),
+      membershipNo: membershipNo ? sanitizeInput(membershipNo) : 'N/A',
       email: sanitizeInput(email),
-      phone: sanitizeInput(phone),
       course: sanitizeInput(course),
-      message: sanitizeInput(message),
     }
 
-    // Send email via Resend
+    // Convert picture to buffer for email attachment
+    const picBuffer = Buffer.from(await picture.arrayBuffer())
+    const picExt = picture.type.includes('png') ? 'png' : 'jpg'
+
     try {
       await resend.emails.send({
         from: siteConfig.email.fromEmail,
         to: siteConfig.email.adminEmail,
-        subject: `New IT Course Inquiry: ${sanitizedData.course}`,
+        subject: `New IT Course Inquiry: ${sanitized.course}`,
         html: `
-          <h2>New Course Inquiry</h2>
-          <p><strong>Name:</strong> ${sanitizedData.name}</p>
-          <p><strong>Email:</strong> ${sanitizedData.email}</p>
-          <p><strong>Phone:</strong> ${sanitizedData.phone}</p>
-          <p><strong>Course:</strong> ${sanitizedData.course}</p>
-          <p><strong>Message:</strong></p>
-          <p>${sanitizedData.message}</p>
+          <h2>New IT Course Enrollment Inquiry</h2>
+          <p><strong>Name:</strong> ${sanitized.name}</p>
+          <p><strong>Father's Name:</strong> ${sanitized.fatherName}</p>
+          <p><strong>Membership No:</strong> ${sanitized.membershipNo}</p>
+          <p><strong>Email:</strong> ${sanitized.email}</p>
+          <p><strong>Course:</strong> ${sanitized.course}</p>
+          <p><em>Picture attached below.</em></p>
         `,
+        attachments: [
+          {
+            filename: `applicant-${sanitized.name.replace(/\s+/g, '-')}.${picExt}`,
+            content: picBuffer,
+          },
+        ],
       })
 
-      return NextResponse.json({
-        success: true,
-        message: 'Inquiry submitted successfully',
-      })
+      return NextResponse.json({ success: true, message: 'Inquiry submitted successfully' })
     } catch {
       return NextResponse.json(
-        {
-          success: false,
-          error: 'Failed to send inquiry. Please try again later.',
-        },
+        { success: false, error: 'Failed to send inquiry. Please try again later.' },
         { status: 500 }
       )
     }
   } catch {
     return NextResponse.json(
-      {
-        success: false,
-        error: 'An error occurred while processing your request',
-      },
+      { success: false, error: 'An error occurred while processing your request.' },
       { status: 500 }
     )
   }

@@ -69,6 +69,8 @@ export function HeroSection({ description, ctaText }: HeroSectionProps) {
             <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold text-foreground leading-tight tracking-tight mb-5">
               Tanzeem-e-<br />
               <span className="text-primary">Khawajgan</span>
+              <br />
+              <span className="text-2xl md:text-3xl text-accent font-semibold">Registered Karachi</span>
             </h1>
 
             {/* Divider */}

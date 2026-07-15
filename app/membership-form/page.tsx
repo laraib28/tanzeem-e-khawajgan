@@ -242,7 +242,7 @@ export default function MembershipFormPage() {
     setSubmitMessage('')
 
     try {
-      const response = await fetch(`${BACKEND_URL}/submit-membership`, {
+      const response = await fetch(`/api/forms/membership`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

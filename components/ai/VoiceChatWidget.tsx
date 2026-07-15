@@ -130,7 +130,9 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
     if (!('speechSynthesis' in window)) { onEnd(); return }
     window.speechSynthesis.cancel()
     const utt = new SpeechSynthesisUtterance(text)
-    utt.lang = 'en-US'; utt.rate = 0.9
+    const hasUrdu = /[\u0600-\u06FF]/.test(text)
+    utt.lang = hasUrdu ? 'ur-PK' : 'en-US'
+    utt.rate = 0.9
     utt.onend = onEnd
     utt.onerror = onEnd
     window.speechSynthesis.speak(utt)
@@ -490,7 +492,7 @@ export function VoiceChatWidget({ onClose }: VoiceChatWidgetProps) {
                   }`}>
                     {msg.role === 'user' ? 'U' : 'AI'}
                   </div>
-                  <div className={`flex-1 p-2.5 rounded-lg text-sm whitespace-pre-wrap ${
+                  <div dir="auto" className={`flex-1 p-2.5 rounded-lg text-sm whitespace-pre-wrap ${
                     msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'
                   }`}>
                     {msg.content || (

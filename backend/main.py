@@ -335,8 +335,12 @@ def lookup_member(
 
     except Exception as e:
         print(f"[ERROR] membership_info table lookup: {e}")
-        db_errors.append(f"membership_info table: {e}")
+        # If membership_info table doesn't exist, treat as no results (not a fatal error)
+        err_str = str(e)
+        if "UndefinedTable" not in err_str and "does not exist" not in err_str:
+            db_errors.append(f"membership_info table: {e}")
 
+    # Only raise 500 for unexpected errors, not missing legacy table
     if db_errors:
         raise HTTPException(status_code=500, detail=f"Database error: {'; '.join(db_errors)}")
 

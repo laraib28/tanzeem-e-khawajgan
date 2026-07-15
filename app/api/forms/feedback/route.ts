@@ -3,7 +3,7 @@ import { Resend } from 'resend'
 import { feedbackSchema } from '@/lib/forms/validation'
 import siteConfig from '@/config/site-config.json'
 
-const resend = new Resend(siteConfig.email.resendApiKey)
+const resend = new Resend(process.env.RESEND_API_KEY || siteConfig.email.resendApiKey)
 
 // Simple rate limiting storage (in-memory)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
