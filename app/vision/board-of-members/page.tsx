@@ -28,7 +28,7 @@ const boardMembers = [
     name: 'Khawaja Muhammad Ahmed',
     cast: 'Mehta',
     designation: 'Vice President',
-    image: '/board-members/khawaja-muhammad-ahmed.jpg',
+    image: '/dr-ahmed.jpeg',
     description: 'Guiding organizational growth and community relations.',
     email: 'vp@tanzeem-e-khawjgan.org'
   },
