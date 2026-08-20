@@ -5,7 +5,6 @@ import servicesContent from '@/config/content/en/services.json'
 import {
   Clock,
   MapPin,
-  Phone,
   Stethoscope,
   Baby,
   Heart,
