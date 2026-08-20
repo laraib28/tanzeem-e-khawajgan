@@ -460,14 +460,6 @@ export default function MedicalServicePage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
                 <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Phone className="w-7 h-7 text-primary" />
-                </div>
-                <h3 className="font-bold text-foreground mb-2">Dr. Fabiha</h3>
-                <p className="text-foreground/60">0334-8277714</p>
-              </div>
-
-              <div className="bg-white p-6 rounded-xl shadow-lg text-center hover:shadow-xl transition-shadow">
-                <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Clock className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="font-bold text-foreground mb-2">OPD Hours</h3>

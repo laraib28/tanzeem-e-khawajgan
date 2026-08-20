@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://tanzeem-e-khawajgan.org',
+    url: 'https://khawajgan.com',
     siteName: 'Tanzeem-e-Khawajgan',
     title: 'Tanzeem-e-Khawajgan | Community Organization',
     description: 'Community-focused organization providing IT training, medical services, education programs, and more.',

@@ -11,7 +11,7 @@ const president = {
   image: '/javed.jpeg',
   description: 'Leading the organization with vision and dedication. Committed to excellence in community service and organizational growth.',
   message: 'Welcome to Tanzeem-e-Khawjgan. Our commitment is to serve the community with integrity, compassion, and excellence. Together, we strive to create opportunities and improve lives.',
-  email: 'president@tanzeem-e-khawjgan.org',
+  email: 'president@khawajgan.com',
   phone: '+92 XXX XXXXXXX'
 }
 
@@ -22,7 +22,7 @@ const boardMembers = [
     designation: 'Sr. Vice President',
     image: '/ahmed.jpeg',
     description: 'Supporting organizational leadership and strategic initiatives.',
-    email: 'srvp@tanzeem-e-khawjgan.org'
+    email: 'srvp@khawajgan.com'
   },
   {
     name: 'Khawaja Muhammad Ahmed',
@@ -30,7 +30,7 @@ const boardMembers = [
     designation: 'Vice President',
     image: '/dr-ahmed.jpeg',
     description: 'Guiding organizational growth and community relations.',
-    email: 'vp@tanzeem-e-khawjgan.org'
+    email: 'vp@khawajgan.com'
   },
   {
     name: 'Khawaja Babar Hafeez',
@@ -38,7 +38,7 @@ const boardMembers = [
     designation: 'General Secretary',
     image: '/baber.jpeg',
     description: 'Managing organizational operations and administrative affairs.',
-    email: 'secretary@tanzeem-e-khawjgan.org'
+    email: 'secretary@khawajgan.com'
   },
   {
     name: 'Zafar Jawed Khawaja',
@@ -46,7 +46,7 @@ const boardMembers = [
     designation: 'Finance Secretary',
     image: '/zafar.jpeg',
     description: 'Overseeing financial management and accountability.',
-    email: 'finance@tanzeem-e-khawjgan.org'
+    email: 'finance@khawajgan.com'
   },
   {
     name: 'Khawaja Mutayyab Shareef',
@@ -54,7 +54,7 @@ const boardMembers = [
     designation: 'Joint Secretary',
     image: '/mutayab.jpeg',
     description: 'Coordinating organizational activities and member engagement.',
-    email: 'joint@tanzeem-e-khawjgan.org'
+    email: 'joint@khawajgan.com'
   },
   {
     name: 'Khawaja Haseeb Mazher',
@@ -62,7 +62,7 @@ const boardMembers = [
     designation: 'Social Secretary',
     image: '/haseeb.jpeg',
     description: 'Leading social programs and community events.',
-    email: 'social@tanzeem-e-khawjgan.org'
+    email: 'social@khawajgan.com'
   },
 ]
 

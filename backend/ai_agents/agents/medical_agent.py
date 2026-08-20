@@ -56,7 +56,6 @@ Hijama:
 Lab:
 - Sindh Lab: Mon–Sat (10:30 AM – 8:00 PM)
 
-Contact (ONLY if asked): Dr. Fabiha 0334-8277714
 
 CRITICAL:
 - If requested medical information is not available, reply EXACTLY:

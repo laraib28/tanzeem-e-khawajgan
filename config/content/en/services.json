@@ -37,10 +37,6 @@
       "subtitle": "Quality healthcare services for the community"
     },
     "description": "Our medical center provides accessible, affordable healthcare services with experienced doctors and modern facilities. We offer a wide range of medical services including general OPD, specialist consultations, dental care, eye care, and laboratory services.",
-    "contact": {
-      "name": "Dr. Fabiha",
-      "phone": "0334-8277714"
-    },
     "doctors": [
       {
         "name": "Dr. Qurat Ul Ain",

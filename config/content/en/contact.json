@@ -18,7 +18,7 @@
     },
     "email": {
       "label": "Email",
-      "value": "info@tanzeem-e-khawajgan.org",
+      "value": "info@khawajgan.com",
       "icon": "📧"
     },
     "hours": {
@@ -32,8 +32,7 @@
     "list": [
       {
         "name": "Medical Center",
-        "contact": "Dr. Fabiha",
-        "phone": "0334-8277714",
+        "phone": "",
         "icon": "🏥"
       },
       {

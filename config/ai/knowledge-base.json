@@ -59,7 +59,7 @@
     "medical": {
       "name": "Medical Center",
       "description": "Quality healthcare services with experienced doctors and modern facilities.",
-      "contact": {"name": "Dr. Fabiha", "phone": "0334-8277714"},
+
       "doctors": [
         {"name": "Dr. Qurat Ul Ain", "specialty": "General OPD & Ultrasound", "days": "Mon–Fri", "timing": "11:00 am – 1:00 pm"},
         {"name": "Dr. Farzana", "specialty": "Child OPD", "days": "Mon, Wed, Fri", "timing": "10:30 am – 12:30 pm"},

@@ -28,8 +28,8 @@
   },
   "email": {
     "resendApiKey": "RESEND_API_KEY_HERE",
-    "fromEmail": "noreply@tanzeem-e-khawajgan.org",
-    "adminEmail": "admin@tanzeem-e-khawajgan.org"
+    "fromEmail": "noreply@khawajgan.com",
+    "adminEmail": "admin@khawajgan.com"
   },
   "ai": {
     "sessionTTL": 1800,
